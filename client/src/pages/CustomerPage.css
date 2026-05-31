@@ -320,6 +320,20 @@
   display: inline-block; margin-bottom: 18px; letter-spacing: 2px;
 }
 .success-msg { font-size: 15px; color: var(--cream-2); line-height: 1.8; margin-bottom: 28px; }
+.whatsapp-btn {
+  display: block; width: 100%;
+  background: #25D366; color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 17px; font-weight: 800;
+  text-align: center; text-decoration: none;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 18px rgba(37,211,102,.3);
+  transition: background .15s, transform .1s;
+}
+.whatsapp-btn:hover  { background: #1ebe5d; }
+.whatsapp-btn:active { transform: scale(.98); }
+
 .success-btn {
   background: transparent; color: var(--cream-2);
   border: 1.5px solid var(--border); border-radius: var(--radius-sm);
