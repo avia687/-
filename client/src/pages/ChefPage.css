@@ -60,6 +60,16 @@
   display: flex; justify-content: space-between; align-items: center;
   border-top: 1px solid #F0F0F0; padding-top: 14px;
 }
+.chef-actions { display: flex; gap: 8px; }
+.wa-notify-btn {
+  background: #25D366; color: #fff;
+  border-radius: 9px; padding: 11px 16px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none;
+  display: flex; align-items: center;
+  transition: background .15s;
+}
+.wa-notify-btn:hover { background: #1ebe5d; }
 .chef-total { font-size: 18px; font-weight: 800; color: #1A1A1A; }
 
 .ready-btn {
