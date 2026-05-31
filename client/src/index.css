@@ -1,37 +1,37 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:           #F5F5F5;
-  --white:        #FFFFFF;
-  --black:        #111111;
-  --text:         #1A1A1A;
-  --secondary:    #555555;
-  --muted:        #888888;
-  --accent:       #C8440A;
-  --accent-soft:  #FFF0EB;
-  --border:       #E2E2E2;
-  --shadow-sm:    0 1px 4px rgba(0,0,0,0.07);
-  --shadow-md:    0 2px 16px rgba(0,0,0,0.10);
-  --shadow-lg:    0 8px 40px rgba(0,0,0,0.13);
-  --green:        #1A6E38;
-  --radius:       14px;
-  --radius-sm:    9px;
+  --bg:          #0C0C0C;
+  --card:        #161616;
+  --card2:       #1E1E1E;
+  --gold:        #C9963A;
+  --gold-l:      #E2B05A;
+  --gold-pale:   rgba(201,150,58,.1);
+  --gold-border: rgba(201,150,58,.22);
+  --cream:       #F0E8D8;
+  --cream-2:     #B8A888;
+  --green:       #237A42;
+  --green-glow:  rgba(35,122,66,.3);
+  --red:         #B03030;
+  --border:      rgba(255,255,255,.07);
+  --radius:      16px;
+  --radius-sm:   10px;
 }
 
 html, body {
   direction: rtl;
   font-family: -apple-system, 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
   background: var(--bg);
-  color: var(--text);
+  color: var(--cream);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  font-size: 16px;
 }
 
 button { cursor: pointer; font-family: inherit; border: none; outline: none; }
 input  { font-family: inherit; outline: none; }
 
-@keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
-@keyframes slideUp  { from { transform: translateY(100%) } to { transform: translateY(0) } }
-@keyframes spin     { to { transform: rotate(360deg) } }
-@keyframes scaleIn  { from { transform: scale(.94); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+@keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
+@keyframes slideUp  { from { transform:translateY(100%) } to { transform:translateY(0) } }
+@keyframes spin     { to { transform:rotate(360deg) } }
+@keyframes scaleIn  { from { opacity:0; transform:scale(.93) } to { opacity:1; transform:scale(1) } }
