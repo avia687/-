@@ -104,20 +104,37 @@ export default function CustomerPage() {
     finally  { setLoading(false); }
   }
 
-  if (orderId) return (
-    <div className="success-wrap">
-      <div className="success-card">
-        <span className="success-check">✓</span>
-        <h2 className="success-title">ההזמנה נשלחה!</h2>
-        <div className="success-num">#{orderId}</div>
-        <p className="success-msg">נשלח לך הודעה בוואטסאפ<br/>כשהאוכל מוכן</p>
-        <button className="success-btn"
-          onClick={() => { setCart([]); setName(''); setPhone(''); setOrderId(null); }}>
-          הזמנה חדשה
-        </button>
+  if (orderId) {
+    const waText = [
+      `הזמנה חדשה! 🛵 #${orderId}`,
+      ``,
+      `שם: ${name}`,
+      `טלפון: ${phone}`,
+      ``,
+      ...cart.map(i => `• ${i.name}${i.extras.length ? ' - ' + i.extras.join(', ') : ''}: ${i.price}₪`),
+      ``,
+      `סה״כ: ${total}₪`
+    ].join('\n');
+    const waUrl = `https://wa.me/972545414123?text=${encodeURIComponent(waText)}`;
+
+    return (
+      <div className="success-wrap">
+        <div className="success-card">
+          <span className="success-check">✓</span>
+          <h2 className="success-title">ההזמנה מוכנה!</h2>
+          <div className="success-num">#{orderId}</div>
+          <p className="success-msg">לחץ על הכפתור כדי לשלוח<br/>את ההזמנה לשף בוואטסאפ</p>
+          <a href={waUrl} className="whatsapp-btn" target="_blank" rel="noopener noreferrer">
+            שלח הזמנה לשף 📲
+          </a>
+          <button className="success-btn"
+            onClick={() => { setCart([]); setName(''); setPhone(''); setOrderId(null); }}>
+            הזמנה חדשה
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="page">
