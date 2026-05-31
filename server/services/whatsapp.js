@@ -36,6 +36,7 @@ function buildOrderMessage(order) {
 }
 
 async function sendOrderToChefs(order) {
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) return;
   const client = getClient();
   const message = buildOrderMessage(order);
   const from = `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}`;
@@ -55,6 +56,7 @@ async function sendOrderToChefs(order) {
 }
 
 async function sendReadyToCustomer(order) {
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) return;
   const client = getClient();
   const message = [
     `✅ ההזמנה שלך מוכנה!`,
