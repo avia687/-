@@ -1,83 +1,37 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:           #0C0C0C;
-  --bg-card:      #161616;
-  --bg-card-2:    #1F1F1F;
-  --gold:         #C9963A;
-  --gold-light:   #E8B84B;
-  --gold-pale:    rgba(201,150,58,0.12);
-  --gold-border:  rgba(201,150,58,0.25);
-  --cream:        #F5ECD7;
-  --cream-muted:  #9A8B77;
+  --bg:           #F5F5F5;
   --white:        #FFFFFF;
-  --green:        #2A7A47;
-  --green-glow:   rgba(42,122,71,0.35);
-  --red:          #B03A2E;
-  --shadow:       0 4px 30px rgba(0,0,0,0.5);
-  --shadow-gold:  0 0 30px rgba(201,150,58,0.2);
-  --radius:       20px;
-  --radius-sm:    12px;
+  --black:        #111111;
+  --text:         #1A1A1A;
+  --secondary:    #555555;
+  --muted:        #888888;
+  --accent:       #C8440A;
+  --accent-soft:  #FFF0EB;
+  --border:       #E2E2E2;
+  --shadow-sm:    0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md:    0 2px 16px rgba(0,0,0,0.10);
+  --shadow-lg:    0 8px 40px rgba(0,0,0,0.13);
+  --green:        #1A6E38;
+  --radius:       14px;
+  --radius-sm:    9px;
 }
 
 html, body {
   direction: rtl;
-  font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+  font-family: -apple-system, 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
   background: var(--bg);
-  color: var(--cream);
+  color: var(--text);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  font-size: 16px;
 }
 
 button { cursor: pointer; font-family: inherit; border: none; outline: none; }
 input  { font-family: inherit; outline: none; }
 
-/* ── Animations ── */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: 1; transform: scale(1);    }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0);   }
-  50%       { transform: translateY(-7px); }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-
-@keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201,150,58,0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(201,150,58,0);  }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes checkPop {
-  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
-  60%  { transform: scale(1.2) rotate(5deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0deg);   opacity: 1; }
-}
+@keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp  { from { transform: translateY(100%) } to { transform: translateY(0) } }
+@keyframes spin     { to { transform: rotate(360deg) } }
+@keyframes scaleIn  { from { transform: scale(.94); opacity: 0 } to { transform: scale(1); opacity: 1 } }
