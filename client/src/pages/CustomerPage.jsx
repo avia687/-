@@ -1,28 +1,22 @@
 import { useState } from 'react';
 import './CustomerPage.css';
 
-const MENU = [
+const FOOD = [
   {
-    id: 'toast',
-    name: 'טוסט',
-    icon: '🥪',
-    basePrice: 26,
+    id: 'toast', name: 'טוסט', icon: '🥪', basePrice: 26,
     desc: 'רוטב פיצה · גבינה צהובה',
-    note: 'תוספת ראשונה כלולה · כל תוספת נוספת 2₪',
+    note: 'תוספת ראשונה כלולה · כל תוספת נוספת +2₪',
     toppings: [
-      { id: 'tomato',    name: 'עגבניה',  free: false },
-      { id: 'onion',     name: 'בצל',     free: false },
-      { id: 'olives',    name: 'זיתים',   free: false },
-      { id: 'mushrooms', name: 'פטריות',  free: false },
-      { id: 'pesto',     name: 'פסטו',    free: false },
-      { id: 'spicy',     name: 'חריף',    free: true  },
+      { id: 'tomato',    name: 'עגבניה', free: false },
+      { id: 'onion',     name: 'בצל',    free: false },
+      { id: 'olives',    name: 'זיתים',  free: false },
+      { id: 'mushrooms', name: 'פטריות', free: false },
+      { id: 'pesto',     name: 'פסטו',   free: false },
+      { id: 'spicy',     name: 'חריף',   free: true  },
     ]
   },
   {
-    id: 'omelette',
-    name: 'חביתה',
-    icon: '🍳',
-    basePrice: 28,
+    id: 'omelette', name: 'חביתה', icon: '🍳', basePrice: 28,
     desc: 'חביתה טרייה',
     note: 'כל הירקות כלולים במחיר',
     vegetables: [
@@ -36,30 +30,44 @@ const MENU = [
   }
 ];
 
+// drinks with sizes: can 8₪ / bottle 10₪
+// drinks without sizes: fixed price
+const DRINKS = [
+  { id: 'coke',         name: 'קולה',        bg: '#CC0000', sizes: true  },
+  { id: 'coke-zero',    name: 'קולה זירו',   bg: '#111111', sizes: true  },
+  { id: 'fanta',        name: 'פאנטה',       bg: '#E55A00', sizes: true  },
+  { id: 'sprite',       name: 'ספרייט',      bg: '#007A33', sizes: true  },
+  { id: 'water-grape',  name: 'מים ענבים',   bg: '#5B2D8E', price: 10, sizes: false },
+  { id: 'water-peach',  name: 'מים אפרסק',   bg: '#D4660A', price: 10, sizes: false },
+  { id: 'excel',        name: 'אקסל',        bg: '#1A4FA0', price: 7,  sizes: false },
+  { id: 'excel-black',  name: 'אקסל שחור',   bg: '#1A1A1A', price: 7,  sizes: false },
+  { id: 'excel-blue',   name: 'אקסל בלו',    bg: '#0A7EC2', price: 7,  sizes: false },
+];
+
 function calcToastPrice(sel) {
   return 26 + Math.max(0, sel.filter(id => id !== 'spicy').length - 1) * 2;
 }
 
 export default function CustomerPage() {
-  const [modal,      setModal]      = useState(null);
-  const [toastSel,   setToastSel]   = useState([]);
-  const [omlSel,     setOmlSel]     = useState([]);
-  const [cart,       setCart]       = useState([]);
-  const [name,       setName]       = useState('');
-  const [phone,      setPhone]      = useState('');
-  const [loading,    setLoading]    = useState(false);
-  const [error,      setError]      = useState('');
-  const [orderId,    setOrderId]    = useState(null);
+  const [modal,   setModal]   = useState(null);
+  const [toastSel, setToastSel] = useState([]);
+  const [omlSel,  setOmlSel]  = useState([]);
+  const [cart,    setCart]    = useState([]);
+  const [name,    setName]    = useState('');
+  const [phone,   setPhone]   = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState('');
+  const [orderId, setOrderId] = useState(null);
 
   const total = cart.reduce((s, i) => s + i.price, 0);
 
   function openModal(item) { setModal(item); setToastSel([]); setOmlSel([]); }
 
-  function toggle(id, sel, setSel) {
-    setSel(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  function toggle(id, sel, set) {
+    set(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   }
 
-  function addToCart() {
+  function addFood() {
     if (modal.id === 'toast') {
       const extras = toastSel.map(id => modal.toppings.find(t => t.id === id)?.name).filter(Boolean);
       setCart(p => [...p, { uid: Date.now(), name: 'טוסט', extras, price: calcToastPrice(toastSel) }]);
@@ -70,16 +78,21 @@ export default function CustomerPage() {
     setModal(null);
   }
 
+  function addDrink(drink, size, price) {
+    const name = size ? `${drink.name} ${size}` : drink.name;
+    setCart(p => [...p, { uid: Date.now(), name, extras: [], price }]);
+  }
+
   async function submit() {
-    if (!name.trim())                                         { setError('נא להכניס שם'); return; }
-    if (!/^0[0-9]{9}$/.test(phone.replace(/[-\s]/g, '')))    { setError('מספר טלפון לא תקין'); return; }
+    if (!name.trim())                                       { setError('נא להכניס שם'); return; }
+    if (!/^0[0-9]{9}$/.test(phone.replace(/[-\s]/g, ''))) { setError('מספר טלפון לא תקין'); return; }
     setError(''); setLoading(true);
     try {
       const res  = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerName: name.trim(),
+          customerName:  name.trim(),
           customerPhone: phone.replace(/[-\s]/g, ''),
           items: cart.map(i => ({ name: i.name, extras: i.extras, price: i.price })),
           total
@@ -98,7 +111,8 @@ export default function CustomerPage() {
         <h2 className="success-title">ההזמנה נשלחה!</h2>
         <div className="success-num">#{orderId}</div>
         <p className="success-msg">נשלח לך הודעה בוואטסאפ<br/>כשהאוכל מוכן</p>
-        <button className="success-btn" onClick={() => { setCart([]); setName(''); setPhone(''); setOrderId(null); }}>
+        <button className="success-btn"
+          onClick={() => { setCart([]); setName(''); setPhone(''); setOrderId(null); }}>
           הזמנה חדשה
         </button>
       </div>
@@ -107,27 +121,30 @@ export default function CustomerPage() {
 
   return (
     <div className="page">
+
+      {/* Header */}
       <header className="header">
-        <div className="header-inner">
-          <div className="header-logo">ה<span>קרון</span></div>
-          <span className="header-tag">אוכל רחוב</span>
-        </div>
+        <div className="header-glow" />
+        <span className="header-icon">🚐</span>
+        <h1 className="header-title">הקרון</h1>
       </header>
 
       <main className="main">
+
+        {/* Food */}
         <section className="section">
-          <p className="section-label">התפריט</p>
-          <div className="menu-grid">
-            {MENU.map(item => (
-              <div key={item.id} className="menu-card">
-                <div className="menu-card-left">
-                  <span className="menu-item-icon">{item.icon}</span>
-                  <div className="menu-item-name">{item.name}</div>
-                  <div className="menu-item-desc">{item.desc}</div>
-                  <div className="menu-item-note">{item.note}</div>
+          <p className="section-label">אוכל</p>
+          <div className="food-grid">
+            {FOOD.map((item, i) => (
+              <div key={item.id} className="food-card" style={{ animationDelay: `${i * 0.12}s` }}>
+                <span className="food-icon">{item.icon}</span>
+                <div className="food-body">
+                  <h3 className="food-name">{item.name}</h3>
+                  <p className="food-desc">{item.desc}</p>
+                  <p className="food-note">{item.note}</p>
                 </div>
-                <div className="menu-card-right">
-                  <span className="menu-item-price">{item.basePrice}₪</span>
+                <div className="food-right">
+                  <span className="food-price">{item.basePrice}₪</span>
                   <button className="add-btn" onClick={() => openModal(item)}>הוסף +</button>
                 </div>
               </div>
@@ -135,38 +152,64 @@ export default function CustomerPage() {
           </div>
         </section>
 
+        {/* Drinks */}
+        <section className="section">
+          <p className="section-label">שתייה</p>
+          <div className="drinks-grid">
+            {DRINKS.map(d => (
+              <div key={d.id} className="drink-card">
+                <div className="drink-dot" style={{ background: d.bg }} />
+                <span className="drink-name">{d.name}</span>
+                {d.sizes ? (
+                  <div className="drink-sizes">
+                    <button className="drink-btn" onClick={() => addDrink(d, 'פחית', 8)}>
+                      <span>פחית</span><strong>8₪</strong>
+                    </button>
+                    <button className="drink-btn" onClick={() => addDrink(d, 'בקבוק', 10)}>
+                      <span>בקבוק</span><strong>10₪</strong>
+                    </button>
+                  </div>
+                ) : (
+                  <button className="drink-add" onClick={() => addDrink(d, null, d.price)}>
+                    {d.price}₪ +
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Cart */}
         {cart.length > 0 && (
           <section className="section">
-            <p className="section-label">הזמנה</p>
-            <div className="cart-section">
-              <div className="cart-header">פריטים שנבחרו</div>
-
+            <p className="section-label">ההזמנה שלי</p>
+            <div className="cart-box">
               {cart.map(item => (
-                <div key={item.uid} className="cart-item">
-                  <div className="cart-item-info">
-                    <div className="cart-item-name">{item.name}</div>
+                <div key={item.uid} className="cart-row">
+                  <div className="cart-info">
+                    <span className="cart-name">{item.name}</span>
                     {item.extras.length > 0 &&
-                      <div className="cart-item-extras">{item.extras.join(', ')}</div>}
+                      <span className="cart-extras">{item.extras.join(' · ')}</span>}
                   </div>
-                  <div className="cart-item-right">
-                    <span className="cart-item-price">{item.price}₪</span>
-                    <button className="remove-btn" onClick={() => setCart(p => p.filter(i => i.uid !== item.uid))}>✕</button>
-                  </div>
+                  <span className="cart-price">{item.price}₪</span>
+                  <button className="del-btn"
+                    onClick={() => setCart(p => p.filter(i => i.uid !== item.uid))}>✕</button>
                 </div>
               ))}
-
-              <div className="total-row">
-                <span className="total-label">סה"כ לתשלום</span>
-                <span className="total-price">{total}₪</span>
+              <div className="cart-total">
+                <span>סה"כ</span>
+                <span className="cart-total-price">{total}₪</span>
               </div>
 
-              <div className="form-section">
-                <p className="form-title">לאן לשלוח הודעה?</p>
-                <input className="input" type="text" placeholder="שם" value={name} onChange={e => setName(e.target.value)} />
-                <input className="input" type="tel"  placeholder="מספר טלפון" value={phone} onChange={e => setPhone(e.target.value)} dir="ltr" />
-                {error && <p className="error-msg">{error}</p>}
+              <div className="form">
+                <p className="form-label">לאן לשלוח הודעה כשמוכן?</p>
+                <input className="inp" type="text" placeholder="שם" value={name}
+                  onChange={e => setName(e.target.value)} />
+                <input className="inp" type="tel" placeholder="מספר טלפון" value={phone}
+                  onChange={e => setPhone(e.target.value)} dir="ltr" />
+                {error && <p className="err">{error}</p>}
                 <button className="submit-btn" onClick={submit} disabled={loading}>
-                  {loading ? <span className="spinner" /> : `שלח הזמנה · ${total}₪`}
+                  {loading ? <span className="spin" /> : `שלח הזמנה · ${total}₪`}
                 </button>
               </div>
             </div>
@@ -174,49 +217,49 @@ export default function CustomerPage() {
         )}
       </main>
 
+      {/* Modal */}
       {modal && (
         <div className="overlay" onClick={() => setModal(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-handle" />
+            <div className="modal-bar" />
             <button className="close-btn" onClick={() => setModal(null)}>✕</button>
-
-            <span className="modal-item-icon">{modal.icon}</span>
+            <span className="modal-icon">{modal.icon}</span>
             <h3 className="modal-title">{modal.name}</h3>
 
             {modal.id === 'toast' && (<>
-              <p className="modal-subtitle">בחר תוספות</p>
+              <p className="modal-sub">בחר תוספות</p>
               <p className="modal-note">תוספת ראשונה כלולה · חריף תמיד בחינם</p>
               <div className="topping-grid">
                 {modal.toppings.map(t => (
                   <button key={t.id}
-                    className={`topping-btn ${toastSel.includes(t.id) ? 'topping-btn--active' : ''}`}
+                    className={`top-btn ${toastSel.includes(t.id) ? 'top-btn--on' : ''}`}
                     onClick={() => toggle(t.id, toastSel, setToastSel)}>
                     {t.name}
                     {t.free && <span className="free-tag">חינם</span>}
                   </button>
                 ))}
               </div>
-              <div className="modal-footer">
+              <div className="modal-foot">
                 <span className="modal-price">{calcToastPrice(toastSel)}₪</span>
-                <button className="modal-add-btn" onClick={addToCart}>הוסף להזמנה</button>
+                <button className="modal-add" onClick={addFood}>הוסף להזמנה</button>
               </div>
             </>)}
 
             {modal.id === 'omelette' && (<>
-              <p className="modal-subtitle">ירקות לבחירה</p>
+              <p className="modal-sub">ירקות לבחירה</p>
               <p className="modal-note">הכל כלול במחיר</p>
               <div className="topping-grid">
                 {modal.vegetables.map(v => (
                   <button key={v.id}
-                    className={`topping-btn ${omlSel.includes(v.id) ? 'topping-btn--active' : ''}`}
+                    className={`top-btn ${omlSel.includes(v.id) ? 'top-btn--on' : ''}`}
                     onClick={() => toggle(v.id, omlSel, setOmlSel)}>
                     {v.name}
                   </button>
                 ))}
               </div>
-              <div className="modal-footer">
+              <div className="modal-foot">
                 <span className="modal-price">28₪</span>
-                <button className="modal-add-btn" onClick={addToCart}>הוסף להזמנה</button>
+                <button className="modal-add" onClick={addFood}>הוסף להזמנה</button>
               </div>
             </>)}
           </div>
