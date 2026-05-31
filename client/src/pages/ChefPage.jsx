@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import './ChefPage.css';
 
+function toWaPhone(phone) {
+  const d = phone.replace(/\D/g, '');
+  return d.startsWith('0') ? '972' + d.slice(1) : d;
+}
+
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
   if (diff < 60) return `${diff} שנ\'`;
@@ -91,15 +96,23 @@ export default function ChefPage() {
 
                 <div className="chef-footer">
                   <span className="chef-total">סה"כ {order.total}₪</span>
-                  <button
-                    className={`ready-btn ${completing === order.id ? 'ready-btn--loading' : ''}`}
-                    onClick={() => markReady(order.id)}
-                    disabled={completing === order.id}
-                  >
-                    {completing === order.id
-                      ? <span className="spinner" />
-                      : '✓ מוכן'}
-                  </button>
+                  <div className="chef-actions">
+                    <a
+                      href={`https://wa.me/${toWaPhone(order.customerPhone)}?text=${encodeURIComponent('ההזמנה שלך מוכנה! 🎉\nהקרון — הזמנה #' + order.id)}`}
+                      className="wa-notify-btn"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      💬 שלח מוכן
+                    </a>
+                    <button
+                      className={`ready-btn ${completing === order.id ? 'ready-btn--loading' : ''}`}
+                      onClick={() => markReady(order.id)}
+                      disabled={completing === order.id}
+                    >
+                      {completing === order.id ? <span className="spinner" /> : '✓ סיים'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
