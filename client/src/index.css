@@ -1,0 +1,46 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --orange: #E8622A;
+  --orange-light: #F47B45;
+  --orange-pale: #FFF0E6;
+  --orange-border: #F5C9A8;
+  --dark: #1E1209;
+  --text: #2D1A0E;
+  --muted: #7A5840;
+  --bg: #FFFAF6;
+  --white: #FFFFFF;
+  --green: #2D8A4E;
+  --green-light: #E8F5ED;
+  --red: #C0392B;
+  --red-light: #FDECEA;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+html, body {
+  direction: rtl;
+  font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
+
+input {
+  font-family: inherit;
+  outline: none;
+}
