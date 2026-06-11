@@ -89,6 +89,7 @@ export default function CustomerPage() {
   const [cart,    setCart]    = useState([]);
   const [name,    setName]    = useState('');
   const [phone,   setPhone]   = useState('');
+  const [payment, setPayment] = useState('');
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
   const [orderId, setOrderId] = useState(null);
@@ -128,6 +129,7 @@ export default function CustomerPage() {
   async function submit() {
     if (!name.trim())                                       { setError('נא להכניס שם'); return; }
     if (!/^0[0-9]{9}$/.test(phone.replace(/[-\s]/g, ''))) { setError('מספר טלפון לא תקין'); return; }
+    if (!payment)                                           { setError('נא לבחור אמצעי תשלום'); return; }
     setError(''); setLoading(true);
     try {
       const res  = await fetch('/api/orders', {
@@ -137,7 +139,8 @@ export default function CustomerPage() {
           customerName:  name.trim(),
           customerPhone: phone.replace(/[-\s]/g, ''),
           items: cart.map(i => ({ name: i.name, extras: i.extras, price: i.price })),
-          total
+          total,
+          payment
         })
       });
       const data = await res.json();
@@ -147,11 +150,13 @@ export default function CustomerPage() {
   }
 
   if (orderId) {
+    const paymentEmoji = { 'פיבוקס': '💙', 'ביט': '🟠', 'מזומן': '💵' }[payment] || '';
     const waText = [
       `הזמנה חדשה! 🛵 #${orderId}`,
       ``,
       `שם: ${name}`,
       `טלפון: ${phone}`,
+      `תשלום: ${paymentEmoji} ${payment}`,
       ``,
       ...cart.map(i => `• ${i.name}${i.extras.length ? ' - ' + i.extras.join(', ') : ''}: ${i.price}₪`),
       ``,
@@ -266,6 +271,24 @@ export default function CustomerPage() {
                   onChange={e => setName(e.target.value)} />
                 <input className="inp" type="tel" placeholder="מספר טלפון" value={phone}
                   onChange={e => setPhone(e.target.value)} dir="ltr" />
+
+                <p className="form-label" style={{marginTop:'14px'}}>אמצעי תשלום</p>
+                <div className="payment-grid">
+                  {[
+                    { id: 'פיבוקס', emoji: '💙', color: '#1565C0' },
+                    { id: 'ביט',    emoji: '🟠', color: '#E65100' },
+                    { id: 'מזומן',  emoji: '💵', color: '#2E7D32' },
+                  ].map(p => (
+                    <button key={p.id}
+                      className={`payment-btn ${payment === p.id ? 'payment-btn--on' : ''}`}
+                      style={payment === p.id ? { '--pay-color': p.color } : {}}
+                      onClick={() => setPayment(p.id)}>
+                      <span className="payment-emoji">{p.emoji}</span>
+                      <span className="payment-label">{p.id}</span>
+                    </button>
+                  ))}
+                </div>
+
                 {error && <p className="err">{error}</p>}
                 <button className="submit-btn" onClick={submit} disabled={loading}>
                   {loading ? <span className="spin" /> : `שלח הזמנה · ${total}₪`}
