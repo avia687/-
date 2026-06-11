@@ -36,6 +36,19 @@ const FOOD = [
     id: 'mushroom-omelette', name: 'חביתת פטריות', icon: '🍄', basePrice: 31,
     desc: 'חביתה עם פטריות',
   },
+  {
+    id: 'cream-cheese', name: 'סנדביץ גבינת שמנת', icon: '🥖', basePrice: 25,
+    desc: 'גבינת שמנת טרייה',
+    note: 'כל הירקות כלולים במחיר',
+    vegetables: [
+      { id: 'tomato',   name: 'עגבניה' },
+      { id: 'cucumber', name: 'מלפפון' },
+      { id: 'lettuce',  name: 'חסה'    },
+      { id: 'onion',    name: 'בצל'    },
+      { id: 'olives',   name: 'זיתים'  },
+      { id: 'pickles',  name: 'חמוצים' },
+    ]
+  },
 ];
 
 // drinks with sizes: can 8₪ / bottle 10₪
