@@ -44,6 +44,22 @@ const menuItems = [
     emoji: '🍄',
     basePrice: 31,
     description: 'חביתה עם פטריות'
+  },
+  {
+    id: 'cream-cheese',
+    name: 'סנדביץ גבינת שמנת',
+    emoji: '🥖',
+    basePrice: 25,
+    description: 'גבינת שמנת טרייה',
+    priceNote: 'כל הירקות כלולים במחיר',
+    vegetables: [
+      { id: 'tomato',   name: 'עגבניה' },
+      { id: 'cucumber', name: 'מלפפון' },
+      { id: 'lettuce',  name: 'חסה'    },
+      { id: 'onion',    name: 'בצל'    },
+      { id: 'olives',   name: 'זיתים'  },
+      { id: 'pickles',  name: 'חמוצים' }
+    ]
   }
 ];
 
