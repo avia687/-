@@ -415,6 +415,47 @@
   box-shadow: 0 0 0 3px rgba(201,150,58,.12);
 }
 
+/* ── Payment ── */
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.payment-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border2);
+  background: var(--card2);
+  transition: border-color .15s, background .15s, transform .15s, box-shadow .15s;
+}
+.payment-btn:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.payment-btn:active { transform: scale(.96); }
+
+.payment-btn--on {
+  border-color: var(--pay-color, var(--gold));
+  background: color-mix(in srgb, var(--pay-color, var(--gold)) 12%, var(--card2));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--pay-color, var(--gold)) 30%, transparent);
+  transform: translateY(-2px);
+}
+
+.payment-emoji { font-size: 26px; }
+.payment-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cream);
+  letter-spacing: .3px;
+}
+.payment-btn--on .payment-label { color: #fff; }
+
 .err {
   font-size: 13px;
   color: #E06060;
