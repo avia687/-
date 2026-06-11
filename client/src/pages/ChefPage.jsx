@@ -83,7 +83,7 @@ export default function ChefPage() {
                   <span className="chef-phone">📞 {order.customerPhone}</span>
                   {order.payment && (
                     <span className="chef-payment">
-                      {{ 'פיבוקס': '💙', 'ביט': '🟠', 'מזומן': '💵' }[order.payment] || '💳'} {order.payment}
+                      {{ 'פיבוקס': '💙', 'ביט': '🔵', 'מזומן': '💵' }[order.payment] || '💳'} {order.payment}
                     </span>
                   )}
                 </div>
