@@ -1,21 +1,30 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:          #0C0C0C;
-  --card:        #161616;
-  --card2:       #1E1E1E;
+  --bg:          #080808;
+  --bg2:         #0E0E0E;
+  --card:        #111111;
+  --card2:       #191919;
+  --card3:       #202020;
   --gold:        #C9963A;
-  --gold-l:      #E2B05A;
-  --gold-pale:   rgba(201,150,58,.1);
-  --gold-border: rgba(201,150,58,.22);
-  --cream:       #F0E8D8;
-  --cream-2:     #B8A888;
-  --green:       #237A42;
-  --green-glow:  rgba(35,122,66,.3);
+  --gold-l:      #E8B96A;
+  --gold-ll:     #F5D08A;
+  --gold-pale:   rgba(201,150,58,.08);
+  --gold-pale2:  rgba(201,150,58,.15);
+  --gold-border: rgba(201,150,58,.18);
+  --gold-border2:rgba(201,150,58,.35);
+  --cream:       #F2EAD8;
+  --cream-2:     #A89878;
+  --cream-3:     #786858;
+  --green:       #1E7A40;
+  --green-l:     #25D366;
+  --green-glow:  rgba(30,122,64,.4);
   --red:         #B03030;
-  --border:      rgba(255,255,255,.07);
-  --radius:      16px;
-  --radius-sm:   10px;
+  --border:      rgba(255,255,255,.06);
+  --border2:     rgba(255,255,255,.1);
+  --radius:      18px;
+  --radius-sm:   12px;
+  --radius-xs:   8px;
 }
 
 html, body {
@@ -25,13 +34,51 @@ html, body {
   color: var(--cream);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 button { cursor: pointer; font-family: inherit; border: none; outline: none; }
 input  { font-family: inherit; outline: none; }
 
-@keyframes fadeInUp { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+/* ── Keyframes ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 @keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
 @keyframes slideUp  { from { transform:translateY(100%) } to { transform:translateY(0) } }
+@keyframes scaleIn  { from { opacity:0; transform:scale(.92) } to { opacity:1; transform:scale(1) } }
 @keyframes spin     { to { transform:rotate(360deg) } }
-@keyframes scaleIn  { from { opacity:0; transform:scale(.93) } to { opacity:1; transform:scale(1) } }
+@keyframes shimmer  {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes pulse    {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .55; }
+}
+@keyframes floatBubble {
+  0%   { transform: translateY(0) scale(1);   opacity: .18; }
+  50%  { transform: translateY(-30px) scale(1.1); opacity: .28; }
+  100% { transform: translateY(0) scale(1);   opacity: .18; }
+}
+@keyframes headerGlow {
+  0%, 100% { opacity: .6; }
+  50%       { opacity: 1; }
+}
+@keyframes cartSlideIn {
+  from { opacity: 0; transform: translateY(16px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes successPop {
+  0%   { opacity: 0; transform: scale(.7) rotate(-8deg); }
+  70%  { transform: scale(1.12) rotate(3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes ripple {
+  to { transform: scale(2.5); opacity: 0; }
+}

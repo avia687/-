@@ -3,6 +3,10 @@ import './CustomerPage.css';
 
 const FOOD = [
   {
+    id: 'omelette', name: 'חביתה', icon: '🍳', basePrice: 28,
+    desc: 'חביתה טרייה',
+  },
+  {
     id: 'toast', name: 'טוסט', icon: '🥪', basePrice: 26,
     desc: 'רוטב פיצה · גבינה צהובה',
     note: 'תוספת ראשונה כלולה · כל תוספת נוספת +2₪',
@@ -16,8 +20,8 @@ const FOOD = [
     ]
   },
   {
-    id: 'omelette', name: 'חביתה', icon: '🍳', basePrice: 28,
-    desc: 'חביתה טרייה',
+    id: 'veggie-omelette', name: 'חביתת ירק', icon: '🥬', basePrice: 33,
+    desc: 'חביתה עם כל הירקות',
     note: 'כל הירקות כלולים במחיר',
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
@@ -27,7 +31,11 @@ const FOOD = [
       { id: 'olives',   name: 'זיתים'  },
       { id: 'pickles',  name: 'חמוצים' },
     ]
-  }
+  },
+  {
+    id: 'mushroom-omelette', name: 'חביתת פטריות', icon: '🍄', basePrice: 31,
+    desc: 'חביתה עם פטריות',
+  },
 ];
 
 // drinks with sizes: can 8₪ / bottle 10₪
@@ -63,17 +71,25 @@ export default function CustomerPage() {
 
   function openModal(item) { setModal(item); setToastSel([]); setOmlSel([]); }
 
+  function handleAdd(item) {
+    if (item.toppings || item.vegetables) {
+      openModal(item);
+    } else {
+      setCart(p => [...p, { uid: Date.now(), name: item.name, extras: [], price: item.basePrice }]);
+    }
+  }
+
   function toggle(id, sel, set) {
     set(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   }
 
   function addFood() {
-    if (modal.id === 'toast') {
+    if (modal.toppings) {
       const extras = toastSel.map(id => modal.toppings.find(t => t.id === id)?.name).filter(Boolean);
-      setCart(p => [...p, { uid: Date.now(), name: 'טוסט', extras, price: calcToastPrice(toastSel) }]);
+      setCart(p => [...p, { uid: Date.now(), name: modal.name, extras, price: calcToastPrice(toastSel) }]);
     } else {
       const extras = omlSel.map(id => modal.vegetables.find(v => v.id === id)?.name).filter(Boolean);
-      setCart(p => [...p, { uid: Date.now(), name: 'חביתה', extras, price: 28 }]);
+      setCart(p => [...p, { uid: Date.now(), name: modal.name, extras, price: modal.basePrice }]);
     }
     setModal(null);
   }
@@ -120,7 +136,7 @@ export default function CustomerPage() {
     return (
       <div className="success-wrap">
         <div className="success-card">
-          <span className="success-check">✓</span>
+          <div className="success-check">✓</div>
           <h2 className="success-title">ההזמנה מוכנה!</h2>
           <div className="success-num">#{orderId}</div>
           <p className="success-msg">לחץ על הכפתור כדי לשלוח<br/>את ההזמנה לשף בוואטסאפ</p>
@@ -162,7 +178,7 @@ export default function CustomerPage() {
                 </div>
                 <div className="food-right">
                   <span className="food-price">{item.basePrice}₪</span>
-                  <button className="add-btn" onClick={() => openModal(item)}>הוסף +</button>
+                  <button className="add-btn" onClick={() => handleAdd(item)}>הוסף +</button>
                 </div>
               </div>
             ))}
@@ -243,7 +259,7 @@ export default function CustomerPage() {
             <span className="modal-icon">{modal.icon}</span>
             <h3 className="modal-title">{modal.name}</h3>
 
-            {modal.id === 'toast' && (<>
+            {modal.toppings && (<>
               <p className="modal-sub">בחר תוספות</p>
               <p className="modal-note">תוספת ראשונה כלולה · חריף תמיד בחינם</p>
               <div className="topping-grid">
@@ -262,7 +278,7 @@ export default function CustomerPage() {
               </div>
             </>)}
 
-            {modal.id === 'omelette' && (<>
+            {modal.vegetables && (<>
               <p className="modal-sub">ירקות לבחירה</p>
               <p className="modal-note">הכל כלול במחיר</p>
               <div className="topping-grid">
@@ -275,7 +291,7 @@ export default function CustomerPage() {
                 ))}
               </div>
               <div className="modal-foot">
-                <span className="modal-price">28₪</span>
+                <span className="modal-price">{modal.basePrice}₪</span>
                 <button className="modal-add" onClick={addFood}>הוסף להזמנה</button>
               </div>
             </>)}

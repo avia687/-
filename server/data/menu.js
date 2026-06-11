@@ -1,5 +1,12 @@
 const menuItems = [
   {
+    id: 'omelette',
+    name: 'חביתה',
+    emoji: '🍳',
+    basePrice: 28,
+    description: 'חביתה טרייה'
+  },
+  {
     id: 'toast',
     name: 'טוסט',
     emoji: '🥪',
@@ -16,11 +23,11 @@ const menuItems = [
     ]
   },
   {
-    id: 'omelette',
-    name: 'חביתה',
-    emoji: '🍳',
-    basePrice: 28,
-    description: 'חביתה טרייה עם ירקות לבחירה',
+    id: 'veggie-omelette',
+    name: 'חביתת ירק',
+    emoji: '🥬',
+    basePrice: 33,
+    description: 'חביתה עם כל הירקות',
     priceNote: 'כל הירקות כלולים במחיר',
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
@@ -30,6 +37,13 @@ const menuItems = [
       { id: 'olives',   name: 'זיתים'  },
       { id: 'pickles',  name: 'חמוצים' }
     ]
+  },
+  {
+    id: 'mushroom-omelette',
+    name: 'חביתת פטריות',
+    emoji: '🍄',
+    basePrice: 31,
+    description: 'חביתה עם פטריות'
   }
 ];
 
