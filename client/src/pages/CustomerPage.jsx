@@ -43,6 +43,7 @@ const FOOD = [
     spreads: [
       { id: 'cream-cheese', name: 'גבינת שמנת' },
       { id: 'pesto',        name: 'פסטו' },
+      { id: 'spicy',        name: 'חריף' },
     ],
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
@@ -57,7 +58,10 @@ const FOOD = [
     id: 'cream-cheese', name: 'סנדביץ גבינת שמנת', icon: '🥖', basePrice: 25,
     desc: 'גבינת שמנת טרייה',
     note: 'כל הירקות כלולים במחיר',
-    spreads: [{ id: 'pesto', name: 'פסטו' }],
+    spreads: [
+      { id: 'pesto', name: 'פסטו' },
+      { id: 'spicy', name: 'חריף' },
+    ],
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
       { id: 'cucumber', name: 'מלפפון' },
