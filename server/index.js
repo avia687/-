@@ -12,9 +12,10 @@ app.use(express.json());
 
 app.use('/api/orders', ordersRouter);
 
-// Serve React build in production
-if (process.env.NODE_ENV === 'production') {
-  const buildPath = path.join(__dirname, '../client/dist');
+// Serve React build
+const buildPath = path.join(__dirname, '../client/dist');
+const fs = require('fs');
+if (fs.existsSync(buildPath)) {
   app.use(express.static(buildPath));
   app.get('*', (req, res) => {
     res.sendFile(path.join(buildPath, 'index.html'));
