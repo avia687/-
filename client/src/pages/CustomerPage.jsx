@@ -59,8 +59,9 @@ const FOOD = [
     desc: 'גבינת שמנת טרייה',
     note: 'כל הירקות כלולים במחיר',
     spreads: [
-      { id: 'pesto', name: 'פסטו' },
-      { id: 'spicy', name: 'חריף' },
+      { id: 'cream-cheese', name: 'גבינת שמנת' },
+      { id: 'pesto',        name: 'פסטו' },
+      { id: 'spicy',        name: 'חריף' },
     ],
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
