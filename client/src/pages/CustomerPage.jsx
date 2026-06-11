@@ -40,6 +40,10 @@ const FOOD = [
     id: 'avocado', name: 'סנדביץ אבוקדו', icon: '🥑', basePrice: 33,
     desc: 'אבוקדו טרי',
     note: 'כל הירקות כלולים במחיר',
+    spreads: [
+      { id: 'cream-cheese', name: 'גבינת שמנת' },
+      { id: 'pesto',        name: 'פסטו' },
+    ],
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
       { id: 'cucumber', name: 'מלפפון' },
@@ -53,6 +57,7 @@ const FOOD = [
     id: 'cream-cheese', name: 'סנדביץ גבינת שמנת', icon: '🥖', basePrice: 25,
     desc: 'גבינת שמנת טרייה',
     note: 'כל הירקות כלולים במחיר',
+    spreads: [{ id: 'pesto', name: 'פסטו' }],
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
       { id: 'cucumber', name: 'מלפפון' },
@@ -83,9 +88,10 @@ function calcToastPrice(sel) {
 }
 
 export default function CustomerPage() {
-  const [modal,   setModal]   = useState(null);
-  const [toastSel, setToastSel] = useState([]);
-  const [omlSel,  setOmlSel]  = useState([]);
+  const [modal,      setModal]      = useState(null);
+  const [toastSel,   setToastSel]   = useState([]);
+  const [omlSel,     setOmlSel]     = useState([]);
+  const [spreadSel,  setSpreadSel]  = useState([]);
   const [cart,    setCart]    = useState([]);
   const [name,    setName]    = useState('');
   const [phone,   setPhone]   = useState('');
@@ -96,7 +102,7 @@ export default function CustomerPage() {
 
   const total = cart.reduce((s, i) => s + i.price, 0);
 
-  function openModal(item) { setModal(item); setToastSel([]); setOmlSel([]); }
+  function openModal(item) { setModal(item); setToastSel([]); setOmlSel([]); setSpreadSel([]); }
 
   function handleAdd(item) {
     if (item.toppings || item.vegetables) {
@@ -115,7 +121,12 @@ export default function CustomerPage() {
       const extras = toastSel.map(id => modal.toppings.find(t => t.id === id)?.name).filter(Boolean);
       setCart(p => [...p, { uid: Date.now(), name: modal.name, extras, price: calcToastPrice(toastSel) }]);
     } else {
-      const extras = omlSel.map(id => modal.vegetables.find(v => v.id === id)?.name).filter(Boolean);
+      // ממרח תמיד ראשון, אחר כך ירקות
+      const spreadExtras = (modal.spreads || [])
+        .filter(s => spreadSel.includes(s.id))
+        .map(s => s.name);
+      const vegExtras = omlSel.map(id => modal.vegetables?.find(v => v.id === id)?.name).filter(Boolean);
+      const extras = [...spreadExtras, ...vegExtras];
       setCart(p => [...p, { uid: Date.now(), name: modal.name, extras, price: modal.basePrice }]);
     }
     setModal(null);
@@ -328,6 +339,20 @@ export default function CustomerPage() {
             </>)}
 
             {modal.vegetables && (<>
+              {modal.spreads && (<>
+                <p className="modal-sub">ממרח (אופציונלי)</p>
+                <div className="topping-grid" style={{marginBottom:'18px'}}>
+                  {modal.spreads.map(s => (
+                    <button key={s.id}
+                      className={`top-btn spread-btn ${spreadSel.includes(s.id) ? 'top-btn--on' : ''}`}
+                      onClick={() => toggle(s.id, spreadSel, setSpreadSel)}>
+                      🌿 {s.name}
+                      {spreadSel.includes(s.id) && <span className="free-tag">✓ נבחר</span>}
+                    </button>
+                  ))}
+                </div>
+              </>)}
+
               <p className="modal-sub">ירקות לבחירה</p>
               <p className="modal-note">הכל כלול במחיר</p>
               <div className="topping-grid">

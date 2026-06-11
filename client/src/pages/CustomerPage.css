@@ -606,6 +606,17 @@
   box-shadow: 0 0 12px rgba(201,150,58,.2);
 }
 
+.spread-btn {
+  border-color: rgba(80,160,80,.35) !important;
+  background: rgba(30,80,30,.2) !important;
+}
+.spread-btn.top-btn--on {
+  border-color: #4CAF50 !important;
+  background: rgba(76,175,80,.15) !important;
+  color: #8FD990 !important;
+  box-shadow: 0 0 12px rgba(76,175,80,.25) !important;
+}
+
 .free-tag {
   font-size: 10px;
   background: rgba(35,122,66,.3);
