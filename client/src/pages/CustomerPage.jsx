@@ -136,7 +136,7 @@ export default function CustomerPage() {
     return (
       <div className="success-wrap">
         <div className="success-card">
-          <span className="success-check">✓</span>
+          <div className="success-check">✓</div>
           <h2 className="success-title">ההזמנה מוכנה!</h2>
           <div className="success-num">#{orderId}</div>
           <p className="success-msg">לחץ על הכפתור כדי לשלוח<br/>את ההזמנה לשף בוואטסאפ</p>
