@@ -150,7 +150,7 @@ export default function CustomerPage() {
   }
 
   if (orderId) {
-    const paymentEmoji = { 'פיבוקס': '💙', 'ביט': '🟠', 'מזומן': '💵' }[payment] || '';
+    const paymentEmoji = { 'פיבוקס': '💙', 'ביט': '🔵', 'מזומן': '💵' }[payment] || '';
     const waText = [
       `הזמנה חדשה! 🛵 #${orderId}`,
       ``,
@@ -276,7 +276,7 @@ export default function CustomerPage() {
                 <div className="payment-grid">
                   {[
                     { id: 'פיבוקס', emoji: '💙', color: '#1565C0' },
-                    { id: 'ביט',    emoji: '🟠', color: '#E65100' },
+                    { id: 'ביט',    emoji: '🔵', color: '#1565C0' },
                     { id: 'מזומן',  emoji: '💵', color: '#2E7D32' },
                   ].map(p => (
                     <button key={p.id}
