@@ -37,6 +37,19 @@ const FOOD = [
     desc: 'חביתה עם פטריות',
   },
   {
+    id: 'avocado', name: 'סנדביץ אבוקדו', icon: '🥑', basePrice: 33,
+    desc: 'אבוקדו טרי',
+    note: 'כל הירקות כלולים במחיר',
+    vegetables: [
+      { id: 'tomato',   name: 'עגבניה' },
+      { id: 'cucumber', name: 'מלפפון' },
+      { id: 'lettuce',  name: 'חסה'    },
+      { id: 'onion',    name: 'בצל'    },
+      { id: 'olives',   name: 'זיתים'  },
+      { id: 'pickles',  name: 'חמוצים' },
+    ]
+  },
+  {
     id: 'cream-cheese', name: 'סנדביץ גבינת שמנת', icon: '🥖', basePrice: 25,
     desc: 'גבינת שמנת טרייה',
     note: 'כל הירקות כלולים במחיר',

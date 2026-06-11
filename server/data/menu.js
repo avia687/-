@@ -46,6 +46,22 @@ const menuItems = [
     description: 'חביתה עם פטריות'
   },
   {
+    id: 'avocado',
+    name: 'סנדביץ אבוקדו',
+    emoji: '🥑',
+    basePrice: 33,
+    description: 'אבוקדו טרי',
+    priceNote: 'כל הירקות כלולים במחיר',
+    vegetables: [
+      { id: 'tomato',   name: 'עגבניה' },
+      { id: 'cucumber', name: 'מלפפון' },
+      { id: 'lettuce',  name: 'חסה'    },
+      { id: 'onion',    name: 'בצל'    },
+      { id: 'olives',   name: 'זיתים'  },
+      { id: 'pickles',  name: 'חמוצים' }
+    ]
+  },
+  {
     id: 'cream-cheese',
     name: 'סנדביץ גבינת שמנת',
     emoji: '🥖',
