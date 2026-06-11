@@ -68,6 +68,19 @@
   filter: drop-shadow(0 0 14px rgba(201,150,58,.5));
   animation: fadeInDown .6s cubic-bezier(.22,1,.36,1) both;
 }
+.header-logo {
+  width: 90px; height: 90px;
+  display: block;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  animation: fadeInDown .6s cubic-bezier(.22,1,.36,1) both;
+  filter: drop-shadow(0 0 18px rgba(201,150,58,.45));
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), filter .3s;
+}
+.header-logo:hover {
+  transform: scale(1.08) rotate(3deg);
+  filter: drop-shadow(0 0 28px rgba(201,150,58,.7));
+}
 .header-title {
   font-size: 40px;
   font-weight: 900;

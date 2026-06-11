@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#1A1400"/>
+      <stop offset="100%" stop-color="#0A0800"/>
+    </radialGradient>
+    <radialGradient id="goldGrad" cx="50%" cy="0%" r="100%">
+      <stop offset="0%" stop-color="#F5D080"/>
+      <stop offset="50%" stop-color="#C9963A"/>
+      <stop offset="100%" stop-color="#8A6010"/>
+    </radialGradient>
+    <radialGradient id="rimGrad" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#F5D080"/>
+      <stop offset="100%" stop-color="#7A5010"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="circle-clip">
+      <circle cx="100" cy="100" r="93"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="98" fill="url(#rimGrad)" opacity="0.9"/>
+  <!-- Inner background -->
+  <circle cx="100" cy="100" r="93" fill="url(#bgGrad)"/>
+  <!-- Gold ring line -->
+  <circle cx="100" cy="100" r="88" fill="none" stroke="#C9963A" stroke-width="1.2" opacity="0.6"/>
+
+  <!-- ── TRAIN WAGON ── -->
+  <g clip-path="url(#circle-clip)">
+
+    <!-- Track rails -->
+    <rect x="20" y="148" width="160" height="3" rx="1.5" fill="#6A5020" opacity="0.7"/>
+    <rect x="20" y="153" width="160" height="3" rx="1.5" fill="#6A5020" opacity="0.7"/>
+    <!-- Rail sleepers -->
+    <rect x="28"  y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="48"  y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="68"  y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="88"  y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="108" y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="128" y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="148" y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+    <rect x="165" y="146" width="6" height="12" rx="1" fill="#5A4018" opacity="0.6"/>
+
+    <!-- Wagon body -->
+    <rect x="34" y="94" width="132" height="52" rx="5" fill="#2A1F0A"/>
+    <rect x="34" y="94" width="132" height="52" rx="5" fill="none" stroke="#C9963A" stroke-width="1.5" opacity="0.7"/>
+
+    <!-- Wagon roof -->
+    <path d="M30 98 Q100 82 170 98 L170 102 Q100 87 30 102 Z" fill="#C9963A" opacity="0.9"/>
+    <rect x="30" y="95" width="140" height="6" rx="3" fill="#1A1000"/>
+    <rect x="30" y="95" width="140" height="6" rx="3" fill="none" stroke="#C9963A" stroke-width="1" opacity="0.8"/>
+
+    <!-- Chimney / steam pipe -->
+    <rect x="52" y="78" width="8" height="20" rx="3" fill="#1E1600" stroke="#C9963A" stroke-width="1" opacity="0.8"/>
+    <ellipse cx="56" cy="78" rx="6" ry="3" fill="#C9963A" opacity="0.8"/>
+    <!-- Steam puffs -->
+    <circle cx="56" cy="68" r="5" fill="#E8D090" opacity="0.25"/>
+    <circle cx="62" cy="60" r="4" fill="#E8D090" opacity="0.18"/>
+    <circle cx="50" cy="58" r="3" fill="#E8D090" opacity="0.12"/>
+
+    <!-- Windows -->
+    <rect x="46" y="102" width="24" height="18" rx="3" fill="#0C1820" stroke="#C9963A" stroke-width="1.2" opacity="0.9"/>
+    <rect x="78" y="102" width="44" height="18" rx="3" fill="#0C1820" stroke="#C9963A" stroke-width="1.2" opacity="0.9"/>
+    <rect x="130" y="102" width="24" height="18" rx="3" fill="#0C1820" stroke="#C9963A" stroke-width="1.2" opacity="0.9"/>
+
+    <!-- Window shine -->
+    <rect x="48" y="104" width="9" height="5" rx="1" fill="#203040" opacity="0.7"/>
+    <rect x="80" y="104" width="16" height="5" rx="1" fill="#203040" opacity="0.7"/>
+    <rect x="132" y="104" width="9" height="5" rx="1" fill="#203040" opacity="0.7"/>
+
+    <!-- Door -->
+    <rect x="92" y="112" width="16" height="34" rx="2" fill="#1A1200" stroke="#C9963A" stroke-width="1"/>
+    <circle cx="104" cy="129" r="2" fill="#C9963A"/>
+
+    <!-- Wagon decorative stripe -->
+    <rect x="34" y="126" width="132" height="2.5" rx="1" fill="#C9963A" opacity="0.5"/>
+
+    <!-- Wheels -->
+    <!-- Left wheel -->
+    <circle cx="62" cy="151" r="13" fill="#1A1200" stroke="#C9963A" stroke-width="1.8"/>
+    <circle cx="62" cy="151" r="8" fill="#0F0C00" stroke="#9A7020" stroke-width="1"/>
+    <circle cx="62" cy="151" r="3" fill="#C9963A"/>
+    <!-- wheel spokes -->
+    <line x1="62" y1="139" x2="62" y2="163" stroke="#8A6018" stroke-width="1" opacity="0.7"/>
+    <line x1="50" y1="151" x2="74" y2="151" stroke="#8A6018" stroke-width="1" opacity="0.7"/>
+    <line x1="54" y1="143" x2="70" y2="159" stroke="#8A6018" stroke-width="0.8" opacity="0.5"/>
+    <line x1="70" y1="143" x2="54" y2="159" stroke="#8A6018" stroke-width="0.8" opacity="0.5"/>
+
+    <!-- Right wheel -->
+    <circle cx="138" cy="151" r="13" fill="#1A1200" stroke="#C9963A" stroke-width="1.8"/>
+    <circle cx="138" cy="151" r="8" fill="#0F0C00" stroke="#9A7020" stroke-width="1"/>
+    <circle cx="138" cy="151" r="3" fill="#C9963A"/>
+    <line x1="138" y1="139" x2="138" y2="163" stroke="#8A6018" stroke-width="1" opacity="0.7"/>
+    <line x1="126" y1="151" x2="150" y2="151" stroke="#8A6018" stroke-width="1" opacity="0.7"/>
+    <line x1="130" y1="143" x2="146" y2="159" stroke="#8A6018" stroke-width="0.8" opacity="0.5"/>
+    <line x1="146" y1="143" x2="130" y2="159" stroke="#8A6018" stroke-width="0.8" opacity="0.5"/>
+
+    <!-- Coupler hook -->
+    <rect x="162" y="127" width="10" height="6" rx="2" fill="#8A6018" stroke="#C9963A" stroke-width=".8"/>
+    <rect x="170" y="129" width="6" height="2" rx="1" fill="#C9963A"/>
+    <rect x="28" y="127" width="10" height="6" rx="2" fill="#8A6018" stroke="#C9963A" stroke-width=".8"/>
+    <rect x="24" y="129" width="6" height="2" rx="1" fill="#C9963A"/>
+
+  </g>
+
+  <!-- ── TEXT ── -->
+  <!-- "הקרון" top arc -->
+  <path id="topArc" d="M 30,100 A 70,70 0 0,1 170,100" fill="none"/>
+  <text font-family="Arial Hebrew, Arial, sans-serif" font-weight="900" font-size="22" fill="url(#goldGrad)" filter="url(#glow)" text-anchor="middle">
+    <textPath href="#topArc" startOffset="50%">הקרון</textPath>
+  </text>
+
+  <!-- "טעים" bottom arc -->
+  <path id="bottomArc" d="M 42,140 A 62,62 0 0,0 158,140" fill="none"/>
+  <text font-family="Arial Hebrew, Arial, sans-serif" font-weight="700" font-size="15" fill="#C9963A" text-anchor="middle" opacity="0.9">
+    <textPath href="#bottomArc" startOffset="50%">✦ טעים ✦</textPath>
+  </text>
+
+  <!-- Outer decorative dots -->
+  <circle cx="100" cy="10"  r="2" fill="#C9963A" opacity="0.6"/>
+  <circle cx="100" cy="190" r="2" fill="#C9963A" opacity="0.6"/>
+  <circle cx="10"  cy="100" r="2" fill="#C9963A" opacity="0.6"/>
+  <circle cx="190" cy="100" r="2" fill="#C9963A" opacity="0.6"/>
+</svg>

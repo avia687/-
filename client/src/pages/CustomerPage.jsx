@@ -158,7 +158,7 @@ export default function CustomerPage() {
       {/* Header */}
       <header className="header">
         <div className="header-glow" />
-        <span className="header-icon">🚐</span>
+        <img src="/logo.svg" alt="הקרון" className="header-logo" />
         <h1 className="header-title">הקרון</h1>
       </header>
 
