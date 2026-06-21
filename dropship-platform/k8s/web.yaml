@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dropship-web
+  namespace: dropship
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dropship-web
+  template:
+    metadata:
+      labels:
+        app: dropship-web
+    spec:
+      containers:
+        - name: web
+          image: REGISTRY/dropship-web:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: https://api.example.com
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dropship-web
+  namespace: dropship
+spec:
+  selector:
+    app: dropship-web
+  ports:
+    - port: 80
+      targetPort: 3000

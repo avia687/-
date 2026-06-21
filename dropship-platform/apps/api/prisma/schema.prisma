@@ -1,0 +1,483 @@
+// Dropship Platform — Prisma schema (multi-tenant, shared-schema with row-level tenantId).
+// Money is stored as integer minor units (e.g. cents) + currency code. Never floats.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  SUPER_ADMIN
+  STORE_OWNER
+  MANAGER
+  EMPLOYEE
+  CUSTOMER
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum SalesChannel {
+  SHOPIFY
+  WOOCOMMERCE
+  AMAZON
+  EBAY
+  ETSY
+  WALMART
+  TIKTOK_SHOP
+  FACEBOOK_SHOP
+  INSTAGRAM_SHOP
+  DIRECT
+}
+
+enum SupplierProvider {
+  ALIEXPRESS
+  CJ_DROPSHIPPING
+  ZENDROP
+  SPOCKET
+  AUTODS
+  DSERS
+  MANUAL
+}
+
+enum IntegrationType {
+  MARKETPLACE
+  SUPPLIER
+  PAYMENT
+  SHIPPING
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}
+
+enum FulfillmentStatus {
+  PENDING
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYPAL
+  APPLE_PAY
+  GOOGLE_PAY
+}
+
+enum AiJobType {
+  PRODUCT_DESCRIPTION
+  SEO
+  PROFITABILITY
+  PRODUCT_RESEARCH
+}
+
+enum AiJobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+// ---------------------------------------------------------------------------
+// Tenancy & identity
+// ---------------------------------------------------------------------------
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  stores       Store[]
+  suppliers    Supplier[]
+  products     Product[]
+  categories   Category[]
+  tags         Tag[]
+  customers    Customer[]
+  orders       Order[]
+  integrations Integration[]
+  aiJobs       AiJob[]
+  auditLogs    AuditLog[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  tenantId     String
+  email        String
+  passwordHash String?
+  name         String?
+  role         Role     @default(STORE_OWNER)
+  isActive     Boolean  @default(true)
+  // OAuth identity (Google/Facebook) — nullable for password users
+  oauthProvider String?
+  oauthSubject  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Stores (sales channels) & integrations
+// ---------------------------------------------------------------------------
+
+model Store {
+  id        String       @id @default(cuid())
+  tenantId  String
+  name      String
+  channel   SalesChannel @default(DIRECT)
+  domain    String?
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  tenant   Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  listings StoreListing[]
+
+  @@index([tenantId])
+}
+
+model Integration {
+  id          String          @id @default(cuid())
+  tenantId    String
+  type        IntegrationType
+  provider    String          // e.g. "SHOPIFY", "ALIEXPRESS", "STRIPE"
+  // AES-256-GCM encrypted credentials blob (see CryptoService). Never plaintext.
+  credentials String
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, type, provider])
+  @@index([tenantId])
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model Supplier {
+  id         String           @id @default(cuid())
+  tenantId   String
+  name       String
+  provider   SupplierProvider @default(MANUAL)
+  externalId String?          // id of this supplier/account on the provider
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@index([tenantId])
+}
+
+model Product {
+  id            String        @id @default(cuid())
+  tenantId      String
+  supplierId    String?
+  title         String
+  description   String?
+  status        ProductStatus @default(DRAFT)
+  // Default/anchor price in minor units; per-variant prices override.
+  basePriceCents Int          @default(0)
+  currency      String        @default("USD")
+  imageUrls     String[]      @default([])
+  externalRef   String?       // supplier product id this was imported from
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  tenant     Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  supplier   Supplier?         @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  variants   ProductVariant[]
+  categories ProductCategory[]
+  tags       ProductTag[]
+  listings   StoreListing[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+}
+
+model ProductVariant {
+  id          String  @id @default(cuid())
+  productId   String
+  sku         String
+  title       String?
+  priceCents  Int     @default(0)
+  costCents   Int     @default(0) // supplier cost — for margin math
+  options     Json?   // { "Size": "M", "Color": "Red" }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inventory  Inventory?
+  orderItems OrderItem[]
+
+  @@unique([productId, sku])
+  @@index([productId])
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  variantId String   @unique
+  quantity  Int      @default(0)
+  reserved  Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id       String  @id @default(cuid())
+  tenantId String
+  name     String
+  slug     String
+
+  tenant   Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products ProductCategory[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+model Tag {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+
+  tenant   Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products ProductTag[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model ProductTag {
+  productId String
+  tagId     String
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+}
+
+model StoreListing {
+  id             String   @id @default(cuid())
+  storeId        String
+  productId      String
+  externalId     String?  // listing id on the marketplace
+  priceCents     Int?     // channel price override
+  isPublished    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, productId])
+  @@index([storeId])
+  @@index([productId])
+}
+
+// ---------------------------------------------------------------------------
+// Customers, orders, fulfillment, payments
+// ---------------------------------------------------------------------------
+
+model Customer {
+  id        String   @id @default(cuid())
+  tenantId  String
+  email     String
+  name      String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  tenantId      String
+  customerId    String?
+  storeId       String?
+  number        String      // human-friendly order number, unique per tenant
+  status        OrderStatus @default(PENDING)
+  currency      String      @default("USD")
+  subtotalCents Int         @default(0)
+  shippingCents Int         @default(0)
+  totalCents    Int         @default(0)
+  shippingAddress Json?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer     Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items        OrderItem[]
+  fulfillments Fulfillment[]
+  payments     Payment[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId])
+  @@index([tenantId, status])
+}
+
+model OrderItem {
+  id              String @id @default(cuid())
+  orderId         String
+  variantId       String?
+  titleSnapshot   String // product/variant title at time of order
+  quantity        Int
+  unitPriceCents  Int
+  unitCostCents   Int    @default(0) // supplier cost snapshot for profit reporting
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+model Fulfillment {
+  id             String            @id @default(cuid())
+  orderId        String
+  carrier        String?           // DHL | UPS | FEDEX | USPS
+  trackingNumber String?
+  status         FulfillmentStatus @default(PENDING)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  order  Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  events TrackingEvent[]
+
+  @@index([orderId])
+}
+
+model TrackingEvent {
+  id            String   @id @default(cuid())
+  fulfillmentId String
+  status        String
+  description   String?
+  location      String?
+  occurredAt    DateTime
+  createdAt     DateTime @default(now())
+
+  fulfillment Fulfillment @relation(fields: [fulfillmentId], references: [id], onDelete: Cascade)
+
+  @@index([fulfillmentId])
+}
+
+model Payment {
+  id            String          @id @default(cuid())
+  orderId       String
+  provider      PaymentProvider
+  status        PaymentStatus   @default(PENDING)
+  amountCents   Int
+  currency      String          @default("USD")
+  externalId    String?         // provider charge/intent id
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// AI agent runs & audit
+// ---------------------------------------------------------------------------
+
+model AiJob {
+  id          String      @id @default(cuid())
+  tenantId    String
+  type        AiJobType
+  status      AiJobStatus @default(PENDING)
+  input       Json
+  output      Json?
+  model       String?
+  inputTokens Int?
+  outputTokens Int?
+  error       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, type])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, action])
+}
