@@ -1,0 +1,16 @@
+{
+  "name": "polymarket-trader-scanner",
+  "version": "1.0.0",
+  "description": "Scans Polymarket for profitable traders, ranks them, and lets you follow them.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

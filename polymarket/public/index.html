@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>סורק הסוחרים של Polymarket</title>
+    <meta name="description" content="סורק את Polymarket ומדרג את הסוחרים הכי רווחיים" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=Inter:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">◆</div>
+        <div>
+          <h1>סורק הסוחרים <span>Polymarket</span></h1>
+          <p class="tagline">מאתר את הסוחרים הכי רווחיים בשוק — בזמן אמת</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="watchlistBtn" class="ghost-btn">
+          ⭐ רשימת מעקב <span id="watchCount" class="pill">0</span>
+        </button>
+        <span id="sourceBadge" class="source-badge" title="מקור הנתונים">…</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- Stats strip -->
+      <section class="stats" id="stats"></section>
+
+      <!-- Controls -->
+      <section class="controls">
+        <div class="control-group">
+          <label>חלון זמן</label>
+          <div class="segmented" id="windowSeg">
+            <button data-window="1d">יום</button>
+            <button data-window="7d">שבוע</button>
+            <button data-window="30d">חודש</button>
+            <button data-window="all" class="active">הכל</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>מיון לפי</label>
+          <select id="sortSel">
+            <option value="score">ציון סורק</option>
+            <option value="profit">רווח</option>
+            <option value="roi">תשואה (ROI)</option>
+            <option value="volume">נפח מסחר</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>רווח מינ׳ ($)</label>
+          <input type="number" id="minProfit" placeholder="0" min="0" step="1000" />
+        </div>
+
+        <div class="control-group">
+          <label>נפח מינ׳ ($)</label>
+          <input type="number" id="minVolume" placeholder="0" min="0" step="10000" />
+        </div>
+
+        <div class="control-group grow">
+          <label>חיפוש סוחר / ארנק</label>
+          <input type="search" id="search" placeholder="שם, כינוי או 0x..." />
+        </div>
+
+        <button id="scanBtn" class="primary-btn">🔄 סרוק עכשיו</button>
+      </section>
+
+      <!-- Leaderboard -->
+      <section class="board-wrap">
+        <div class="board-head">
+          <h2>סוחרים רווחיים <span id="resultCount" class="muted"></span></h2>
+          <span id="updatedAt" class="muted small"></span>
+        </div>
+        <div id="boardStatus" class="board-status">טוען…</div>
+        <div class="table-scroll">
+          <table class="board" id="board">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>סוחר</th>
+                <th class="num">ציון</th>
+                <th class="num">רווח</th>
+                <th class="num">תשואה</th>
+                <th class="num">נפח</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="boardBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Trader detail drawer -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <aside class="drawer" id="drawer" aria-hidden="true">
+      <button class="drawer-close" id="drawerClose">✕</button>
+      <div id="drawerBody"></div>
+    </aside>
+
+    <footer class="footer">
+      נתונים מ‑Polymarket (API ציבורי). אין כאן ייעוץ השקעות — מסחר בשווקי חיזוי כרוך בסיכון.
+    </footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
