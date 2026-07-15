@@ -1,0 +1,645 @@
+<title>Personal Finance OS — PRD</title>
+
+<style>
+  :root {
+    --ground: #f7f8f6;
+    --surface: #ffffff;
+    --surface-2: #f0f2ee;
+    --ink: #14201b;
+    --ink-soft: #34433c;
+    --mid: #5c6b64;
+    --faint: #8a978f;
+    --line: #e2e6e0;
+    --line-strong: #d2d8d0;
+    --accent: #12876a;
+    --accent-soft: #d8ebe4;
+    --accent-ink: #0c5f4b;
+    --gold: #a9782a;
+    --gold-soft: #f0e6d0;
+    --good: #12876a;
+    --warn: #b8862f;
+    --crit: #b3452f;
+    --shadow: 0 1px 2px rgba(20,32,27,.04), 0 8px 28px rgba(20,32,27,.06);
+    --radius: 14px;
+    --maxw: 1220px;
+    --col: 70ch;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0e1613;
+      --surface: #141f1b;
+      --surface-2: #1a2621;
+      --ink: #e7efea;
+      --ink-soft: #c3cfc8;
+      --mid: #93a49b;
+      --faint: #6f817a;
+      --line: #24322c;
+      --line-strong: #2f3f38;
+      --accent: #2fbe96;
+      --accent-soft: #16352b;
+      --accent-ink: #7ad9bb;
+      --gold: #d5a94e;
+      --gold-soft: #302713;
+      --good: #2fbe96;
+      --warn: #d5a94e;
+      --crit: #e0785f;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #f7f8f6; --surface: #ffffff; --surface-2: #f0f2ee;
+    --ink: #14201b; --ink-soft: #34433c; --mid: #5c6b64; --faint: #8a978f;
+    --line: #e2e6e0; --line-strong: #d2d8d0;
+    --accent: #12876a; --accent-soft: #d8ebe4; --accent-ink: #0c5f4b;
+    --gold: #a9782a; --gold-soft: #f0e6d0;
+    --good: #12876a; --warn: #b8862f; --crit: #b3452f;
+    --shadow: 0 1px 2px rgba(20,32,27,.04), 0 8px 28px rgba(20,32,27,.06);
+  }
+  :root[data-theme="dark"] {
+    --ground: #0e1613; --surface: #141f1b; --surface-2: #1a2621;
+    --ink: #e7efea; --ink-soft: #c3cfc8; --mid: #93a49b; --faint: #6f817a;
+    --line: #24322c; --line-strong: #2f3f38;
+    --accent: #2fbe96; --accent-soft: #16352b; --accent-ink: #7ad9bb;
+    --gold: #d5a94e; --gold-soft: #302713;
+    --good: #2fbe96; --warn: #d5a94e; --crit: #e0785f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ::selection { background: var(--accent-soft); }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ---- top bar ---- */
+  .topbar {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--ground) 86%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 12px 24px; max-width: var(--maxw); margin: 0 auto;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.01em; }
+  .brand .dot {
+    width: 22px; height: 22px; border-radius: 7px;
+    background: linear-gradient(150deg, var(--accent), var(--gold));
+    display: inline-block;
+  }
+  .brand small { font-family: var(--mono); font-weight: 500; color: var(--faint); font-size: 11px; letter-spacing: .04em; }
+  .status-pill {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--gold); background: var(--gold-soft);
+    border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+    padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .theme-btn {
+    font: inherit; font-size: 13px; cursor: pointer;
+    background: var(--surface); color: var(--ink-soft);
+    border: 1px solid var(--line-strong); border-radius: 8px;
+    padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+  /* ---- hero ---- */
+  .hero { padding: 60px 0 34px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent-ink); display: flex; gap: 10px; align-items: center;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent); }
+  h1 {
+    font-size: clamp(2.2rem, 5.2vw, 3.7rem);
+    line-height: 1.04; letter-spacing: -.03em; font-weight: 800;
+    margin: 18px 0 0; max-width: 20ch; text-wrap: balance;
+  }
+  h1 .accent { color: var(--accent); }
+  .lede {
+    margin: 20px 0 0; font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+    color: var(--ink-soft); max-width: 60ch; line-height: 1.55;
+  }
+  .hero-meta { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .02em;
+    color: var(--mid); background: var(--surface); border: 1px solid var(--line);
+    padding: 6px 11px; border-radius: 999px;
+  }
+  .chip b { color: var(--ink); font-weight: 600; }
+
+  /* ---- metric tiles ---- */
+  .metrics {
+    margin-top: 34px; display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 18px 16px; box-shadow: var(--shadow);
+  }
+  .tile .k {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 10px;
+  }
+  .tile .v {
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    font-size: 1.9rem; font-weight: 600; letter-spacing: -.02em; color: var(--ink);
+  }
+  .tile .v small { font-size: .95rem; color: var(--accent); font-weight: 600; }
+  .tile .d { font-size: 12.5px; color: var(--mid); margin-top: 6px; line-height: 1.4; }
+
+  /* ---- layout ---- */
+  .layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; padding: 46px 0 90px; align-items: start; }
+  nav.toc { position: sticky; top: 78px; align-self: start; }
+  nav.toc .tl { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-bottom: 12px; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+  nav.toc li { counter-increment: t; }
+  nav.toc a {
+    display: flex; gap: 10px; align-items: baseline; padding: 5px 0;
+    color: var(--mid); font-size: 13.5px; line-height: 1.35;
+    border-left: 2px solid transparent; padding-left: 12px; margin-left: -2px;
+  }
+  nav.toc a::before {
+    content: counter(t, decimal-leading-zero);
+    font-family: var(--mono); font-size: 11px; color: var(--faint); flex: none; width: 1.6em;
+  }
+  nav.toc a:hover { color: var(--ink); text-decoration: none; border-left-color: var(--accent); }
+
+  main { min-width: 0; }
+  section.sec { scroll-margin-top: 84px; padding-top: 8px; margin-bottom: 52px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 22px; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: .04em; flex: none; }
+  h2 { font-size: clamp(1.4rem, 3vw, 1.85rem); letter-spacing: -.02em; margin: 0; font-weight: 750; line-height: 1.15; text-wrap: balance; }
+  h3 { font-size: 1.05rem; letter-spacing: -.01em; margin: 26px 0 10px; font-weight: 700; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: var(--col); color: var(--ink-soft); }
+  ul, ol.body { max-width: var(--col); padding-left: 20px; margin: 0 0 14px; color: var(--ink-soft); }
+  li { margin: 5px 0; }
+  strong { color: var(--ink); font-weight: 650; }
+  .muted { color: var(--mid); }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    color: var(--accent-ink); padding: 14px 16px; border-radius: 0 10px 10px 0;
+    margin: 8px 0 18px; max-width: var(--col); font-size: 14.5px;
+  }
+  .callout.warn { border-left-color: var(--warn); background: var(--gold-soft); color: var(--gold); }
+  .callout b { color: inherit; }
+
+  /* cards grid */
+  .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: 4px 0 8px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+  .card .t { font-weight: 700; font-size: 14.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .card .t .tag { font-family: var(--mono); font-size: 10px; color: var(--faint); border: 1px solid var(--line-strong); border-radius: 5px; padding: 1px 5px; letter-spacing: .04em; }
+  .card p { font-size: 13.5px; margin: 0; color: var(--mid); }
+
+  /* persona */
+  .persona .t { color: var(--accent-ink); }
+
+  /* table */
+  .tblwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; margin: 6px 0 16px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 520px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th { background: var(--surface-2); font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--mid); font-weight: 600; }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--accent-ink); white-space: nowrap; }
+  tbody tr:hover td { background: var(--surface-2); }
+
+  /* code / pipeline */
+  .code {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.7;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px; overflow-x: auto; color: var(--ink-soft); box-shadow: var(--shadow);
+    white-space: pre; margin: 6px 0 16px;
+  }
+  .code .c { color: var(--faint); }
+  .code .a { color: var(--accent); }
+
+  /* MVP split */
+  .split { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: var(--surface); box-shadow: var(--shadow); }
+  .panel h4 { margin: 0 0 10px; font-size: 13px; font-family: var(--mono); letter-spacing: .05em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .panel.in h4 { color: var(--good); }
+  .panel.out h4 { color: var(--crit); }
+  .panel h4 .mk { width: 8px; height: 8px; border-radius: 50%; }
+  .panel.in .mk { background: var(--good); }
+  .panel.out .mk { background: var(--crit); }
+  .panel ul { margin: 0; padding-left: 18px; font-size: 13.5px; }
+
+  /* roadmap timeline */
+  .road { display: grid; gap: 10px; }
+  .phase { display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: start; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--surface); box-shadow: var(--shadow); }
+  .phase .wk { font-family: var(--mono); font-size: 11.5px; color: var(--accent); font-weight: 600; padding-top: 2px; }
+  .phase .body b { display: block; font-size: 14.5px; margin-bottom: 3px; color: var(--ink); }
+  .phase .body span { font-size: 13.5px; color: var(--mid); }
+
+  /* milestone rail */
+  .miles { border-left: 2px solid var(--line-strong); margin-left: 8px; padding-left: 22px; display: grid; gap: 18px; }
+  .mile { position: relative; }
+  .mile::before { content: ""; position: absolute; left: -30px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
+  .mile .id { font-family: var(--mono); font-size: 12px; color: var(--accent-ink); font-weight: 600; }
+  .mile .t { font-weight: 700; font-size: 15px; margin: 2px 0 3px; }
+  .mile .e { font-size: 13px; color: var(--mid); }
+  .mile .e b { color: var(--ink-soft); }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 60px; }
+  .approval { background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); color: var(--accent-ink); border-radius: var(--radius); padding: 20px 22px; max-width: var(--col); }
+  .approval b { color: inherit; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    nav.toc { display: none; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(10px); animation: rise .6s cubic-bezier(.2,.7,.2,1) forwards; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="topbar">
+  <div class="row">
+    <span class="brand"><span class="dot" aria-hidden="true"></span> Ledger <small>PERSONAL FINANCE OS</small></span>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="status-pill">Planning · Pre-build</span>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme">◑ Theme</button>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap reveal">
+    <div class="eyebrow">Product Requirements Document · v0.1</div>
+    <h1>Every expense you have, in <span class="accent">one calm place</span>.</h1>
+    <p class="lede">A SaaS web app that automatically pulls your credit cards, bank, subscriptions, utilities, and email invoices into a single, fast, AI-powered dashboard — a personal financial operating system. You should barely type a thing.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>Market</b> · Israel 🇮🇱 → Global 🌍</span>
+      <span class="chip"><b>Feel</b> · Linear + Stripe + Apple Wallet</span>
+      <span class="chip"><b>Stack</b> · Next.js · Postgres · Claude AI</span>
+      <span class="chip"><b>MVP</b> · ~16 weeks</span>
+    </div>
+
+    <div class="metrics">
+      <div class="tile">
+        <div class="k">North-star</div>
+        <div class="v">&gt;90<small>%</small></div>
+        <div class="d">of transactions imported automatically, not typed</div>
+      </div>
+      <div class="tile">
+        <div class="k">Time to value</div>
+        <div class="v">&lt;5<small>min</small></div>
+        <div class="d">signup → first populated dashboard</div>
+      </div>
+      <div class="tile">
+        <div class="k">AI accuracy</div>
+        <div class="v">&gt;92<small>%</small></div>
+        <div class="d">auto-categorization before any correction</div>
+      </div>
+      <div class="tile">
+        <div class="k">Money surfaced</div>
+        <div class="v">≥₪150<small>/mo</small></div>
+        <div class="d">savings from subs + insights per user</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Contents">
+      <div class="tl">Deliverables</div>
+      <ol>
+        <li><a href="#s1">Product Vision</a></li>
+        <li><a href="#s2">PRD Core</a></li>
+        <li><a href="#s3">Functional Reqs</a></li>
+        <li><a href="#s4">Non-Functional</a></li>
+        <li><a href="#s5">Database Design</a></li>
+        <li><a href="#s6">API Architecture</a></li>
+        <li><a href="#s7">UX Flow</a></li>
+        <li><a href="#s8">UI Components</a></li>
+        <li><a href="#s9">Folder Structure</a></li>
+        <li><a href="#s10">Infrastructure</a></li>
+        <li><a href="#s11">Security Plan</a></li>
+        <li><a href="#s12">AI Features</a></li>
+        <li><a href="#s13">Roadmap</a></li>
+        <li><a href="#s14">Milestones</a></li>
+        <li><a href="#s15">Future</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <!-- 1 -->
+      <section class="sec" id="s1">
+        <div class="sec-head"><span class="sec-num">01</span><h2>Product Vision</h2></div>
+        <p><strong>The problem.</strong> Money lives across 10–20 disconnected surfaces — two banks, three cards, PayPal, Apple/Google subscriptions, utility portals, insurance, Amazon, email invoices, SMS receipts. There is no single trustworthy answer to <em>“where did my money go this month, and what’s coming up?”</em> The best global tools don’t support Israeli banks; local tools are manual and clunky.</p>
+        <div class="callout"><b>The vision.</b> Instead of a dozen apps, you open one. Everything imports automatically, AI categorizes it, and it’s presented in a calm, premium interface that answers questions in plain language and quietly finds you money to save.</div>
+        <h3>Design principles</h3>
+        <div class="cards">
+          <div class="card"><div class="t">Zero-effort ingestion</div><p>Manual entry is the exception, never the rule.</p></div>
+          <div class="card"><div class="t">Trust before features</div><p>It touches money — security and correctness beat flash.</p></div>
+          <div class="card"><div class="t">Explainable AI</div><p>Every category & insight is traceable and user-correctable.</p></div>
+          <div class="card"><div class="t">Calm software</div><p>No dark patterns. Notifications earn their place.</p></div>
+          <div class="card"><div class="t">Speed is a feature</div><p>Sub-second interactions everywhere.</p></div>
+          <div class="card"><div class="t">Local-first correctness</div><p>ILS, Hebrew, RTL, Israeli banks — first-class, not bolted on.</p></div>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section class="sec" id="s2">
+        <div class="sec-head"><span class="sec-num">02</span><h2>PRD Core — Personas &amp; MVP</h2></div>
+        <h3>Who it’s for</h3>
+        <div class="cards">
+          <div class="card persona"><div class="t">Noa <span class="tag">PRIMARY</span></div><p>Overwhelmed professional. One bank, two cards, ~8 subs. Wants one truth and to stop feeling anxious — won’t tolerate data entry.</p></div>
+          <div class="card persona"><div class="t">Dan <span class="tag">POWER</span></div><p>Freelancer + salary, multiple cards, PayPal, FX. Loves dashboards, budgets, cutting waste, forecasting.</p></div>
+          <div class="card persona"><div class="t">Maya &amp; Tom <span class="tag">HOUSEHOLD</span></div><p>Shared expenses. Want a joint view with per-person breakdown and shared budgets.</p></div>
+          <div class="card persona"><div class="t">Avi <span class="tag">CAUTIOUS</span></div><p>Distrusts fintech. Needs read-only guarantees & simple summaries. Starts with email + manual.</p></div>
+        </div>
+        <h3>MVP scope</h3>
+        <div class="split">
+          <div class="panel in">
+            <h4><span class="mk"></span> In the MVP</h4>
+            <ul>
+              <li>Auth, accounts, household (single-user first)</li>
+              <li>Ingestion: manual + statement upload (CSV/PDF/XLS) + <b>Gmail read-only</b> scan + one read-only bank/card sync</li>
+              <li>AI categorization with correction &amp; learning</li>
+              <li>Dashboard v1 — totals, categories, cash flow, upcoming bills, largest, month-over-month</li>
+              <li>Subscription detection + renewal reminders</li>
+              <li>Budgets v1 (monthly + per-category alerts)</li>
+              <li>NL Q&amp;A assistant v1 · Monthly reports (PDF/CSV)</li>
+              <li>Dark/light · responsive · Hebrew RTL + English</li>
+            </ul>
+          </div>
+          <div class="panel out">
+            <h4><span class="mk"></span> Deferred to Future</h4>
+            <ul>
+              <li>Native mobile apps (PWA first)</li>
+              <li>Investments / net-worth tracking</li>
+              <li>Bill-pay &amp; “cancel on your behalf”</li>
+              <li>WhatsApp / SMS ingestion (privacy risk)</li>
+              <li>Advanced multi-currency tax reporting</li>
+              <li>Team/advisor sharing beyond one household</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 -->
+      <section class="sec" id="s3">
+        <div class="sec-head"><span class="sec-num">03</span><h2>Functional Requirements</h2></div>
+        <div class="tblwrap">
+          <table>
+            <thead><tr><th>Area</th><th>Requirement highlights</th></tr></thead>
+            <tbody>
+              <tr><td class="num">Ingest</td><td>Read-only bank/card sync · statement upload with format auto-detect · Gmail/Outlook invoice scan · unique forwarding inbox · fast manual entry · <b>cross-source dedup</b> (card + email + statement → one transaction)</td></tr>
+              <tr><td class="num">Normalize</td><td>Merchant cleanup + logo + canonical ID · multi-currency (original + converted, daily FX) · lifecycle pending → posted → reconciled, refunds</td></tr>
+              <tr><td class="num">Categorize</td><td>Auto category + confidence · user override creates rules · split / merge / tag / notes / attach receipt</td></tr>
+              <tr><td class="num">Budgets</td><td>Monthly + per-category · rollover · projected end-of-month · 80/100% alerts · AI recommendations</td></tr>
+              <tr><td class="num">Subs</td><td>Recurring detection · renewal dates · price-increase, duplicate &amp; unused flags · reminders before renewal</td></tr>
+              <tr><td class="num">Assistant</td><td>NL Q&amp;A with chart + clickable sources · monthly summaries · anomaly explanations</td></tr>
+              <tr><td class="num">Reports</td><td>Monthly / quarterly / annual · export PDF / Excel / CSV · scheduled email</td></tr>
+              <tr><td class="num">Notify</td><td>Bills, budget, large txn, renewal, suspicious, savings · per-type prefs + quiet hours</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4 -->
+      <section class="sec" id="s4">
+        <div class="sec-head"><span class="sec-num">04</span><h2>Non-Functional Requirements</h2></div>
+        <div class="cards">
+          <div class="card"><div class="t">Performance</div><p>Dashboard &lt;1.5s p75 · API reads &lt;300ms p95 · NL answer &lt;3s · 2k-row statement &lt;20s.</p></div>
+          <div class="card"><div class="t">Scalability</div><p>Designed for 1M users. Stateless API + autoscale, async queues, partition-friendly schema, read replicas.</p></div>
+          <div class="card"><div class="t">Reliability</div><p>Exactly-once ingest via idempotency keys · retries + circuit breakers · dead-letter queues.</p></div>
+          <div class="card"><div class="t">Availability</div><p>99.9% target · graceful degrade — AI down still imports as “uncategorized”.</p></div>
+          <div class="card"><div class="t">Accessibility</div><p>WCAG 2.1 AA · full keyboard nav · reduced-motion · contrast in both themes.</p></div>
+          <div class="card"><div class="t">i18n / l10n</div><p>Hebrew (RTL) + English at launch · locale-aware money/date/number.</p></div>
+          <div class="card"><div class="t">Observability</div><p>Structured logs, tracing, metrics, SLO alerting, ingestion/AI dashboards.</p></div>
+          <div class="card"><div class="t">Cost control</div><p>Cheap models for bulk categorize, premium for Q&amp;A · caching · per-user quotas.</p></div>
+        </div>
+      </section>
+
+      <!-- 5 -->
+      <section class="sec" id="s5">
+        <div class="sec-head"><span class="sec-num">05</span><h2>Database Design</h2></div>
+        <p><strong>PostgreSQL</strong> core · <strong>Redis</strong> cache/queues · <strong>S3</strong> for receipts/reports · <strong>pgvector</strong> for merchant/transaction embeddings. ~16 core entities.</p>
+        <div class="cards">
+          <div class="card"><div class="t">Key decisions</div><p>Money as integer minor units (never floats). Soft deletes + append-only audit logs. Postgres RLS scopes every query to user/household.</p></div>
+          <div class="card"><div class="t">Dedup hash</div><p>hash(merchant + amount bucket + date bucket + account) collapses the same expense arriving from card, email &amp; statement.</p></div>
+          <div class="card"><div class="t">Learning without retraining</div><p>Per-user <code>category_rules</code> + embeddings — corrections compound, no per-user fine-tune.</p></div>
+          <div class="card"><div class="t">Analytics at scale</div><p>Materialized <code>monthly_category_totals</code>; transactions partition by user/date as volume grows.</p></div>
+        </div>
+        <div class="code"><span class="c">-- core spine</span>
+users · households · household_members
+accounts · connections<span class="c">(tokens encrypted)</span>
+<span class="a">transactions</span> · transaction_splits · merchants
+categories · category_rules · subscriptions
+budgets · budget_categories · goals
+insights · notifications · documents
+ingestion_jobs · audit_logs</div>
+      </section>
+
+      <!-- 6 -->
+      <section class="sec" id="s6">
+        <div class="sec-head"><span class="sec-num">06</span><h2>API Architecture</h2></div>
+        <p><strong>BFF pattern.</strong> Next.js server as primary API — <strong>tRPC</strong> internally for end-to-end types, plus a versioned public <strong>REST <code>/api/v1</code></strong> for future mobile &amp; power users. Zod validates every contract. Long work runs on async workers, never blocking requests.</p>
+        <h3>Cross-cutting</h3>
+        <ul>
+          <li><b>Idempotency-Key</b> on every financial POST · cursor pagination for transactions</li>
+          <li>Per-user + per-IP rate limits (Redis) · stricter on assistant &amp; ingestion</li>
+          <li>SSE streaming for assistant answers &amp; ingestion progress · RFC 7807 errors</li>
+        </ul>
+        <h3>Event-driven ingestion pipeline</h3>
+        <div class="code">Source <span class="c">(bank webhook / email / upload)</span>
+   │
+   ▼  enqueue → <span class="a">Redis / BullMQ</span>
+<span class="a">Normalizer</span>   clean · FX-convert · dedup(hash)
+   │
+<span class="a">Categorizer</span>  rules → embeddings → LLM fallback → confidence
+   │
+   ├─▶ Subscription / Anomaly / Duplicate detectors
+   ▼
+Persist txn + refresh summaries → emit events
+   │
+   ▼
+<span class="a">Notifier / Insight generator</span></div>
+      </section>
+
+      <!-- 7 -->
+      <section class="sec" id="s7">
+        <div class="sec-head"><span class="sec-num">07</span><h2>UX Flow</h2></div>
+        <h3>First-run activation — the “here’s your month” moment</h3>
+        <div class="code">Sign up <span class="c">(email / Google / Apple)</span>
+  → pick base currency + language <span class="c">(Hebrew / English)</span>
+  → Add first source:  [ Connect bank ]  [ Scan email ]  [ Upload statement ]
+  → Consent screen  <span class="a">READ-ONLY · encrypted · what we access</span>
+  → Import runs — dashboard skeleton fills in real time
+  → AI categorizes → <span class="a">first value</span>
+  → optional: set a budget, confirm detected subscriptions</div>
+        <h3>Correction flow — the app gets smarter</h3>
+        <p>Click a category → pick a new one → <em>“Apply to 12 similar?”</em> → creates a rule + updates the embedding → future transactions auto-fixed. A <strong>⌘K command palette</strong> jumps anywhere and asks the assistant. Optimistic UI on every edit; empty states that teach.</p>
+      </section>
+
+      <!-- 8 -->
+      <section class="sec" id="s8">
+        <div class="sec-head"><span class="sec-num">08</span><h2>UI Components</h2></div>
+        <p>Design system on <strong>Radix + Tailwind</strong> (shadcn-style) with theme-aware tokens, tabular figures for money, RTL-first logical properties, and motion that respects <code>prefers-reduced-motion</code>.</p>
+        <div class="cards">
+          <div class="card"><div class="t">StatTile</div><p>Big number + trend + sparkline for spend, income, net, savings.</p></div>
+          <div class="card"><div class="t">CategoryDonut</div><p>Breakdown with drill-down back to transactions.</p></div>
+          <div class="card"><div class="t">CashFlowChart</div><p>Income vs. spend over time, emphasized endpoint.</p></div>
+          <div class="card"><div class="t">TransactionTable</div><p>Virtualized · filter / search / sort · inline edit · bulk actions.</p></div>
+          <div class="card"><div class="t">SubscriptionCard</div><p>Logo, cadence, next renewal, price-change badge.</p></div>
+          <div class="card"><div class="t">BudgetProgress</div><p>Per-category bars + projected overage.</p></div>
+          <div class="card"><div class="t">AssistantPanel</div><p>⌘K NL Q&amp;A, streamed answer + inline chart.</p></div>
+          <div class="card"><div class="t">InsightCard</div><p>Anomaly / duplicate / saving / summary with one action.</p></div>
+        </div>
+      </section>
+
+      <!-- 9 -->
+      <section class="sec" id="s9">
+        <div class="sec-head"><span class="sec-num">09</span><h2>Folder Structure</h2></div>
+        <p>Monorepo (<strong>Turborepo + pnpm</strong>) so web, future mobile &amp; workers share types. New integrations = a new adapter implementing a common <code>SourceAdapter</code> — no core changes.</p>
+        <div class="code">/apps
+  /web        <span class="c">Next.js App Router — dashboard + BFF</span>
+  /workers    <span class="c">async: ingest · categorize · fx · reports · notify</span>
+  /mobile     <span class="c">(future) Expo — reuses /packages</span>
+/packages
+  /db         <span class="c">schema · migrations · RLS policies</span>
+  /core       <span class="c">dedup · rules · subscription detect</span>
+  /ai         <span class="c">LLM clients · prompts · embeddings · guardrails</span>
+  /integrations  <span class="c">plaid · saltedge · paypal · gmail · parsers</span>
+  /types      <span class="c">shared Zod schemas + TS types</span>
+  /ui         <span class="c">design system</span>
+/infra · /docs</div>
+      </section>
+
+      <!-- 10 -->
+      <section class="sec" id="s10">
+        <div class="sec-head"><span class="sec-num">10</span><h2>Infrastructure &amp; Integrations</h2></div>
+        <div class="tblwrap">
+          <table>
+            <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td class="num">Framework</td><td>Next.js · React · TS</td><td>UI + BFF in one, streaming SSR, huge ecosystem</td></tr>
+              <tr><td class="num">DB / ORM</td><td>PostgreSQL · Drizzle</td><td>Integrity, RLS, JSONB, pgvector; SQL-first types</td></tr>
+              <tr><td class="num">Cache / Queue</td><td>Redis · BullMQ</td><td>Rate limits + reliable async ingest with retries/DLQ</td></tr>
+              <tr><td class="num">Auth</td><td>Clerk</td><td>Fastest secure path — MFA, social, sessions, less custom risk</td></tr>
+              <tr><td class="num">AI</td><td>Claude + cheap tier</td><td>Claude for Q&amp;A/insights, cheap model bulk categorize, model-agnostic gateway</td></tr>
+              <tr><td class="num">Bank data</td><td>SaltEdge / Plaid + email</td><td>Global via Plaid; <b>Israel has no Plaid</b> → SaltEdge + email/upload fallback</td></tr>
+              <tr><td class="num">Hosting</td><td>Vercel + containers</td><td>Edge/SSR for web; long-running workers in containers</td></tr>
+              <tr><td class="num">Edge / WAF</td><td>Cloudflare</td><td>CDN, DDoS, bot mgmt, edge rate limiting</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warn"><b>Key constraint:</b> Israel has no official Plaid coverage. MVP leans on <b>Gmail invoice scan + statement upload</b> as the reliable ingestion path, with SaltEdge as the live-sync option — which is exactly why email ingestion sits in the MVP, not the backlog.</div>
+      </section>
+
+      <!-- 11 -->
+      <section class="sec" id="s11">
+        <div class="sec-head"><span class="sec-num">11</span><h2>Security Plan</h2></div>
+        <div class="callout"><b>This app touches money — security <em>is</em> the product.</b> Read-only financial access; we never move money in the MVP, and we say so prominently.</div>
+        <div class="cards">
+          <div class="card"><div class="t">Encryption</div><p>TLS in transit, AES-256 at rest, field-level envelope encryption (KMS) for tokens &amp; PII. Tokens never logged.</p></div>
+          <div class="card"><div class="t">AuthZ</div><p>MFA, OAuth, short-lived JWT + rotating refresh, Postgres RLS + app-layer checks (defense in depth).</p></div>
+          <div class="card"><div class="t">Audit &amp; abuse</div><p>Append-only audit logs, edge + app rate limits, login anomaly / impossible-travel detection.</p></div>
+          <div class="card"><div class="t">AI safety</div><p>No cross-user data in prompts, PII minimization, prompt-injection defense on ingested email/receipt text.</p></div>
+          <div class="card"><div class="t">Compliance</div><p>GDPR + Israeli Privacy Law · consent per integration · data export &amp; delete · DPAs with subprocessors.</p></div>
+          <div class="card"><div class="t">Backup / recovery</div><p>Encrypted backups + PITR, tested restore, RPO ≤15m / RTO ≤1h.</p></div>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section class="sec" id="s12">
+        <div class="sec-head"><span class="sec-num">12</span><h2>AI Features</h2></div>
+        <h3>Categorization — hybrid, cheap by default</h3>
+        <div class="code"><span class="a">1. rules</span>      user rules · known merchants · MCC     <span class="c">free · instant · majority</span>
+<span class="a">2. embeddings</span> nearest categorized txns (pgvector)     <span class="c">cheap</span>
+<span class="a">3. LLM</span>        only low-confidence / unknown           <span class="c">batched · cached</span>
+  ↳ user correction → new rule + embedding → accuracy compounds</div>
+        <div class="cards">
+          <div class="card"><div class="t">Subscription detection</div><p>Recurring pattern → next-renewal prediction, price-increase, duplicate &amp; unused flags.</p></div>
+          <div class="card"><div class="t">Anomaly &amp; duplicate</div><p>“3× your usual electricity bill”, double charges, potential fraud → insights + alerts.</p></div>
+          <div class="card"><div class="t">Forecasting</div><p>Predict end-of-month total &amp; per-category spend, feeding budget warnings.</p></div>
+          <div class="card"><div class="t">NL assistant</div><p>NL → validated query plan → aggregation → Claude writes answer. <b>Numbers come from the query layer, never invented.</b></p></div>
+        </div>
+        <p class="muted">Cost controls: model routing by task, caching, batching, per-user quotas, and graceful fallback if AI is unavailable.</p>
+      </section>
+
+      <!-- 13 -->
+      <section class="sec" id="s13">
+        <div class="sec-head"><span class="sec-num">13</span><h2>Development Roadmap</h2></div>
+        <div class="road">
+          <div class="phase"><div class="wk">Wk 1–2</div><div class="body"><b>Phase 0 · Foundations</b><span>Monorepo, CI/CD, schema, auth, tokens, RLS — skeleton deploys.</span></div></div>
+          <div class="phase"><div class="wk">Wk 3–5</div><div class="body"><b>Phase 1 · Ingestion core</b><span>Manual + statement upload + dedup + normalization.</span></div></div>
+          <div class="phase"><div class="wk">Wk 5–7</div><div class="body"><b>Phase 2 · AI categorization</b><span>Rules + embeddings + LLM fallback + correction learning.</span></div></div>
+          <div class="phase"><div class="wk">Wk 7–9</div><div class="body"><b>Phase 3 · Dashboard v1</b><span>Stat tiles, categories, cash flow, MoM, filters/search.</span></div></div>
+          <div class="phase"><div class="wk">Wk 9–12</div><div class="body"><b>Phase 4 · Email + one live source</b><span>Gmail scan + SaltEdge bank + cross-source dedup.</span></div></div>
+          <div class="phase"><div class="wk">Wk 12–14</div><div class="body"><b>Phase 5 · Subscriptions + Budgets</b><span>Detection, renewals, reminders, alerts.</span></div></div>
+          <div class="phase"><div class="wk">Wk 14–16</div><div class="body"><b>Phase 6 · Assistant + Reports + Notifications</b><span>NL Q&amp;A, PDF/CSV, notification prefs — MVP feature-complete.</span></div></div>
+          <div class="phase"><div class="wk">Wk 16–18</div><div class="body"><b>Phase 7 · Hardening &amp; Beta</b><span>Security review, pen-test, perf, a11y, i18n → private beta.</span></div></div>
+        </div>
+      </section>
+
+      <!-- 14 -->
+      <section class="sec" id="s14">
+        <div class="sec-head"><span class="sec-num">14</span><h2>Milestone Breakdown</h2></div>
+        <div class="miles">
+          <div class="mile"><div class="id">M0 · Wk 2</div><div class="t">Walking skeleton</div><div class="e">Auth + deploy + schema + RLS. <b>Exit:</b> user can log in on staging.</div></div>
+          <div class="mile"><div class="id">M1 · Wk 5</div><div class="t">First data in</div><div class="e">Upload/manual + dedup + table. <b>Exit:</b> upload a real statement, see clean transactions.</div></div>
+          <div class="mile"><div class="id">M2 · Wk 7</div><div class="t">It understands money</div><div class="e">AI categorization + learning. <b>Exit:</b> &gt;85% auto-categorized; corrections persist.</div></div>
+          <div class="mile"><div class="id">M3 · Wk 9</div><div class="t">The dashboard moment</div><div class="e">Dashboard v1 + filters. <b>Exit:</b> “here’s your month” is genuinely useful.</div></div>
+          <div class="mile"><div class="id">M4 · Wk 12</div><div class="t">Nearly automatic</div><div class="e">Gmail + live bank + dedup. <b>Exit:</b> &gt;80% of a real month imported with no typing.</div></div>
+          <div class="mile"><div class="id">M5 · Wk 14</div><div class="t">Proactive</div><div class="e">Subs + budgets + alerts. <b>Exit:</b> app warns before renewal/overspend.</div></div>
+          <div class="mile"><div class="id">M6 · Wk 16</div><div class="t">MVP complete</div><div class="e">Assistant + reports + notifications. <b>Exit:</b> all MVP requirements pass.</div></div>
+          <div class="mile"><div class="id">M7 · Wk 18</div><div class="t">Beta-ready</div><div class="e">Security / perf / a11y / i18n sign-off. <b>Exit:</b> private beta with real users.</div></div>
+        </div>
+      </section>
+
+      <!-- 15 -->
+      <section class="sec" id="s15">
+        <div class="sec-head"><span class="sec-num">15</span><h2>Future Expansion</h2></div>
+        <div class="cards">
+          <div class="card"><div class="t">Wealth, not just spend</div><p>Investments, net worth, assets/liabilities, retirement view.</p></div>
+          <div class="card"><div class="t">Automation</div><p>Goal-based auto-savings and rules (“move ₪X when under budget”).</p></div>
+          <div class="card"><div class="t">Concierge cancel</div><p>Help cancel &amp; negotiate subs, insurance, cellular.</p></div>
+          <div class="card"><div class="t">Household &amp; family</div><p>Shared budgets with roles, kids’ allowances, per-member analytics.</p></div>
+          <div class="card"><div class="t">Native mobile</div><p>Camera receipt capture, push, widgets, Face ID.</p></div>
+          <div class="card"><div class="t">Open platform</div><p>Public API + webhooks; marketplace of community rules &amp; insights.</p></div>
+          <div class="card"><div class="t">Tax-season pack</div><p>Categorized export for accountants; VAT/expense for freelancers.</p></div>
+          <div class="card"><div class="t">Bill-pay</div><p>Open-banking payment initiation, once trust &amp; compliance are set.</p></div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="approval">
+          <b>Approval gate.</b> This is Phase 1 (planning) only — no application code is written until this plan is reviewed and approved. On approval we begin at <b>M0 (walking skeleton)</b> and proceed milestone by milestone, with a demo and a metric check at every gate.
+        </div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var root = document.documentElement;
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme');
+      if (!cur) {
+        cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
