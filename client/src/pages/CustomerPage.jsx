@@ -5,6 +5,9 @@ const FOOD = [
   {
     id: 'omelette', name: 'חביתה', icon: '🍳', basePrice: 28,
     desc: 'חביתה טרייה',
+    spreads: [
+      { id: 'hummus', name: 'חומוס' },
+    ],
   },
   {
     id: 'toast', name: 'טוסט', icon: '🥪', basePrice: 26,
@@ -23,6 +26,9 @@ const FOOD = [
     id: 'veggie-omelette', name: 'חביתת ירק', icon: '🥬', basePrice: 33,
     desc: 'חביתה עם כל הירקות',
     note: 'כל הירקות כלולים במחיר',
+    spreads: [
+      { id: 'hummus', name: 'חומוס' },
+    ],
     vegetables: [
       { id: 'tomato',   name: 'עגבניה' },
       { id: 'cucumber', name: 'מלפפון' },
@@ -35,6 +41,9 @@ const FOOD = [
   {
     id: 'mushroom-omelette', name: 'חביתת פטריות', icon: '🍄', basePrice: 31,
     desc: 'חביתה עם פטריות',
+    spreads: [
+      { id: 'hummus', name: 'חומוס' },
+    ],
   },
   {
     id: 'avocado', name: 'סנדביץ אבוקדו', icon: '🥑', basePrice: 33,
@@ -42,6 +51,7 @@ const FOOD = [
     note: 'כל הירקות כלולים במחיר',
     spreads: [
       { id: 'cream-cheese', name: 'גבינת שמנת' },
+      { id: 'hummus',       name: 'חומוס' },
       { id: 'pesto',        name: 'פסטו' },
       { id: 'spicy',        name: 'חריף' },
     ],
@@ -60,6 +70,7 @@ const FOOD = [
     note: 'כל הירקות כלולים במחיר',
     spreads: [
       { id: 'cream-cheese', name: 'גבינת שמנת' },
+      { id: 'hummus',       name: 'חומוס' },
       { id: 'pesto',        name: 'פסטו' },
       { id: 'spicy',        name: 'חריף' },
     ],
@@ -110,7 +121,7 @@ export default function CustomerPage() {
   function openModal(item) { setModal(item); setToastSel([]); setOmlSel([]); setSpreadSel([]); }
 
   function handleAdd(item) {
-    if (item.toppings || item.vegetables) {
+    if (item.toppings || item.vegetables || item.spreads) {
       openModal(item);
     } else {
       setCart(p => [...p, { uid: Date.now(), name: item.name, extras: [], price: item.basePrice }]);
@@ -343,7 +354,7 @@ export default function CustomerPage() {
               </div>
             </>)}
 
-            {modal.vegetables && (<>
+            {(modal.vegetables || modal.spreads) && !modal.toppings && (<>
               {modal.spreads && (<>
                 <p className="modal-sub">ממרח (אופציונלי)</p>
                 <div className="topping-grid" style={{marginBottom:'18px'}}>
@@ -358,17 +369,19 @@ export default function CustomerPage() {
                 </div>
               </>)}
 
-              <p className="modal-sub">ירקות לבחירה</p>
-              <p className="modal-note">הכל כלול במחיר</p>
-              <div className="topping-grid">
-                {modal.vegetables.map(v => (
-                  <button key={v.id}
-                    className={`top-btn ${omlSel.includes(v.id) ? 'top-btn--on' : ''}`}
-                    onClick={() => toggle(v.id, omlSel, setOmlSel)}>
-                    {v.name}
-                  </button>
-                ))}
-              </div>
+              {modal.vegetables && (<>
+                <p className="modal-sub">ירקות לבחירה</p>
+                <p className="modal-note">הכל כלול במחיר</p>
+                <div className="topping-grid">
+                  {modal.vegetables.map(v => (
+                    <button key={v.id}
+                      className={`top-btn ${omlSel.includes(v.id) ? 'top-btn--on' : ''}`}
+                      onClick={() => toggle(v.id, omlSel, setOmlSel)}>
+                      {v.name}
+                    </button>
+                  ))}
+                </div>
+              </>)}
               <div className="modal-foot">
                 <span className="modal-price">{modal.basePrice}₪</span>
                 <button className="modal-add" onClick={addFood}>הוסף להזמנה</button>
