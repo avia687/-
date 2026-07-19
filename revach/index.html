@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e9f6e" />
+  <title>רווח — כמה הרווחת השבוע</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ======= App shell ======= -->
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-logo">💰</span>
+        <span class="brand-name">רווח</span>
+      </div>
+      <button id="settingsBtn" class="icon-btn" aria-label="הגדרות">⚙️</button>
+    </header>
+
+    <!-- ======= HOME ======= -->
+    <section class="screen" id="screen-home" data-screen="home">
+      <div class="screen-inner"></div>
+    </section>
+
+    <!-- ======= INSIGHTS ======= -->
+    <section class="screen hidden" id="screen-insights" data-screen="insights">
+      <div class="screen-inner"></div>
+    </section>
+
+    <!-- ======= GOALS ======= -->
+    <section class="screen hidden" id="screen-goals" data-screen="goals">
+      <div class="screen-inner"></div>
+    </section>
+
+    <!-- ======= JOBS LIST ======= -->
+    <section class="screen hidden" id="screen-jobs" data-screen="jobs">
+      <div class="screen-inner"></div>
+    </section>
+
+    <!-- Bottom navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-nav="home">
+        <span class="nav-ico">🏠</span><span class="nav-lbl">בית</span>
+      </button>
+      <button class="nav-btn" data-nav="insights">
+        <span class="nav-ico">📊</span><span class="nav-lbl">תובנות</span>
+      </button>
+      <button class="fab" id="fabAdd" aria-label="הוספת עבודה">+</button>
+      <button class="nav-btn" data-nav="goals">
+        <span class="nav-ico">🎯</span><span class="nav-lbl">מטרות</span>
+      </button>
+      <button class="nav-btn" data-nav="jobs">
+        <span class="nav-ico">📋</span><span class="nav-lbl">עבודות</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======= Sheet / Modal container ======= -->
+  <div class="sheet-backdrop hidden" id="sheetBackdrop"></div>
+  <div class="sheet hidden" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
