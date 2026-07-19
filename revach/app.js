@@ -47,6 +47,7 @@ function moneyShort(n) {
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 const DAY_SHORT = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
 const MONTHS = ['ינו׳', 'פבר׳', 'מרץ', 'אפר׳', 'מאי', 'יוני', 'יולי', 'אוג׳', 'ספט׳', 'אוק׳', 'נוב׳', 'דצמ׳'];
+const MONTHS_FULL = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
 
 function todayISO() { return toISO(new Date()); }
 function toISO(d) {
@@ -72,6 +73,8 @@ function niceDate(iso) {
 }
 
 function sum(arr, f) { return arr.reduce((s, x) => s + (f ? f(x) : x), 0); }
+function daysAgo(iso) { return Math.floor((Date.now() - parseISO(iso).getTime()) / 864e5); }
+function jobNet(j) { return (Number(j.amount) || 0) - (Number(j.expenses) || 0); }
 
 /* -------------------- Goal allocation --------------------
    Each goal saves from every job:
@@ -117,6 +120,12 @@ function stats() {
   const thisWeekJobs = jobsInRange(weekRange(0).start, weekRange(0).end);
   const unpaid = sum(jobs.filter(j => !j.paid), j => Number(j.amount) || 0);
   const total = sum(jobs, j => Number(j.amount) || 0);
+  const totalExpenses = sum(jobs, j => Number(j.expenses) || 0);
+  const netTotal = total - totalExpenses;
+  const hoursJobs = jobs.filter(j => Number(j.hours) > 0);
+  const totalHours = sum(hoursJobs, j => Number(j.hours) || 0);
+  const hourlyRate = totalHours > 0 ? sum(hoursJobs, j => Number(j.amount) || 0) / totalHours : 0;
+  const unpaidJobs = jobs.filter(j => !j.paid).sort((a, b) => a.date.localeCompare(b.date));
 
   // change %
   let change = null;
@@ -135,7 +144,7 @@ function stats() {
   const clientArr = Object.entries(byClient).sort((a, b) => b[1] - a[1]);
   const topClient = clientArr[0] || null;
 
-  return { thisWeek, lastWeek, change, unpaid, total, thisWeekJobs, byDay, bestDay, bestDayVal, byClient, clientArr, topClient };
+  return { thisWeek, lastWeek, change, unpaid, total, totalExpenses, netTotal, totalHours, hourlyRate, unpaidJobs, thisWeekJobs, byDay, bestDay, bestDayVal, byClient, clientArr, topClient };
 }
 
 /* ==========================================================
@@ -190,6 +199,10 @@ function renderHome() {
   }
   c.appendChild(hero);
 
+  // Payment reminders
+  const alertCard = paymentsAlertCard(s);
+  if (alertCard) c.appendChild(alertCard);
+
   // Weekly goal progress (if set)
   if (settings.weeklyGoal > 0) {
     const pct = Math.min(100, Math.round(s.thisWeek / settings.weeklyGoal * 100));
@@ -234,6 +247,8 @@ function insightTiles(s) {
   if (s.bestDay !== null && s.bestDayVal > 0) add('📅', 'bg-blue', `יום ${DAY_NAMES[s.bestDay]} הכי רווחי לך`, `סה״כ ${money(s.bestDayVal)} בימי ${DAY_NAMES[s.bestDay]}`);
   if (s.topClient) add('👤', 'bg-purple', `הלקוח הכי רווחי: ${s.topClient[0]}`, `${money(s.topClient[1])} סה״כ`);
   if (s.unpaid > 0) add('⏳', 'bg-amber', `${money(s.unpaid)} עדיין לא שולמו`, `${jobs.filter(j => !j.paid).length} עבודות ממתינות לתשלום`);
+  if (s.hourlyRate > 0) add('⏱️', 'bg-blue', `שכר שעתי ממוצע: ${money(s.hourlyRate)} לשעה`, `על סמך ${Math.round(s.totalHours)} שעות שרשמת`);
+  if (s.totalExpenses > 0) add('🧾', 'bg-amber', `רווח נטו: ${money(s.netTotal)}`, `${money(s.total)} הכנסות פחות ${money(s.totalExpenses)} הוצאות`);
 
   // goal nudge
   const closest = goals.map(g => ({ g, left: (g.target || 0) - goalSaved(g), pct: goalSaved(g) / (g.target || 1) }))
@@ -242,6 +257,44 @@ function insightTiles(s) {
 
   if (!tiles.length) add('✨', 'bg-green', 'הוסף עוד עבודות', 'ככל שתרשום יותר, כך התובנות ידייקו');
   return tiles;
+}
+
+function paymentsAlertCard(s) {
+  if (!s.unpaidJobs.length) return null;
+  const card = el('div', 'card alert-card');
+  const overdue = s.unpaidJobs.filter(j => daysAgo(j.date) >= 14);
+  const head = overdue.length
+    ? `<b>⏳ ${money(s.unpaid)} ממתינים לתשלום</b><div class="alert-sub">${overdue.length} עבודות באיחור (מעל שבועיים)</div>`
+    : `<b>⏳ ${money(s.unpaid)} ממתינים לתשלום</b><div class="alert-sub">${s.unpaidJobs.length} עבודות שטרם שולמו</div>`;
+  card.innerHTML = `<div class="alert-head">${head}</div>`;
+
+  const list = el('div', 'pay-list');
+  s.unpaidJobs.slice(0, 3).forEach(j => {
+    const late = daysAgo(j.date) >= 14;
+    const row = el('div', 'pay-row');
+    row.innerHTML = `
+      <div class="pay-main">
+        <div class="pay-title">${escAttr(j.title) || 'עבודה'}${late ? ' <span class="late-badge">באיחור</span>' : ''}</div>
+        <div class="pay-sub">${j.client ? escAttr(j.client) + ' · ' : ''}${niceDate(j.date)} · ${money(j.amount)}</div>
+      </div>
+      <button class="pay-btn" data-pay="${j.id}">שולם ✓</button>`;
+    row.querySelector('[data-pay]').onclick = () => markPaid(j.id);
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+
+  if (s.unpaidJobs.length > 3) {
+    const more = el('button', 'link-btn', `לכל ${s.unpaidJobs.length} התשלומים הממתינים ←`);
+    more.style.cssText = 'display:block;margin:4px auto 0';
+    more.onclick = () => { jobFilter = 'unpaid'; nav('jobs'); };
+    card.appendChild(more);
+  }
+  return card;
+}
+
+function markPaid(id) {
+  const j = jobs.find(x => x.id === id);
+  if (j) { j.paid = true; persist(); renderAll(); toast('סומן כשולם ✓ 🎉'); }
 }
 
 /* ---------- INSIGHTS ---------- */
@@ -261,6 +314,21 @@ function renderInsights() {
     <div style="flex:1;border-inline:1px solid var(--border)"><div style="font-size:22px;font-weight:900">${jobs.length}</div><div style="font-size:12px;color:var(--text-soft)">עבודות</div></div>
     <div style="flex:1"><div style="font-size:22px;font-weight:900;color:var(--amber)">${moneyShort(s.unpaid)}</div><div style="font-size:12px;color:var(--text-soft)">ממתין</div></div>`;
   c.appendChild(strip);
+
+  // Net / hourly strip (only if the user tracks expenses or hours)
+  if (s.totalExpenses > 0 || s.hourlyRate > 0) {
+    const strip2 = el('div', 'card');
+    strip2.style.cssText = 'display:flex;text-align:center;padding:16px 8px';
+    const cells = [];
+    cells.push(`<div style="flex:1"><div style="font-size:22px;font-weight:900;color:var(--green)">${moneyShort(s.netTotal)}</div><div style="font-size:12px;color:var(--text-soft)">רווח נטו</div></div>`);
+    if (s.totalExpenses > 0) cells.push(`<div style="flex:1;border-inline-start:1px solid var(--border)"><div style="font-size:22px;font-weight:900;color:var(--red)">${moneyShort(s.totalExpenses)}</div><div style="font-size:12px;color:var(--text-soft)">הוצאות</div></div>`);
+    if (s.hourlyRate > 0) cells.push(`<div style="flex:1;border-inline-start:1px solid var(--border)"><div style="font-size:22px;font-weight:900;color:var(--blue)">${moneyShort(s.hourlyRate)}</div><div style="font-size:12px;color:var(--text-soft)">לשעה</div></div>`);
+    strip2.innerHTML = cells.join('');
+    c.appendChild(strip2);
+  }
+
+  // Monthly report (with navigation, CSV export, WhatsApp share)
+  c.appendChild(monthlyReportCard());
 
   // 6-week trend
   c.appendChild(weeklyTrendChart());
@@ -358,6 +426,107 @@ function paidDonut(s) {
   return card;
 }
 
+/* ---------- Monthly report ---------- */
+let reportMonth = new Date();
+
+function monthJobs(y, m) {
+  return jobs.filter(j => { const d = parseISO(j.date); return d.getFullYear() === y && d.getMonth() === m; });
+}
+
+function monthlyReportCard() {
+  const y = reportMonth.getFullYear(), m = reportMonth.getMonth();
+  const mj = monthJobs(y, m);
+  const income = sum(mj, j => Number(j.amount) || 0);
+  const exp = sum(mj, j => Number(j.expenses) || 0);
+  const net = income - exp;
+  const unpaid = sum(mj.filter(j => !j.paid), j => Number(j.amount) || 0);
+
+  const now = new Date();
+  const isFuture = y > now.getFullYear() || (y === now.getFullYear() && m >= now.getMonth());
+
+  const card = el('div', 'chart-card');
+  card.innerHTML = `
+    <div class="mr-nav">
+      <button class="mr-arrow" id="mr-prev">›</button>
+      <div class="mr-title"><div class="chart-title">דוח חודשי</div><div class="mr-month">${MONTHS_FULL[m]} ${y}</div></div>
+      <button class="mr-arrow ${isFuture ? 'disabled' : ''}" id="mr-next">‹</button>
+    </div>
+    <div class="mr-grid">
+      <div class="mr-stat"><div class="mr-v" style="color:var(--green)">${money(income)}</div><div class="mr-l">הכנסות</div></div>
+      <div class="mr-stat"><div class="mr-v">${mj.length}</div><div class="mr-l">עבודות</div></div>
+      <div class="mr-stat"><div class="mr-v" style="color:var(--green-dark)">${money(net)}</div><div class="mr-l">רווח נטו</div></div>
+      <div class="mr-stat"><div class="mr-v" style="color:var(--amber)">${money(unpaid)}</div><div class="mr-l">ממתין</div></div>
+    </div>
+    <div class="row2" style="margin-top:6px">
+      <button class="btn btn-ghost btn-sm" id="mr-share" style="flex:1">📤 שיתוף בוואטסאפ</button>
+      <button class="btn btn-ghost btn-sm" id="mr-csv" style="flex:1">📄 ייצוא לאקסל</button>
+    </div>`;
+
+  card.querySelector('#mr-prev').onclick = () => { reportMonth = new Date(y, m - 1, 1); renderInsights(); };
+  const next = card.querySelector('#mr-next');
+  if (!isFuture) next.onclick = () => { reportMonth = new Date(y, m + 1, 1); renderInsights(); };
+  card.querySelector('#mr-share').onclick = () => openShareSheet(monthReportText(y, m));
+  card.querySelector('#mr-csv').onclick = () => exportMonthCSV(y, m);
+  return card;
+}
+
+function monthReportText(y, m) {
+  const mj = monthJobs(y, m);
+  const income = sum(mj, j => Number(j.amount) || 0);
+  const exp = sum(mj, j => Number(j.expenses) || 0);
+  const unpaid = sum(mj.filter(j => !j.paid), j => Number(j.amount) || 0);
+  const byClient = {};
+  mj.forEach(j => { const c = (j.client || '').trim() || 'ללא לקוח'; byClient[c] = (byClient[c] || 0) + (Number(j.amount) || 0); });
+  const clientLines = Object.entries(byClient).sort((a, b) => b[1] - a[1]).map(([c, v]) => `• ${c}: ${money(v)}`).join('\n');
+
+  let t = `📊 דוח ${MONTHS_FULL[m]} ${y} — רווח\n`;
+  t += `━━━━━━━━━━━━━━\n`;
+  t += `💰 הכנסות: ${money(income)}\n`;
+  if (exp > 0) { t += `🧾 הוצאות: ${money(exp)}\n`; t += `✅ רווח נטו: ${money(income - exp)}\n`; }
+  t += `📋 עבודות: ${mj.length}\n`;
+  if (unpaid > 0) t += `⏳ ממתין לתשלום: ${money(unpaid)}\n`;
+  if (clientLines) t += `\nלפי לקוח:\n${clientLines}\n`;
+  return t;
+}
+
+function exportMonthCSV(y, m) {
+  const mj = [...monthJobs(y, m)].sort((a, b) => a.date.localeCompare(b.date));
+  if (!mj.length) { toast('אין עבודות בחודש הזה'); return; }
+  const rows = [['תאריך', 'מה עשיתי', 'לקוח', 'סכום', 'שעות', 'הוצאות', 'נטו', 'סטטוס']];
+  mj.forEach(j => rows.push([j.date, j.title || '', j.client || '', j.amount || 0, j.hours || '', j.expenses || '', jobNet(j), j.paid ? 'שולם' : 'ממתין']));
+  const income = sum(mj, j => Number(j.amount) || 0);
+  rows.push([]);
+  rows.push(['סה״כ', '', '', income, '', sum(mj, j => Number(j.expenses) || 0), sum(mj, j => jobNet(j)), '']);
+  downloadFile(csvString(rows), `revach-${y}-${String(m + 1).padStart(2, '0')}.csv`, 'text/csv;charset=utf-8');
+  toast('הקובץ הורד — נפתח באקסל ✓');
+}
+
+function csvString(rows) {
+  return '﻿' + rows.map(r => r.map(c => `"${String(c == null ? '' : c).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+}
+function downloadFile(content, name, type) {
+  try {
+    const blob = new Blob([content], { type });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (e) { toast('הורדה נחסמה בדפדפן הזה'); }
+}
+
+function openShareSheet(text) {
+  openSheet(`
+    <div class="sheet-title">📤 שיתוף הדוח</div>
+    <pre class="report-preview">${escAttr(text)}</pre>
+    <a class="btn btn-primary mt8" id="sh-wa" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">שיתוף בוואטסאפ</a>
+    <button class="btn btn-ghost mt8" id="sh-copy">העתקת הטקסט</button>
+  `);
+  $('#sh-copy').onclick = async () => {
+    try { await navigator.clipboard.writeText(text); toast('הועתק ✓'); }
+    catch (e) { toast('לא ניתן להעתיק — סמן והעתק ידנית'); }
+  };
+}
+
 /* ---------- GOALS ---------- */
 function renderGoals() {
   const c = inner('goals'); c.innerHTML = '';
@@ -443,28 +612,53 @@ function renderJobs() {
     return;
   }
 
-  const sorted = [...jobs].sort((a, b) => b.date.localeCompare(a.date) || b.created - a.created);
+  // filter chips
+  const unpaidCount = jobs.filter(j => !j.paid).length;
+  const filters = el('div', 'chips');
+  filters.style.marginBottom = '14px';
+  filters.innerHTML = `
+    <button class="chip ${jobFilter === 'all' ? 'chip-on' : ''}" data-f="all">הכל (${jobs.length})</button>
+    <button class="chip ${jobFilter === 'unpaid' ? 'chip-on' : ''}" data-f="unpaid">ממתין לתשלום (${unpaidCount})</button>`;
+  filters.querySelectorAll('.chip').forEach(ch => ch.onclick = () => { jobFilter = ch.dataset.f; renderJobs(); });
+  c.appendChild(filters);
+
+  let list = [...jobs].sort((a, b) => b.date.localeCompare(a.date) || b.created - a.created);
+  if (jobFilter === 'unpaid') list = list.filter(j => !j.paid);
+
+  if (!list.length) {
+    c.appendChild(el('div', 'empty', '<div class="empty-emoji">✅</div><div class="empty-title">אין תשלומים ממתינים</div><div class="empty-text">כל העבודות שולמו. כל הכבוד!</div>'));
+    return;
+  }
+
   let lastGroup = '';
-  sorted.forEach(j => {
+  list.forEach(j => {
     const g = niceDate(j.date);
     if (g !== lastGroup) { c.appendChild(el('div', 'date-group-label', g)); lastGroup = g; }
-    c.appendChild(jobRow(j, true));
+    c.appendChild(jobRow(j, true, true));
   });
 }
 
-function jobRow(j, tappable) {
+function jobRow(j, tappable, showPay) {
   const row = el('div', 'job-row');
   const initial = (j.title || '?').trim().charAt(0) || '💼';
+  const meta = [];
+  if (j.client) meta.push(escAttr(j.client));
+  meta.push(niceDate(j.date));
+  if (Number(j.hours) > 0) meta.push(`${j.hours} ש׳`);
+  const payBtn = (showPay && !j.paid) ? `<button class="row-pay" data-pay="${j.id}" aria-label="סמן כשולם">✓</button>` : '';
   row.innerHTML = `
     <div class="job-avatar">${initial}</div>
     <div class="job-main">
-      <div class="job-title">${j.title || 'עבודה'}</div>
-      <div class="job-sub">${j.client ? j.client + ' · ' : ''}${niceDate(j.date)}</div>
+      <div class="job-title">${escAttr(j.title) || 'עבודה'}</div>
+      <div class="job-sub">${meta.join(' · ')}</div>
     </div>
     <div class="job-right">
       <div class="job-amount">${money(j.amount)}</div>
       <span class="status-chip ${j.paid ? 'status-paid' : 'status-unpaid'}">${j.paid ? 'שולם' : 'ממתין'}</span>
-    </div>`;
+    </div>
+    ${payBtn}`;
+  const pb = row.querySelector('[data-pay]');
+  if (pb) pb.onclick = (e) => { e.stopPropagation(); markPaid(j.id); };
   if (tappable) row.onclick = () => openJobSheet(j);
   return row;
 }
@@ -503,7 +697,7 @@ const RECENT_TITLES = () => [...new Set(jobs.map(j => j.title).filter(Boolean))]
 const RECENT_CLIENTS = () => [...new Set(jobs.map(j => j.client).filter(Boolean))].slice(0, 8);
 
 function openJobSheet(existing) {
-  const j = existing || { title: '', client: '', amount: '', date: todayISO(), paid: true };
+  const j = existing || { title: '', client: '', amount: '', date: todayISO(), paid: true, hours: '', expenses: '' };
   const isEdit = !!existing;
 
   openSheet(`
@@ -538,9 +732,32 @@ function openJobSheet(existing) {
         </div>
       </div>
     </div>
+    <div class="row2">
+      <div class="field">
+        <label>שעות עבודה <span class="opt">לא חובה</span></label>
+        <input type="number" id="f-hours" inputmode="decimal" placeholder="0" value="${j.hours || ''}" />
+      </div>
+      <div class="field">
+        <label>הוצאות ${CUR()} <span class="opt">לא חובה</span></label>
+        <input type="number" id="f-expenses" inputmode="decimal" placeholder="0" value="${j.expenses || ''}" />
+      </div>
+    </div>
+    <div class="hint" id="f-net-hint" style="margin:-6px 2px 14px"></div>
     <button class="btn btn-primary mt8" id="f-save">${isEdit ? 'שמירה' : 'הוספה'}</button>
     ${isEdit ? '<button class="btn btn-danger mt8" id="f-delete">מחיקת עבודה</button>' : ''}
   `);
+
+  const updateNetHint = () => {
+    const a = parseFloat($('#f-amount').value) || 0;
+    const ex = parseFloat($('#f-expenses').value) || 0;
+    const h = parseFloat($('#f-hours').value) || 0;
+    const parts = [];
+    if (ex > 0) parts.push(`רווח נטו: ${money(a - ex)}`);
+    if (h > 0 && a > 0) parts.push(`${money(a / h)} לשעה`);
+    $('#f-net-hint').textContent = parts.join(' · ');
+  };
+  ['#f-amount', '#f-expenses', '#f-hours'].forEach(id => $(id).addEventListener('input', updateNetHint));
+  updateNetHint();
 
   let paid = j.paid;
   $('#t-paid').onclick = () => { paid = true; $('#t-paid').classList.add('on'); $('#t-unpaid').classList.remove('on'); };
@@ -554,11 +771,13 @@ function openJobSheet(existing) {
     const amount = parseFloat($('#f-amount').value);
     const client = $('#f-client').value.trim();
     const date = $('#f-date').value || todayISO();
+    const hours = parseFloat($('#f-hours').value) || 0;
+    const expenses = parseFloat($('#f-expenses').value) || 0;
     if (!amount || amount <= 0) { toast('הכנס סכום 💰'); $('#f-amount').focus(); return; }
     if (isEdit) {
-      Object.assign(existing, { title, amount, client, date, paid });
+      Object.assign(existing, { title, amount, client, date, paid, hours, expenses });
     } else {
-      jobs.push({ id: uid(), title, amount, client, date, paid, created: Date.now() });
+      jobs.push({ id: uid(), title, amount, client, date, paid, hours, expenses, created: Date.now() });
     }
     persist(); closeSheet(); renderAll();
     toast(isEdit ? 'העבודה עודכנה ✓' : `נוסף! ${money(amount)} 🎉`);
@@ -692,6 +911,7 @@ function openSettings() {
    Navigation, toast, misc
    ========================================================== */
 let current = 'home';
+let jobFilter = 'all';
 function nav(screen) {
   current = screen;
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('hidden', s.dataset.screen !== screen));
@@ -735,15 +955,15 @@ function loadDemo() {
   const t = new Date();
   const d = n => toISO(addDays(t, n));
   jobs = [
-    { id: uid(), title: 'תיקון חשמל', client: 'דני כהן', amount: 450, date: d(0), paid: true, created: Date.now() - 9e6 },
-    { id: uid(), title: 'התקנת מזגן', client: 'משפחת לוי', amount: 800, date: d(0), paid: true, created: Date.now() - 8e6 },
-    { id: uid(), title: 'ייעוץ', client: 'סטארטאפ ניר', amount: 600, date: d(0), paid: false, created: Date.now() - 7e6 },
-    { id: uid(), title: 'תיקון חשמל', client: 'דני כהן', amount: 350, date: d(-3), paid: true, created: Date.now() - 6e6 },
-    { id: uid(), title: 'משמרת ערב', client: 'קפה מרכז', amount: 320, date: d(-5), paid: true, created: Date.now() - 5e6 },
-    { id: uid(), title: 'התקנת גופים', client: 'משפחת לוי', amount: 500, date: d(-8), paid: false, created: Date.now() - 4e6 },
-    { id: uid(), title: 'תיקון חשמל', client: 'עמותת אור', amount: 700, date: d(-9), paid: true, created: Date.now() - 3e6 },
-    { id: uid(), title: 'משמרת ערב', client: 'קפה מרכז', amount: 320, date: d(-12), paid: true, created: Date.now() - 2e6 },
-    { id: uid(), title: 'ייעוץ', client: 'סטארטאפ ניר', amount: 900, date: d(-15), paid: true, created: Date.now() - 1e6 },
+    { id: uid(), title: 'תיקון חשמל', client: 'דני כהן', amount: 450, hours: 2, expenses: 80, date: d(0), paid: true, created: Date.now() - 9e6 },
+    { id: uid(), title: 'התקנת מזגן', client: 'משפחת לוי', amount: 800, hours: 3, expenses: 150, date: d(0), paid: true, created: Date.now() - 8e6 },
+    { id: uid(), title: 'ייעוץ', client: 'סטארטאפ ניר', amount: 600, hours: 2, expenses: 0, date: d(0), paid: false, created: Date.now() - 7e6 },
+    { id: uid(), title: 'תיקון חשמל', client: 'דני כהן', amount: 350, hours: 1.5, expenses: 40, date: d(-3), paid: true, created: Date.now() - 6e6 },
+    { id: uid(), title: 'משמרת ערב', client: 'קפה מרכז', amount: 320, hours: 6, expenses: 0, date: d(-5), paid: true, created: Date.now() - 5e6 },
+    { id: uid(), title: 'התקנת גופים', client: 'משפחת לוי', amount: 500, hours: 2, expenses: 120, date: d(-18), paid: false, created: Date.now() - 4e6 },
+    { id: uid(), title: 'תיקון חשמל', client: 'עמותת אור', amount: 700, hours: 3, expenses: 90, date: d(-9), paid: true, created: Date.now() - 3e6 },
+    { id: uid(), title: 'משמרת ערב', client: 'קפה מרכז', amount: 320, hours: 6, expenses: 0, date: d(-12), paid: true, created: Date.now() - 2e6 },
+    { id: uid(), title: 'ייעוץ', client: 'סטארטאפ ניר', amount: 900, hours: 3, expenses: 0, date: d(-15), paid: true, created: Date.now() - 1e6 },
   ];
   goals = [
     { id: uid(), name: 'טיול לירושלים', emoji: '🕌', target: 800, type: 'percent', value: 10, created: Date.now() },
