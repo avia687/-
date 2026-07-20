@@ -448,7 +448,7 @@
             <span class="ti-name">${escapeHtml(t.name)}</span>
             <span class="ti-bar"><span class="ti-fill" style="width:${Math.round((t.count / maxc) * 100)}%"></span></span>
           </span>
-          <span class="ti-count num">${t.count}<small> הזמנות</small></span>
+          <span class="ti-count num">${t.count}<small> ${t.count === 1 ? "הזמנה" : "הזמנות"}</small></span>
         </li>`).join("");
     }
   }

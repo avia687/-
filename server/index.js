@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const ordersRouter = require('./routes/orders');
 const incomeRouter = require('./routes/income');
+const { startDailySummaryScheduler } = require('./services/scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,4 +32,5 @@ if (fs.existsSync(buildPath)) {
 
 app.listen(PORT, () => {
   console.log(`הקרון server running on port ${PORT}`);
+  startDailySummaryScheduler();
 });

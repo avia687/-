@@ -55,6 +55,56 @@ async function sendOrderToChefs(order) {
   }
 }
 
+function buildDailySummaryMessage(summary) {
+  const dateLabel = new Intl.DateTimeFormat('he-IL', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  }).format(new Date(summary.date + 'T00:00:00'));
+
+  const top = summary.topItems.slice(0, 5).map((it, i) =>
+    `${i + 1}. ${it.name} — ${it.count === 1 ? 'הזמנה אחת' : it.count + ' הזמנות'}`
+  );
+
+  const lines = [
+    `🧾 סיכום יומי — הקרון`,
+    `📅 ${dateLabel}`,
+    ``,
+    `💰 סה"כ הכנסה: ${summary.total}₪`,
+    `🛒 הזמנות: ${summary.orderCount}`,
+  ];
+  if (summary.orderCount > 0) {
+    lines.push(`📊 ממוצע להזמנה: ${summary.avgOrder}₪`);
+  }
+  if (top.length) {
+    lines.push(``, `🏆 הכי מוזמן היום:`, ...top);
+  }
+  return lines.join('\n');
+}
+
+// Send the end-of-day summary to the chefs. Returns true if messages were sent.
+async function sendDailySummary(summary) {
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+    console.log('Daily summary skipped: Twilio not configured');
+    return false;
+  }
+  const client = getClient();
+  const message = buildDailySummaryMessage(summary);
+  const from = `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}`;
+
+  for (const chef of CHEFS) {
+    try {
+      await client.messages.create({
+        from,
+        to: `whatsapp:${toWhatsAppNumber(chef.phone)}`,
+        body: message,
+      });
+      console.log(`Daily summary sent to ${chef.name}`);
+    } catch (err) {
+      console.error(`Failed to send summary to ${chef.name}:`, err.message);
+    }
+  }
+  return true;
+}
+
 async function sendReadyToCustomer(order) {
   if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) return;
   const client = getClient();
@@ -76,4 +126,9 @@ async function sendReadyToCustomer(order) {
   }
 }
 
-module.exports = { sendOrderToChefs, sendReadyToCustomer };
+module.exports = {
+  sendOrderToChefs,
+  sendReadyToCustomer,
+  sendDailySummary,
+  buildDailySummaryMessage,
+};

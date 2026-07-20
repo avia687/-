@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const store = require('../services/salesStore');
+const { sendDailySummary, buildDailySummaryMessage } = require('../services/whatsapp');
 
 const router = Router();
 
@@ -15,6 +16,17 @@ router.get('/', (req, res) => {
 // End-of-day summary: ?date=YYYY-MM-DD (defaults to today).
 router.get('/summary', (req, res) => {
   res.json(store.dailySummary(req.query.date));
+});
+
+// Send the daily summary to the chefs on WhatsApp now (manual trigger).
+router.post('/summary/send', async (req, res) => {
+  const summary = store.dailySummary(req.query.date || req.body.date);
+  try {
+    const sent = await sendDailySummary(summary);
+    res.json({ sent, summary, message: buildDailySummaryMessage(summary) });
+  } catch (err) {
+    res.status(500).json({ error: err.message, summary });
+  }
 });
 
 // Add a manual income entry.
