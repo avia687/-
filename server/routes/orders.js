@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { sendOrderToChefs, sendReadyToCustomer } = require('../services/whatsapp');
+const salesStore = require('../services/salesStore');
 
 const router = Router();
 
@@ -26,6 +27,13 @@ router.post('/', async (req, res) => {
   };
 
   orders.push(order);
+
+  // Record the order as income for the tracker / daily summary.
+  try {
+    salesStore.recordOrder(order);
+  } catch (err) {
+    console.error('Failed to record order income:', err.message);
+  }
 
   sendOrderToChefs(order).catch(console.error);
 

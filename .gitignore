@@ -4,3 +4,4 @@ client/node_modules/
 client/dist/
 server/.env
 .env
+server/data/sales.json
