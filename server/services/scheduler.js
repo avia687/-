@@ -27,7 +27,7 @@ function startDailySummaryScheduler() {
     if (day === lastSentDay) return;
     lastSentDay = day;
 
-    const summary = store.dailySummary(day);
+    const summary = await store.dailySummary(day);
     if (summary.entryCount === 0) {
       console.log(`Daily summary ${day}: nothing to report`);
       return;
