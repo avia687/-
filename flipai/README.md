@@ -9,11 +9,29 @@
 הדגמה (mock) דטרמיניסטי, ומשתדרגים אוטומטית ל-OpenAI/Stripe אמיתיים ברגע
 שמוסיפים מפתחות בסביבת ההרצה.
 
+## פריסה ל-Vercel (מומלץ)
+
+1. **מסד נתונים:** צרו PostgreSQL חינמי ב-[neon.tech](https://neon.tech) (או ב-Vercel → Storage). העתיקו את מחרוזת החיבור ה-**pooled**.
+2. **Vercel:** New Project → ייבוא הריפו `avia687/-`.
+   - **Root Directory:** `flipai`
+   - **Framework Preset:** Next.js (מזוהה אוטומטית)
+3. **Environment Variables** (ב-Settings → Environment Variables):
+   - `DATABASE_URL` = מחרוזת החיבור מ-Neon
+   - `NEXTAUTH_SECRET` = מחרוזת אקראית (`openssl rand -base64 32`)
+   - `NEXTAUTH_URL` = כתובת הפרויקט ב-Vercel (למשל `https://flipai.vercel.app`)
+   - `APP_URL` = אותה כתובת
+   - *(אופציונלי)* `OPENAI_API_KEY`, `STRIPE_SECRET_KEY` וכו׳ להפעלת AI/תשלומים אמיתיים
+4. **Deploy.** הבנייה יוצרת את הטבלאות אוטומטית (`prisma db push`). פותחים את הכתובת, נרשמים — ומתחילים למכור.
+
+> אין צורך במפתחות AI/Stripe כדי להתחיל: הניתוח והתשלום עובדים במצב הדגמה עד שמוסיפים מפתחות אמיתיים.
+
 ## הרצה מקומית
+
+דורש PostgreSQL (למשל URL חינמי מ-Neon — אותו אחד עובד גם מקומית וגם ב-Vercel).
 
 ```bash
 cd flipai
-cp .env.example .env          # הגדירו NEXTAUTH_SECRET אמיתי
+cp .env.example .env          # הזינו DATABASE_URL (Postgres) + NEXTAUTH_SECRET
 npm install
 npm run setup                 # prisma generate + db push + seed
 npm run dev                   # http://localhost:3000
@@ -61,9 +79,10 @@ prisma/
 
 ## מסד נתונים
 
-SQLite ברירת מחדל (אפס הגדרה). למעבר ל-PostgreSQL בפרודקשן: שנו את
-`datasource.provider` ל-`postgresql` ב-`prisma/schema.prisma` והצביעו את
-`DATABASE_URL` על מסד רץ — אין צורך בשינוי מודלים.
+PostgreSQL דרך Prisma (`DATABASE_URL`). מתאים ל-serverless (Vercel). התמונות
+נשמרות מוטמעות ב-DB כ-data URI, כך שאין תלות בדיסק או ב-blob store — לפריסה
+בקנה מידה גדול אפשר להחליף את `lib/images.ts` ל-S3/R2/Vercel Blob (מבנה הנתונים
+נשאר זהה).
 
 ישויות: `User`, `Account`, `Session`, `Subscription`, `Usage`, `Product`,
 `ProductImage`, `Analysis`, `GeneratedListing`, `NegotiationMessage` — עם

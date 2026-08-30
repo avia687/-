@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireApiUser } from "@/lib/session-guards";
@@ -69,21 +67,12 @@ export async function DELETE(
 
     const product = await prisma.product.findFirst({
       where: { id: params.id, userId },
-      include: { images: true },
+      select: { id: true },
     });
     if (!product) return jsonError(404, "המוצר לא נמצא", "not_found");
 
-    // Best-effort cleanup of stored image files.
-    for (const img of product.images) {
-      for (const url of [img.url, img.thumbUrl].filter(Boolean) as string[]) {
-        if (url.startsWith("/uploads/")) {
-          await fs
-            .unlink(path.join(process.cwd(), "public", url))
-            .catch(() => {});
-        }
-      }
-    }
-
+    // Images are stored inline (data URIs), so deleting the product row
+    // removes them via cascade — no external files to clean up.
     await prisma.product.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
   } catch (err) {

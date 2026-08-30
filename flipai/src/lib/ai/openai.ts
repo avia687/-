@@ -1,5 +1,3 @@
-import { promises as fs } from "fs";
-import path from "path";
 import type {
   AIProvider,
   ListingContext,
@@ -20,18 +18,10 @@ import {
 const API_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
-async function toDataUrl(ref: string): Promise<string | null> {
-  // Only local public uploads are read from disk. Anything else is skipped.
-  if (!ref.startsWith("/uploads/")) return null;
-  try {
-    const filePath = path.join(process.cwd(), "public", ref);
-    const buf = await fs.readFile(filePath);
-    const ext = path.extname(ref).slice(1) || "jpeg";
-    const mime = ext === "jpg" ? "jpeg" : ext;
-    return `data:image/${mime};base64,${buf.toString("base64")}`;
-  } catch {
-    return null;
-  }
+function toDataUrl(ref: string): string | null {
+  // Images are stored as data URIs; pass them straight to the vision API.
+  if (ref.startsWith("data:image/")) return ref;
+  return null;
 }
 
 async function callOpenAI(messages: unknown[]): Promise<unknown> {
@@ -66,9 +56,9 @@ export class OpenAIProvider implements AIProvider {
   readonly name = "openai" as const;
 
   async analyzeProduct(input: AnalyzeInput): Promise<ProductAnalysis> {
-    const dataUrls = (
-      await Promise.all(input.imageRefs.map(toDataUrl))
-    ).filter((u): u is string => Boolean(u));
+    const dataUrls = input.imageRefs
+      .map(toDataUrl)
+      .filter((u): u is string => Boolean(u));
 
     const hints: string[] = [];
     if (input.category)

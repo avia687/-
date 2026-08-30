@@ -1,28 +1,23 @@
-import { promises as fs } from "fs";
-import path from "path";
-import crypto from "crypto";
 import sharp from "sharp";
 import { ApiError } from "@/lib/session-guards";
 
 const ACCEPTED = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
 export type StoredImage = {
-  url: string;
-  thumbUrl: string;
+  url: string; // data URI (webp) — serverless-safe, no filesystem needed
+  thumbUrl: string; // smaller data URI
   width: number;
   height: number;
   bytes: number;
 };
 
-async function ensureDir() {
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-}
-
 /**
- * Validate, compress (max 1600px, webp), generate a 400px thumbnail, and
- * store both under /public/uploads. Returns public URLs.
+ * Validate, compress (max 1280px, webp) and generate a 400px thumbnail, then
+ * return both as base64 data URIs. Storing images as data URIs keeps the app
+ * fully serverless-compatible (Vercel etc.) with no blob store or writable
+ * disk. For very high volume, swap this to an object store (S3/R2/Vercel Blob)
+ * — the return shape stays the same.
  */
 export async function processAndStore(file: File): Promise<StoredImage> {
   if (!ACCEPTED.has(file.type)) {
@@ -34,7 +29,6 @@ export async function processAndStore(file: File): Promise<StoredImage> {
 
   const bytes = Buffer.from(await file.arrayBuffer());
 
-  // Re-encode through sharp — this also validates the file is a real image.
   let pipeline: sharp.Sharp;
   try {
     pipeline = sharp(bytes, { failOn: "error" }).rotate();
@@ -47,29 +41,23 @@ export async function processAndStore(file: File): Promise<StoredImage> {
     throw new ApiError(422, "לא ניתן לקרוא את התמונה", "corrupt");
   }
 
-  await ensureDir();
-  const id = crypto.randomBytes(9).toString("hex");
-  const fullName = `${id}.webp`;
-  const thumbName = `${id}_thumb.webp`;
-
   const full = await pipeline
     .clone()
-    .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 82 })
+    .resize({ width: 1280, height: 1280, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 80 })
     .toBuffer();
-  await fs.writeFile(path.join(UPLOAD_DIR, fullName), full);
 
-  await pipeline
+  const thumb = await pipeline
     .clone()
     .resize({ width: 400, height: 400, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 74 })
-    .toFile(path.join(UPLOAD_DIR, thumbName));
+    .webp({ quality: 72 })
+    .toBuffer();
 
   const info = await sharp(full).metadata();
 
   return {
-    url: `/uploads/${fullName}`,
-    thumbUrl: `/uploads/${thumbName}`,
+    url: `data:image/webp;base64,${full.toString("base64")}`,
+    thumbUrl: `data:image/webp;base64,${thumb.toString("base64")}`,
     width: info.width ?? meta.width,
     height: info.height ?? meta.height,
     bytes: full.length,
