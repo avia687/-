@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neutral canvas */
+    --background: 240 20% 99%;
+    --foreground: 224 32% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 32% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 32% 12%;
+
+    /* Single strong accent — indigo/violet */
+    --primary: 250 84% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 16% 96%;
+    --secondary-foreground: 224 28% 20%;
+
+    --muted: 240 16% 96%;
+    --muted-foreground: 224 12% 46%;
+
+    --accent: 250 90% 96%;
+    --accent-foreground: 250 60% 40%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 58% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 36 92% 48%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 240 14% 91%;
+    --input: 240 14% 89%;
+    --ring: 250 84% 60%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 226 30% 7%;
+    --foreground: 220 24% 96%;
+
+    --card: 226 26% 10%;
+    --card-foreground: 220 24% 96%;
+
+    --popover: 226 28% 9%;
+    --popover-foreground: 220 24% 96%;
+
+    --primary: 252 92% 70%;
+    --primary-foreground: 226 40% 8%;
+
+    --secondary: 226 20% 16%;
+    --secondary-foreground: 220 20% 90%;
+
+    --muted: 226 20% 15%;
+    --muted-foreground: 220 12% 62%;
+
+    --accent: 250 40% 20%;
+    --accent-foreground: 250 90% 88%;
+
+    --destructive: 0 68% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 52% 48%;
+    --success-foreground: 226 40% 8%;
+
+    --warning: 36 90% 56%;
+    --warning-foreground: 226 40% 8%;
+
+    --border: 226 18% 20%;
+    --input: 226 18% 22%;
+    --ring: 252 92% 70%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Consistent, visible focus for keyboard users */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* RTL-aware fine detail: numbers/prices read LTR inside RTL text */
+  .num {
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bg-grid {
+    background-image: radial-gradient(
+      hsl(var(--foreground) / 0.05) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
+
+  .bg-hero-glow {
+    background:
+      radial-gradient(
+        55% 45% at 50% 0%,
+        hsl(var(--primary) / 0.16) 0%,
+        transparent 70%
+      );
+  }
+
+  .glass {
+    background: hsl(var(--card) / 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--foreground) / 0.06),
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* Custom scrollbar — subtle */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.28);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.45);
+  background-clip: content-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
