@@ -23,6 +23,29 @@ npm run dev               # http://localhost:3000
 עסק הדמו — **Avia Sofa Cleaning** — מגיע מלא בלקוחות, לידים, שירותים, הצעות מחיר,
 עבודות ביומן, תשלומים, הוצאות, עובדים וביקורות.
 
+## פריסה אונליין (Vercel + Postgres) — כדי להשתמש מכל מקום
+
+המערכת מוכנה לפריסה. בפיתוח היא רצה על SQLite; בפרודקשן היא עוברת אוטומטית ל-PostgreSQL
+(סקריפט `vercel-build` מחליף את ה-provider בזמן ה-build — אין צורך לערוך כלום ידנית).
+
+1. **Vercel** → התחבר/י עם GitHub → **Add New → Project** → ייבא את המאגר `avia687/-`.
+2. **Root Directory** → הגדר ל-`bizos` (במאגר יש כמה פרויקטים — זה מפנה את Vercel ל-BizOS).
+   Vercel יזהה אוטומטית **Next.js**.
+3. **מסד נתונים**: ב-Vercel → **Storage → Create → Postgres** (מבוסס Neon), באותו פרויקט.
+   העתק/י את מחרוזת החיבור (connection string).
+4. **Environment Variables** (Project → Settings → Environment Variables):
+   - `DATABASE_URL` = מחרוזת החיבור מ-Postgres.
+   - `NEXTAUTH_SECRET` = מחרוזת אקראית ארוכה (`openssl rand -base64 32`).
+   - `NEXTAUTH_URL` = כתובת האתר שלך (למשל `https://your-app.vercel.app`) — הגדר לאחר
+     הפריסה הראשונה כשה-domain מופיע, ואז **Redeploy**.
+   - *(רשות)* `OPENAI_API_KEY` — כדי להחליף את ה-AI מה-mock המובנה למודל אמיתי.
+5. **Deploy**. ה-build הראשון מריץ `prisma db push` ויוצר את הטבלאות ב-Postgres.
+6. פתח/י את הכתובת → **הרשמה** → אשף ה-Onboarding → בחר/י סוג עסק → מתחילים לעבוד.
+   הנתונים נשמרים ב-Postgres וזמינים מכל מכשיר.
+
+> אם ה-build נכשל על `prisma db push` — כמעט תמיד זה `DATABASE_URL` שגוי/חסר.
+> בפרודקשן אין נתוני דמו: נרשמים ומקימים עסק אמיתי דרך ה-Onboarding.
+
 ## סטאק
 
 Next.js 14 (App Router) · TypeScript · Prisma · NextAuth (credentials) ·

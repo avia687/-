@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && prisma db push --skip-generate && next build",
+    "vercel-build": "node scripts/use-postgres.mjs && prisma generate && prisma db push --skip-generate --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
