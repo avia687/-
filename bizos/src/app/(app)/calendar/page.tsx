@@ -7,6 +7,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { LoadingScreen } from "@/components/ui/states";
 import { useToast } from "@/components/ui/toast";
 import { useBusiness } from "@/components/business-context";
+import { JobPhotos } from "@/components/app/job-photos";
 import { api } from "@/lib/client";
 import { formatMoney, addDays, startOfDay } from "@/lib/utils";
 import { ChevronRight, ChevronLeft, Plus, Trash2 } from "lucide-react";
@@ -281,6 +282,7 @@ export default function CalendarPage() {
               </Select>
             </div>
           </div>
+          {editing && <JobPhotos jobId={editing.id} />}
           <div className="flex gap-2">
             {editing && <Button variant="destructive" size="icon" onClick={remove}><Trash2 size={16} /></Button>}
             <Button onClick={save} disabled={saving} className="flex-1">{saving ? "שומר..." : "שמור"}</Button>
