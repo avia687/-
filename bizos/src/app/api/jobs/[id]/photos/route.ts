@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
-import { requirePermission } from "@/lib/tenant";
+import { requirePermission, AuthError } from "@/lib/tenant";
 import { audit } from "@/lib/audit";
 
 const schema = z.object({
@@ -12,7 +12,7 @@ const schema = z.object({
 
 async function ownedJob(id: string, organizationId: string) {
   const job = await prisma.job.findFirst({ where: { id, organizationId } });
-  if (!job) throw Object.assign(new Error("לא נמצא"), { status: 404 });
+  if (!job) throw new AuthError(404, "לא נמצא");
   return job;
 }
 

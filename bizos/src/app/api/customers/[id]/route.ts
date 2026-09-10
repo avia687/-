@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
-import { requirePermission } from "@/lib/tenant";
+import { requirePermission, AuthError } from "@/lib/tenant";
 import { audit } from "@/lib/audit";
 
 const updateSchema = z.object({
@@ -18,7 +18,7 @@ const updateSchema = z.object({
 // Ownership check: the row must belong to the caller's tenant.
 async function owned(id: string, organizationId: string) {
   const row = await prisma.customer.findFirst({ where: { id, organizationId } });
-  if (!row) throw Object.assign(new Error("לא נמצא"), { status: 404 });
+  if (!row) throw new AuthError(404, "לא נמצא");
   return row;
 }
 
