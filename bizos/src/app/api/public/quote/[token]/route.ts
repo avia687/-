@@ -29,6 +29,7 @@ export async function POST(req: Request, { params }: { params: { token: string }
           type: "quote_approved",
           title: "הצעת מחיר אושרה",
           body: `הצעה #${quote.number} בסך ${quote.total}`,
+          link: "/quotes",
         },
       });
     }

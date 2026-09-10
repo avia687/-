@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireTenant } from "@/lib/tenant";
 import { prisma } from "@/lib/db";
-import { getDashboardStats } from "@/lib/stats";
+import { getDashboardStats, RANGE_LABELS, type DateRange } from "@/lib/stats";
+import { RangeTabs } from "@/components/app/range-tabs";
 import { buildSnapshot } from "@/lib/ai/snapshot";
 import { getAI } from "@/lib/ai";
 import { resolveConfig } from "@/lib/business/resolve";
@@ -14,18 +15,25 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { range?: string };
+}) {
   const tenant = await requireTenant();
   const org = tenant.organizationId;
   const profile = await prisma.businessProfile.findUnique({ where: { organizationId: org } });
   const config = resolveConfig(profile);
   const currency = profile?.currency ?? "ILS";
 
-  const [stats, snapshot] = await Promise.all([getDashboardStats(org), buildSnapshot(org)]);
+  const validRanges: DateRange[] = ["today", "7d", "30d", "month"];
+  const range = (validRanges.includes(searchParams.range as DateRange) ? searchParams.range : "7d") as DateRange;
+
+  const [stats, snapshot] = await Promise.all([getDashboardStats(org, range), buildSnapshot(org)]);
   const briefing = await getAI().ask("מה כדאי לי לעשות היום?", snapshot);
 
   const kpis = [
-    { label: "הכנסות היום", value: formatMoney(stats.revenueToday, currency), icon: Wallet, tone: "text-green-500" },
+    { label: `הכנסות (${RANGE_LABELS[range]})`, value: formatMoney(stats.periodRevenue, currency), icon: Wallet, tone: "text-green-500" },
     { label: "הכנסות החודש", value: formatMoney(stats.revenueMonth, currency), icon: TrendingUp, tone: "text-indigo-500" },
     { label: "רווח משוער (חודש)", value: formatMoney(stats.estimatedProfit, currency), icon: TrendingUp, tone: "text-emerald-500" },
     { label: `${config.terminology.jobs} קרובות`, value: String(stats.jobsCount), icon: CalendarClock, tone: "text-blue-500" },
@@ -37,9 +45,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">שלום, {profile?.ownerName || profile?.name} 👋</h1>
-        <p className="text-sm text-muted-foreground">הנה סקירה של העסק שלך היום</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">שלום, {profile?.ownerName || profile?.name} 👋</h1>
+          <p className="text-sm text-muted-foreground">הנה סקירה של העסק שלך</p>
+        </div>
+        <RangeTabs value={range} />
       </div>
 
       {/* AI briefing */}
@@ -73,10 +84,10 @@ export default async function DashboardPage() {
 
       {/* Charts */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="הכנסות (7 ימים אחרונים)">
+        <ChartCard title={`הכנסות (${RANGE_LABELS[range]})`}>
           <RevenueChart data={stats.revenueSeries} />
         </ChartCard>
-        <ChartCard title={`${config.terminology.jobs} (7 ימים אחרונים)`}>
+        <ChartCard title={`${config.terminology.jobs} (${RANGE_LABELS[range]})`}>
           <JobsChart data={stats.jobsSeries} />
         </ChartCard>
         <ChartCard title="מקורות לידים (החודש)">

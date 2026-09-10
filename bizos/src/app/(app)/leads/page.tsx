@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, Input, Label, Select, Textarea, Badge } from "@/components/ui/primitives";
 import { Dialog } from "@/components/ui/dialog";
@@ -10,57 +11,103 @@ import { useToast } from "@/components/ui/toast";
 import { useBusiness } from "@/components/business-context";
 import { api } from "@/lib/client";
 import { formatMoney } from "@/lib/utils";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus, FileText, Trash2 } from "lucide-react";
 
 type Lead = {
   id: string;
   title: string;
   contactName?: string | null;
   contactPhone?: string | null;
+  employeeId?: string | null;
+  customerId?: string | null;
   source?: string | null;
   status: string;
   value: number;
   probability: number;
   notes?: string | null;
 };
+type Employee = { id: string; name: string };
 
 export default function LeadsPage() {
   const { config, currency } = useBusiness();
+  const router = useRouter();
   const toast = useToast();
   const [rows, setRows] = React.useState<Lead[] | null>(null);
+  const [employees, setEmployees] = React.useState<Employee[]>([]);
   const [open, setOpen] = React.useState(false);
+  const [editing, setEditing] = React.useState<Lead | null>(null);
   const [form, setForm] = React.useState<Partial<Lead>>({ status: "new", probability: 50, value: 0 });
   const [saving, setSaving] = React.useState(false);
   const [dragId, setDragId] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
-    const data = await api<{ rows: Lead[] }>("/api/leads");
+    const [data, emp] = await Promise.all([
+      api<{ rows: Lead[] }>("/api/leads"),
+      api<{ rows: Employee[] }>("/api/employees").catch(() => ({ rows: [] })),
+    ]);
     setRows(data.rows);
+    setEmployees(emp.rows);
   }, []);
   React.useEffect(() => {
     load();
   }, [load]);
 
+  function openNew() {
+    setEditing(null);
+    setForm({ status: "new", probability: 50, value: 0 });
+    setOpen(true);
+  }
+  function openEdit(l: Lead) {
+    setEditing(l);
+    setForm(l);
+    setOpen(true);
+  }
+
+  async function remove() {
+    if (!editing || !confirm("למחוק ליד זה?")) return;
+    await api(`/api/leads/${editing.id}`, { method: "DELETE" }).catch(() => {});
+    toast("נמחק");
+    setOpen(false);
+    load();
+  }
+
+  async function convert(navigateToQuote = false) {
+    if (!editing) return;
+    setSaving(true);
+    try {
+      const { customerId } = await api<{ customerId: string }>(`/api/leads/${editing.id}/convert`, { method: "POST" });
+      toast("הומר ללקוח");
+      setOpen(false);
+      load();
+      if (navigateToQuote) router.push(`/quotes?customerId=${customerId}&new=1`);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "שגיאה", "error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function save() {
     if (!form.title) return;
     setSaving(true);
+    const body = {
+      title: form.title,
+      contactName: form.contactName,
+      contactPhone: form.contactPhone,
+      employeeId: form.employeeId || null,
+      source: form.source,
+      status: form.status ?? "new",
+      value: Number(form.value) || 0,
+      probability: Number(form.probability) || 50,
+      notes: form.notes,
+    };
     try {
-      await api("/api/leads", {
-        method: "POST",
-        body: {
-          title: form.title,
-          contactName: form.contactName,
-          contactPhone: form.contactPhone,
-          source: form.source,
-          status: form.status ?? "new",
-          value: Number(form.value) || 0,
-          probability: Number(form.probability) || 50,
-          notes: form.notes,
-        },
-      });
-      toast(`${config.terminology.lead} נוסף`);
+      if (editing) await api(`/api/leads/${editing.id}`, { method: "PATCH", body });
+      else await api("/api/leads", { method: "POST", body });
+      toast(editing ? "עודכן" : `${config.terminology.lead} נוסף`);
       setOpen(false);
       setForm({ status: "new", probability: 50, value: 0 });
+      setEditing(null);
       load();
     } catch (e) {
       toast(e instanceof Error ? e.message : "שגיאה", "error");
@@ -87,7 +134,7 @@ export default function LeadsPage() {
         title={config.terminology.leads}
         subtitle="גרור לידים בין השלבים לניהול תהליך המכירה"
         action={
-          <Button onClick={() => setOpen(true)}>
+          <Button onClick={openNew}>
             <Plus size={16} /> {config.terminology.lead} חדש
           </Button>
         }
@@ -118,7 +165,8 @@ export default function LeadsPage() {
                     draggable
                     onDragStart={() => setDragId(l.id)}
                     onDragEnd={() => setDragId(null)}
-                    className="cursor-grab p-3 active:cursor-grabbing"
+                    onClick={() => openEdit(l)}
+                    className="cursor-pointer p-3"
                   >
                     <p className="text-sm font-medium">{l.title}</p>
                     {l.contactName && <p className="text-xs text-muted-foreground">{l.contactName}</p>}
@@ -138,7 +186,7 @@ export default function LeadsPage() {
         })}
       </div>
 
-      <Dialog open={open} onClose={() => setOpen(false)} title={`${config.terminology.lead} חדש`}>
+      <Dialog open={open} onClose={() => setOpen(false)} title={editing ? `עריכת ${config.terminology.lead}` : `${config.terminology.lead} חדש`}>
         <div className="space-y-3">
           <div>
             <Label>כותרת / תיאור *</Label>
@@ -175,11 +223,35 @@ export default function LeadsPage() {
                 ))}
               </Select>
             </div>
+            <div>
+              <Label>{config.terminology.employee} אחראי</Label>
+              <Select value={form.employeeId ?? ""} onChange={(e) => setForm({ ...form, employeeId: e.target.value })}>
+                <option value="">—</option>
+                {employees.map((em) => <option key={em.id} value={em.id}>{em.name}</option>)}
+              </Select>
+            </div>
           </div>
           <div>
             <Label>הערות</Label>
             <Textarea value={form.notes ?? ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
           </div>
+
+          {editing && (
+            <div className="flex flex-wrap gap-2 rounded-lg border bg-secondary/40 p-2">
+              {!editing.customerId && (
+                <Button size="sm" variant="outline" onClick={() => convert(false)} disabled={saving}>
+                  <UserPlus size={14} /> המר ללקוח
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={() => convert(true)} disabled={saving}>
+                <FileText size={14} /> צור הצעת מחיר
+              </Button>
+              <Button size="sm" variant="destructive" onClick={remove} disabled={saving}>
+                <Trash2 size={14} /> מחק
+              </Button>
+            </div>
+          )}
+
           <Button onClick={save} disabled={saving || !form.title} className="w-full">
             {saving ? "שומר..." : "שמור"}
           </Button>

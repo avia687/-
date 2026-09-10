@@ -30,6 +30,7 @@ model User {
   updatedAt    DateTime  @updatedAt
 
   memberships OrganizationMember[]
+  employees   Employee[]
 }
 
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ model Organization {
   conversations AIConversation[]
   notifications Notification[]
   auditLogs    AuditLog[]
+  invites      Invite[]
 }
 
 // Roles, highest first. Permissions resolved in src/lib/rbac.ts.
@@ -137,6 +139,7 @@ model Lead {
   id             String   @id @default(cuid())
   organizationId String
   customerId     String?
+  employeeId     String?
   title          String
   contactName    String?
   contactPhone   String?
@@ -151,6 +154,7 @@ model Lead {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   customer     Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  employee     Employee?    @relation(fields: [employeeId], references: [id], onDelete: SetNull)
 
   @@index([organizationId])
 }
@@ -237,9 +241,23 @@ model Job {
   quote        Quote?       @relation(fields: [quoteId], references: [id], onDelete: SetNull)
   employee     Employee?    @relation(fields: [employeeId], references: [id], onDelete: SetNull)
   payments     Payment[]
+  photos       JobPhoto[]
 
   @@index([organizationId])
   @@index([startAt])
+}
+
+model JobPhoto {
+  id             String   @id @default(cuid())
+  organizationId String
+  jobId          String
+  kind           String   @default("before") // before|after
+  data           String   // data URI (validated, downscaled client-side)
+  createdAt      DateTime @default(now())
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
 }
 
 model Payment {
@@ -281,6 +299,7 @@ model Expense {
 model Employee {
   id             String   @id @default(cuid())
   organizationId String
+  userId         String?  // linked once the invited person accepts
   name           String
   phone          String?
   role           String   @default("EMPLOYEE") // maps to member role for permissions
@@ -290,7 +309,24 @@ model Employee {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   jobs         Job[]
+  leads        Lead[]
+
+  @@index([organizationId])
+}
+
+model Invite {
+  id             String   @id @default(cuid())
+  organizationId String
+  email          String
+  role           String   @default("EMPLOYEE")
+  token          String   @unique @default(cuid())
+  employeeId     String?  // pre-created Employee row to link on accept
+  acceptedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
 }
@@ -320,8 +356,24 @@ model Automation {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  runs         AutomationRun[]
 
   @@unique([organizationId, key])
+}
+
+model AutomationRun {
+  id             String   @id @default(cuid())
+  organizationId String
+  automationId   String
+  status         String   @default("success") // success|failed
+  detail         String?
+  dedupeKey      String   // prevents double-send on retries
+  createdAt      DateTime @default(now())
+
+  automation Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+
+  @@unique([automationId, dedupeKey])
+  @@index([organizationId])
 }
 
 model Message {
@@ -370,6 +422,7 @@ model Notification {
   type           String   // new_customer|quote_approved|payment_received|job_soon|review_new|...
   title          String
   body           String?
+  link           String?  // in-app target route
   read           Boolean  @default(false)
   createdAt      DateTime @default(now())
 

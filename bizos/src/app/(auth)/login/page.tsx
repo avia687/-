@@ -10,6 +10,11 @@ import { Sparkles } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [callbackUrl, setCallbackUrl] = React.useState("/dashboard");
+  React.useEffect(() => {
+    const u = new URLSearchParams(window.location.search).get("callbackUrl");
+    if (u) setCallbackUrl(u);
+  }, []);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
@@ -25,7 +30,7 @@ export default function LoginPage() {
       setError("אימייל או סיסמה שגויים");
       return;
     }
-    router.push("/dashboard");
+    router.push(callbackUrl);
     router.refresh();
   }
 

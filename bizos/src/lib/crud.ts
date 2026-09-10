@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
 import type { Permission } from "@/lib/rbac";
 
 // Generic tenant-scoped CRUD for straightforward resources. Every query is
@@ -63,6 +64,7 @@ export function crudCreate<C extends z.ZodTypeAny, U extends z.ZodTypeAny>(cfg: 
       const row = await delegate(cfg.model).create({
         data: { ...data, organizationId: tenant.organizationId },
       });
+      await audit(tenant, `${cfg.model}.create`, cfg.model, row.id);
       return NextResponse.json({ row });
     } catch (err) {
       return errorResponse(err);
@@ -83,6 +85,7 @@ export function crudUpdate<C extends z.ZodTypeAny, U extends z.ZodTypeAny>(cfg: 
         where: { id: ctx.params.id },
         data: data as Record<string, unknown>,
       });
+      await audit(tenant, `${cfg.model}.update`, cfg.model, ctx.params.id);
       return NextResponse.json({ row });
     } catch (err) {
       return errorResponse(err);
@@ -99,6 +102,7 @@ export function crudDelete<C extends z.ZodTypeAny, U extends z.ZodTypeAny>(cfg: 
       });
       if (!existing) return NextResponse.json({ error: "לא נמצא" }, { status: 404 });
       await delegate(cfg.model).delete({ where: { id: ctx.params.id } });
+      await audit(tenant, `${cfg.model}.delete`, cfg.model, ctx.params.id);
       return NextResponse.json({ ok: true });
     } catch (err) {
       return errorResponse(err);

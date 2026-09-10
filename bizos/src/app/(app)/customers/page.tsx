@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { useToast } from "@/components/ui/toast";
 import { useBusiness } from "@/components/business-context";
 import { api } from "@/lib/client";
-import { Plus, Users, Phone, Search } from "lucide-react";
+import { Plus, Users, Phone, Search, Pencil, Trash2 } from "lucide-react";
 
 type Customer = {
   id: string;
@@ -27,6 +27,7 @@ export default function CustomersPage() {
   const [rows, setRows] = React.useState<Customer[] | null>(null);
   const [q, setQ] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [editing, setEditing] = React.useState<Customer | null>(null);
   const [form, setForm] = React.useState<Partial<Customer>>({});
   const [saving, setSaving] = React.useState(false);
 
@@ -44,19 +45,43 @@ export default function CustomersPage() {
     return () => clearTimeout(id);
   }, [q, load]);
 
+  function openNew() {
+    setEditing(null);
+    setForm({});
+    setOpen(true);
+  }
+  function openEdit(c: Customer) {
+    setEditing(c);
+    setForm(c);
+    setOpen(true);
+  }
+
   async function save() {
     if (!form.name) return;
     setSaving(true);
     try {
-      await api("/api/customers", { method: "POST", body: form });
-      toast(`${config.terminology.customer} נוסף`);
+      if (editing) await api(`/api/customers/${editing.id}`, { method: "PATCH", body: form });
+      else await api("/api/customers", { method: "POST", body: form });
+      toast(editing ? "עודכן" : `${config.terminology.customer} נוסף`);
       setOpen(false);
       setForm({});
+      setEditing(null);
       load(q);
     } catch (e) {
       toast(e instanceof Error ? e.message : "שגיאה", "error");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function remove(c: Customer) {
+    if (!confirm(`למחוק את ${c.name}?`)) return;
+    try {
+      await api(`/api/customers/${c.id}`, { method: "DELETE" });
+      toast("נמחק");
+      load(q);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "שגיאה", "error");
     }
   }
 
@@ -66,7 +91,7 @@ export default function CustomersPage() {
         title={config.terminology.customers}
         subtitle="ניהול כל הלקוחות שלך במקום אחד"
         action={
-          <Button onClick={() => setOpen(true)}>
+          <Button onClick={openNew}>
             <Plus size={16} /> {config.terminology.customer} חדש
           </Button>
         }
@@ -90,7 +115,7 @@ export default function CustomersPage() {
           title={`אין ${config.terminology.customers} עדיין`}
           description="הוסף את הלקוח הראשון שלך כדי להתחיל"
           action={
-            <Button onClick={() => setOpen(true)}>
+            <Button onClick={openNew}>
               <Plus size={16} /> הוסף {config.terminology.customer}
             </Button>
           }
@@ -98,9 +123,9 @@ export default function CustomersPage() {
       ) : (
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((c) => (
-            <Link key={c.id} href={`/customers/${c.id}`}>
-              <Card className="p-4 transition-colors hover:bg-secondary">
-                <div className="flex items-center gap-3">
+            <Card key={c.id} className="p-4">
+              <div className="flex items-center gap-3">
+                <Link href={`/customers/${c.id}`} className="flex min-w-0 flex-1 items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
                     {c.name.charAt(0)}
                   </div>
@@ -112,14 +137,16 @@ export default function CustomersPage() {
                       </p>
                     )}
                   </div>
-                </div>
-              </Card>
-            </Link>
+                </Link>
+                <button onClick={() => openEdit(c)} aria-label="ערוך" className="rounded p-1.5 text-muted-foreground hover:bg-secondary"><Pencil size={14} /></button>
+                <button onClick={() => remove(c)} aria-label="מחק" className="rounded p-1.5 text-muted-foreground hover:bg-secondary"><Trash2 size={14} /></button>
+              </div>
+            </Card>
           ))}
         </div>
       )}
 
-      <Dialog open={open} onClose={() => setOpen(false)} title={`${config.terminology.customer} חדש`}>
+      <Dialog open={open} onClose={() => setOpen(false)} title={editing ? "עריכת פרטים" : `${config.terminology.customer} חדש`}>
         <div className="space-y-3">
           <div>
             <Label>שם *</Label>

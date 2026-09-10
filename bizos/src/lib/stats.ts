@@ -1,7 +1,19 @@
 import { prisma } from "@/lib/db";
 import { startOfDay, addDays } from "@/lib/utils";
 
+export type DateRange = "today" | "7d" | "30d" | "month";
+
+export const RANGE_LABELS: Record<DateRange, string> = {
+  today: "היום",
+  "7d": "7 ימים",
+  "30d": "30 יום",
+  month: "החודש",
+};
+
 export type DashboardStats = {
+  range: DateRange;
+  periodRevenue: number;
+  periodJobs: number;
   revenueToday: number;
   revenueWeek: number;
   revenueMonth: number;
@@ -20,11 +32,19 @@ export type DashboardStats = {
 
 const DONE = ["done", "scheduled", "in_progress"];
 
-export async function getDashboardStats(organizationId: string): Promise<DashboardStats> {
+export async function getDashboardStats(
+  organizationId: string,
+  range: DateRange = "7d",
+): Promise<DashboardStats> {
   const today = startOfDay();
   const weekStart = addDays(today, -6);
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const in30 = addDays(today, 1);
+
+  // Window start + number of daily buckets for the selected range.
+  const rangeStart =
+    range === "today" ? today : range === "7d" ? weekStart : range === "30d" ? addDays(today, -29) : monthStart;
+  const buckets = range === "today" ? 1 : range === "7d" ? 7 : range === "30d" ? 30 : today.getDate();
 
   const [jobs, monthExpenses, leads, newCustomers, openQuotes, payments, upcoming] =
     await Promise.all([
@@ -61,17 +81,24 @@ export async function getDashboardStats(organizationId: string): Promise<Dashboa
     .reduce((a, j) => a + j.price * 0.15, 0); // rough service-cost proxy
   const estimatedProfit = revenueMonth - (monthExpenses._sum.amount ?? 0) - monthCost;
 
-  // 7-day revenue + jobs series.
+  // Revenue + jobs series across the selected range (daily buckets).
   const revenueSeries: { label: string; value: number }[] = [];
   const jobsSeries: { label: string; value: number }[] = [];
-  for (let i = 6; i >= 0; i--) {
+  const showWeekday = buckets <= 7;
+  for (let i = buckets - 1; i >= 0; i--) {
     const day = addDays(today, -i);
+    if (day < addDays(rangeStart, -1)) continue;
     const next = addDays(day, 1);
     const dayJobs = active.filter((j) => j.startAt >= day && j.startAt < next);
-    const label = day.toLocaleDateString("he-IL", { weekday: "short" });
+    const label = showWeekday
+      ? day.toLocaleDateString("he-IL", { weekday: "short" })
+      : day.toLocaleDateString("he-IL", { day: "numeric", month: "numeric" });
     revenueSeries.push({ label, value: dayJobs.reduce((a, j) => a + j.price, 0) });
     jobsSeries.push({ label, value: dayJobs.length });
   }
+
+  const periodJobsList = active.filter((j) => j.startAt >= rangeStart);
+  const periodRevenue = periodJobsList.reduce((a, j) => a + j.price, 0);
 
   // Lead sources (month).
   const leadRows = await prisma.lead.findMany({
@@ -97,6 +124,9 @@ export async function getDashboardStats(organizationId: string): Promise<Dashboa
     .slice(0, 5);
 
   return {
+    range,
+    periodRevenue,
+    periodJobs: periodJobsList.length,
     revenueToday: sum(today),
     revenueWeek: sum(weekStart),
     revenueMonth,

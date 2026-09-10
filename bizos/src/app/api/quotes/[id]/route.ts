@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
+import { dispatch } from "@/lib/automations/engine";
 
 // Owner-side status changes (send / mark approved / reject). Item editing is
 // done by recreating a quote in this MVP to keep totals authoritative.
@@ -27,6 +29,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       },
       include: { customer: true, items: true },
     });
+    await audit(tenant, "quote.update", "quote", params.id);
+    if (d.status === "sent" && existing.status !== "sent") {
+      await dispatch(tenant.organizationId, "quote_sent", {
+        dedupeKey: `quote_sent:${quote.id}`,
+        customerId: quote.customerId ?? undefined,
+        customerName: quote.customer?.name,
+      });
+    }
     return NextResponse.json({ quote });
   } catch (err) {
     return errorResponse(err);
@@ -41,6 +51,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     });
     if (!existing) return NextResponse.json({ error: "לא נמצא" }, { status: 404 });
     await prisma.quote.delete({ where: { id: params.id } });
+    await audit(tenant, "quote.delete", "quote", params.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return errorResponse(err);

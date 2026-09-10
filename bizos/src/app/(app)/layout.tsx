@@ -23,7 +23,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <BusinessProvider
-      value={{ config, currency: profile.currency, role: tenant.role, plan: tenant.plan }}
+      value={{ config, businessName: profile.name, currency: profile.currency, role: tenant.role, plan: tenant.plan }}
     >
       <AppShell user={{ name: session.user.name, email: session.user.email }}>{children}</AppShell>
     </BusinessProvider>

@@ -1,5 +1,6 @@
 import type { AIProvider } from "@/lib/ai/provider";
 import type {
+  AIAction,
   AssistantReply,
   BusinessSnapshot,
   ConfigProposal,
@@ -106,6 +107,42 @@ export class MockAIProvider implements AIProvider {
     const price = svc ? ` החל מ-${formatMoney(svc.price, snapshot.currency)}` : "";
     const tag = channel === "instagram" || channel === "facebook" ? "\n\n#עסק_מקומי #שירות_מקצועי" : "";
     return `✨ ${snapshot.businessName} — ${topic}!\n\nשירות מקצועי ואמין${price}. הזמינו עכשיו ותיהנו מאיכות ללא פשרות.\n📞 צרו קשר עוד היום.${tag}`;
+  }
+
+  async proposeAction(instruction: string, s: BusinessSnapshot): Promise<AIAction> {
+    const text = instruction.trim();
+    // Find a customer mentioned by name (grounded — never invented).
+    const customer = s.customers.find((c) => text.includes(c.name) || text.includes(c.name.split(" ")[0]));
+
+    if (/הצעת מחיר|הצעה|quote/.test(text)) {
+      if (!customer) {
+        return { type: "none", summary: "לא זיהיתי לקוח קיים בבקשה.", missing: "customer" };
+      }
+      // Prefer a service named in the instruction; else the top service.
+      const svc = s.services.find((x) => text.includes(x.name.split(" ")[0])) ?? s.services[0];
+      if (!svc) return { type: "none", summary: "אין שירותים במחירון ליצירת הצעה.", missing: "service" };
+      return {
+        type: "create_quote",
+        summary: `יצירת טיוטת הצעת מחיר ל${customer.name} עם "${svc.name}" (${svc.price}).`,
+        draft: {
+          customerId: customer.id,
+          customerName: customer.name,
+          items: [{ serviceId: svc.id, name: svc.name, quantity: 1, unitPrice: svc.price }],
+        },
+      };
+    }
+
+    if (/תכתוב|הודעה|שלח|תשלח|message/.test(text)) {
+      if (!customer) return { type: "none", summary: "לא זיהיתי לקוח לשליחת הודעה.", missing: "customer" };
+      const body = `שלום ${customer.name}, נשמח לעמוד לרשותך. — ${s.businessName}`;
+      return {
+        type: "send_message",
+        summary: `הכנת הודעה ל${customer.name}.`,
+        draft: { customerId: customer.id, customerName: customer.name, body },
+      };
+    }
+
+    return { type: "none", summary: "לא הבנתי איזו פעולה לבצע. נסה: \"תיצור הצעת מחיר ל<לקוח>\"." };
   }
 
   async proposeConfig(description: string): Promise<ConfigProposal> {

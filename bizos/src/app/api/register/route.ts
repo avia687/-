@@ -3,6 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
+import { rateLimit, clientKey } from "@/lib/ratelimit";
 
 const schema = z.object({
   name: z.string().min(1).max(80),
@@ -12,6 +13,7 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    rateLimit(clientKey(req, "register"), 5, 60_000); // 5/min per IP
     const { name, email, password } = schema.parse(await req.json());
     const normalized = email.toLowerCase().trim();
 

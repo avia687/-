@@ -10,25 +10,55 @@ import { useToast } from "@/components/ui/toast";
 import { useBusiness } from "@/components/business-context";
 import { api } from "@/lib/client";
 import { ROLE_LABELS, type Role } from "@/lib/rbac";
-import { Plus, UserCog, Trash2, Phone } from "lucide-react";
+import { Plus, UserCog, Trash2, Phone, Mail, Link as LinkIcon } from "lucide-react";
 
 type Employee = { id: string; name: string; phone?: string | null; role: string; title?: string | null; hourlyRate: number; active: boolean };
+type Invite = { id: string; email: string; role: string; token: string };
 
 export default function EmployeesPage() {
   const { config } = useBusiness();
   const toast = useToast();
   const [rows, setRows] = React.useState<Employee[] | null>(null);
+  const [invites, setInvites] = React.useState<Invite[]>([]);
   const [open, setOpen] = React.useState(false);
+  const [inviteOpen, setInviteOpen] = React.useState(false);
   const [form, setForm] = React.useState<any>({ role: "EMPLOYEE", hourlyRate: 0, active: true });
+  const [inviteForm, setInviteForm] = React.useState<any>({ role: "EMPLOYEE" });
   const [saving, setSaving] = React.useState(false);
 
   const load = React.useCallback(async () => {
-    const d = await api<{ rows: Employee[] }>("/api/employees");
+    const [d, inv] = await Promise.all([
+      api<{ rows: Employee[] }>("/api/employees"),
+      api<{ invites: Invite[] }>("/api/invites").catch(() => ({ invites: [] })),
+    ]);
     setRows(d.rows);
+    setInvites(inv.invites);
   }, []);
   React.useEffect(() => {
     load();
   }, [load]);
+
+  async function sendInvite() {
+    if (!inviteForm.name || !inviteForm.email) return;
+    setSaving(true);
+    try {
+      const { invite } = await api<{ invite: Invite }>("/api/invites", { method: "POST", body: inviteForm });
+      const url = `${window.location.origin}/join/${invite.token}`;
+      await navigator.clipboard?.writeText(url).catch(() => {});
+      toast("ההזמנה נוצרה — הקישור הועתק");
+      setInviteOpen(false);
+      setInviteForm({ role: "EMPLOYEE" });
+      load();
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "שגיאה", "error");
+    } finally {
+      setSaving(false);
+    }
+  }
+  function copyInvite(token: string) {
+    navigator.clipboard?.writeText(`${window.location.origin}/join/${token}`);
+    toast("הקישור הועתק");
+  }
 
   async function save() {
     if (!form.name) return;
@@ -53,7 +83,34 @@ export default function EmployeesPage() {
 
   return (
     <div>
-      <PageHeader title={config.terminology.employees} subtitle="ניהול צוות והרשאות" action={<Button onClick={() => setOpen(true)}><Plus size={16} /> {config.terminology.employee} חדש</Button>} />
+      <PageHeader
+        title={config.terminology.employees}
+        subtitle="ניהול צוות והרשאות"
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setInviteOpen(true)}><Mail size={16} /> הזמן</Button>
+            <Button onClick={() => setOpen(true)}><Plus size={16} /> {config.terminology.employee}</Button>
+          </div>
+        }
+      />
+
+      {invites.length > 0 && (
+        <div className="mb-4">
+          <p className="mb-1 text-sm font-medium text-muted-foreground">הזמנות ממתינות</p>
+          <div className="space-y-1">
+            {invites.map((i) => (
+              <Card key={i.id}>
+                <CardContent className="flex items-center gap-2 py-3">
+                  <Mail size={14} className="text-muted-foreground" />
+                  <span className="flex-1 text-sm" dir="ltr">{i.email}</span>
+                  <Badge color="amber">{ROLE_LABELS[i.role as Role] ?? i.role}</Badge>
+                  <button onClick={() => copyInvite(i.token)} className="rounded p-1.5 text-muted-foreground hover:bg-secondary"><LinkIcon size={14} /></button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {rows === null ? (
         <LoadingScreen />
@@ -107,6 +164,29 @@ export default function EmployeesPage() {
             </div>
           </div>
           <Button onClick={save} disabled={saving || !form.name} className="w-full">{saving ? "שומר..." : "שמור"}</Button>
+        </div>
+      </Dialog>
+
+      <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} title="הזמנת חבר צוות">
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">נוצר קישור הצטרפות שתוכל לשלוח. המוזמן ייכנס עם ההרשאה שתבחר.</p>
+          <div>
+            <Label>שם *</Label>
+            <Input value={inviteForm.name ?? ""} onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })} />
+          </div>
+          <div>
+            <Label>אימייל *</Label>
+            <Input type="email" value={inviteForm.email ?? ""} onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })} dir="ltr" />
+          </div>
+          <div>
+            <Label>הרשאה</Label>
+            <Select value={inviteForm.role} onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}>
+              {(["EMPLOYEE", "MANAGER", "ADMIN"] as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+            </Select>
+          </div>
+          <Button onClick={sendInvite} disabled={saving || !inviteForm.name || !inviteForm.email} className="w-full">
+            {saving ? "יוצר..." : "צור קישור הזמנה"}
+          </Button>
         </div>
       </Dialog>
     </div>

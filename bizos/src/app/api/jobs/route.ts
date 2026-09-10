@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
 import { assertWithinLimit } from "@/lib/subscription";
+import { audit } from "@/lib/audit";
+import { dispatch } from "@/lib/automations/engine";
 
 const createSchema = z.object({
   title: z.string().min(1).max(160),
@@ -66,6 +68,13 @@ export async function POST(req: Request) {
         notes: data.notes || null,
       },
       include: { customer: true, employee: true },
+    });
+    await audit(tenant, "job.create", "job", job.id);
+    // Fire the "job confirmation" automation if enabled (no-op otherwise).
+    await dispatch(tenant.organizationId, "job_created", {
+      dedupeKey: `job_created:${job.id}`,
+      customerName: job.customer?.name,
+      date: job.startAt,
     });
     return NextResponse.json({ job });
   } catch (err) {

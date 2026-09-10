@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { AuthError } from "@/lib/tenant";
 import { LimitError } from "@/lib/subscription";
+import { RateLimitError } from "@/lib/ratelimit";
 
 /** Wraps a route handler, translating known errors into JSON responses. */
 export function handler<T>(fn: () => Promise<T>) {
@@ -16,6 +17,9 @@ export function handler<T>(fn: () => Promise<T>) {
 }
 
 export function errorResponse(err: unknown) {
+  if (err instanceof RateLimitError) {
+    return NextResponse.json({ error: err.message }, { status: 429 });
+  }
   if (err instanceof AuthError) {
     return NextResponse.json({ error: err.message }, { status: err.status });
   }

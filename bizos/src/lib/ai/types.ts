@@ -8,7 +8,8 @@ export type BusinessSnapshot = {
   currency: string;
   aiInstructions: string;
   terminology: Record<string, string>;
-  services: { name: string; price: number; category?: string }[];
+  services: { id: string; name: string; price: number; category?: string }[];
+  customers: { id: string; name: string }[];
   todayJobs: { title: string; time: string; customer?: string; status: string }[];
   upcomingJobs: { title: string; date: string; customer?: string }[];
   openQuotes: { customer?: string; total: number; status: string }[];
@@ -44,3 +45,21 @@ export type ConfigProposal = {
   terminology: Record<string, string>;
   services: { name: string; category: string; price: number; durationMin: number }[];
 };
+
+// AI write-actions are always proposed as a DRAFT that the user must confirm.
+export type AIAction =
+  | {
+      type: "create_quote";
+      summary: string;
+      draft: {
+        customerId?: string;
+        customerName?: string;
+        items: { serviceId?: string; name: string; quantity: number; unitPrice: number }[];
+      };
+    }
+  | {
+      type: "send_message";
+      summary: string;
+      draft: { customerId?: string; customerName?: string; body: string };
+    }
+  | { type: "none"; summary: string; missing?: string };

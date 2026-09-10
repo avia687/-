@@ -8,6 +8,7 @@ import { LoadingScreen } from "@/components/ui/states";
 import { PageHeader } from "@/components/app/page-header";
 import { useToast } from "@/components/ui/toast";
 import { api } from "@/lib/client";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { TEMPLATE_LIST } from "@/lib/business/templates";
 import { isMessagingConnected } from "@/lib/messaging";
 import { Building2, Type, Sparkles, Plug, CreditCard, Check, X } from "lucide-react";
@@ -83,6 +84,10 @@ export default function SettingsPage() {
       {tab === "business" && (
         <Card>
           <CardContent className="space-y-3 pt-5">
+            <div>
+              <Label>לוגו</Label>
+              <ImageUpload value={form.logo} onChange={(uri) => setForm({ ...form, logo: uri })} label="לוגו" />
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <Label>שם העסק</Label>
@@ -128,7 +133,7 @@ export default function SettingsPage() {
                 <Input value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} />
               </div>
             </div>
-            <Button onClick={() => save({ name: form.name, ownerName: form.ownerName, businessType: form.businessType, currency: form.currency, phone: form.phone, whatsapp: form.whatsapp, brandColor: form.brandColor, serviceAreas: form.serviceAreas, address: form.address })} disabled={saving}>
+            <Button onClick={() => save({ name: form.name, ownerName: form.ownerName, businessType: form.businessType, currency: form.currency, phone: form.phone, whatsapp: form.whatsapp, brandColor: form.brandColor, serviceAreas: form.serviceAreas, address: form.address, logo: form.logo ?? null })} disabled={saving}>
               שמור שינויים
             </Button>
           </CardContent>

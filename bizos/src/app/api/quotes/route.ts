@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
 import { calcQuote } from "@/lib/quote";
+import { audit } from "@/lib/audit";
 
 const itemSchema = z.object({
   serviceId: z.string().nullish(),
@@ -77,6 +78,7 @@ export async function POST(req: Request) {
       },
       include: { customer: true, items: true },
     });
+    await audit(tenant, "quote.create", "quote", quote.id);
     return NextResponse.json({ quote });
   } catch (err) {
     return errorResponse(err);

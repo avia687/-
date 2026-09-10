@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
 
 const createSchema = z.object({
   customerId: z.string().nullish(),
@@ -53,9 +54,11 @@ export async function POST(req: Request) {
           type: "payment_received",
           title: "התקבל תשלום",
           body: `${payment.amount} ${payment.customer?.name ? `מ${payment.customer.name}` : ""}`,
+          link: "/payments",
         },
       });
     }
+    await audit(tenant, "payment.create", "payment", payment.id);
     return NextResponse.json({ payment });
   } catch (err) {
     return errorResponse(err);

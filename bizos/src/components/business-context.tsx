@@ -8,6 +8,7 @@ import type { BusinessConfig, Terminology } from "@/lib/business/types";
 
 type BusinessContextValue = {
   config: BusinessConfig;
+  businessName: string;
   currency: string;
   role: string;
   plan: string;

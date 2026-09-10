@@ -68,6 +68,16 @@ export default function QuotesPage() {
     load();
   }, [load]);
 
+  // Deep-link from "create quote from lead": ?customerId=..&new=1
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "1") {
+      const cid = params.get("customerId");
+      if (cid) setCustomerId(cid);
+      setOpen(true);
+    }
+  }, []);
+
   const totals = calcQuote({ items, discount, taxRate, taxIncluded: false });
 
   function addService(id: string) {

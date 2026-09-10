@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
 
 const updateSchema = z.object({
   amount: z.number().min(0).optional(),
@@ -29,6 +30,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       },
       include: { customer: true },
     });
+    await audit(tenant, "payment.update", "payment", params.id);
     return NextResponse.json({ payment });
   } catch (err) {
     return errorResponse(err);
@@ -43,6 +45,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     });
     if (!existing) return NextResponse.json({ error: "לא נמצא" }, { status: 404 });
     await prisma.payment.delete({ where: { id: params.id } });
+    await audit(tenant, "payment.delete", "payment", params.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return errorResponse(err);

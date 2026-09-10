@@ -18,7 +18,7 @@ export async function buildSnapshot(organizationId: string): Promise<BusinessSna
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const weekAhead = addDays(today, 7);
 
-  const [services, todayJobs, upcomingJobs, openQuotes, payments, leads, monthJobs, reviews] =
+  const [services, todayJobs, upcomingJobs, openQuotes, payments, leads, monthJobs, reviews, customers] =
     await Promise.all([
       prisma.service.findMany({ where: { organizationId, active: true }, orderBy: { price: "desc" } }),
       prisma.job.findMany({
@@ -50,6 +50,7 @@ export async function buildSnapshot(organizationId: string): Promise<BusinessSna
         select: { price: true, serviceName: true, status: true },
       }),
       prisma.review.findMany({ where: { organizationId, submittedAt: null } }),
+      prisma.customer.findMany({ where: { organizationId }, select: { id: true, name: true }, orderBy: { createdAt: "desc" }, take: 200 }),
     ]);
 
   // Top service by month revenue.
@@ -73,7 +74,8 @@ export async function buildSnapshot(organizationId: string): Promise<BusinessSna
     currency,
     aiInstructions: config.aiInstructions,
     terminology: config.terminology,
-    services: services.map((s) => ({ name: s.name, price: s.price, category: s.category ?? undefined })),
+    services: services.map((s) => ({ id: s.id, name: s.name, price: s.price, category: s.category ?? undefined })),
+    customers: customers.map((c) => ({ id: c.id, name: c.name })),
     todayJobs: todayJobs.map((j) => ({
       title: j.title,
       time: new Date(j.startAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }),

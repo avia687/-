@@ -30,6 +30,15 @@ export default async function CustomerDetail({ params }: { params: { id: string 
   const totalPaid = customer.payments.filter((p) => p.status === "paid").reduce((a, p) => a + p.amount, 0);
   const outstanding = customer.payments.filter((p) => p.status !== "paid").reduce((a, p) => a + p.amount, 0);
 
+  // Unified chronological activity timeline.
+  type Entry = { at: Date; icon: string; text: string };
+  const timeline: Entry[] = [
+    ...customer.jobs.map((j) => ({ at: new Date(j.startAt), icon: "🗓️", text: `${config.terminology.job}: ${j.title} (${formatMoney(j.price, currency)})` })),
+    ...customer.quotes.map((q) => ({ at: new Date(q.createdAt), icon: "📄", text: `הצעה #${q.number} — ${q.status} (${formatMoney(q.total, currency)})` })),
+    ...customer.payments.map((p) => ({ at: new Date(p.createdAt), icon: "💰", text: `תשלום ${formatMoney(p.amount, currency)} — ${p.status}` })),
+    ...customer.reviews.filter((r) => r.submittedAt).map((r) => ({ at: new Date(r.submittedAt!), icon: "⭐", text: `ביקורת ${r.rating}/5` })),
+  ].sort((a, b) => b.at.getTime() - a.at.getTime());
+
   return (
     <div className="space-y-5">
       <Link href="/customers" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -67,6 +76,23 @@ export default async function CustomerDetail({ params }: { params: { id: string 
           <CardContent className="pt-5 text-sm">
             <p className="mb-1 font-semibold">הערות</p>
             <p className="text-muted-foreground">{customer.notes}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {timeline.length > 0 && (
+        <Card>
+          <CardContent className="pt-5">
+            <p className="mb-2 text-sm font-semibold">ציר זמן פעילות</p>
+            <ol className="space-y-2">
+              {timeline.map((e, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span>{e.icon}</span>
+                  <span className="flex-1">{e.text}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(e.at)}</span>
+                </li>
+              ))}
+            </ol>
           </CardContent>
         </Card>
       )}

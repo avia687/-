@@ -11,6 +11,10 @@ import { Sparkles } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
+  const [callbackUrl, setCallbackUrl] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    setCallbackUrl(new URLSearchParams(window.location.search).get("callbackUrl"));
+  }, []);
   const [form, setForm] = React.useState({ name: "", email: "", password: "" });
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -25,7 +29,8 @@ export default function SignupPage() {
     try {
       await api("/api/register", { method: "POST", body: form });
       await signIn("credentials", { email: form.email, password: form.password, redirect: false });
-      router.push("/onboarding");
+      // Invited teammates go straight to accept their invite; new owners onboard.
+      router.push(callbackUrl || "/onboarding");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "שגיאה בהרשמה");

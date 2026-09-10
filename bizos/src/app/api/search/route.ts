@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     const q = new URL(req.url).searchParams.get("q")?.trim();
     if (!q) return NextResponse.json({ results: [] });
 
-    const [customers, leads, quotes, jobs] = await Promise.all([
+    const [customers, leads, quotes, jobs, payments] = await Promise.all([
       prisma.customer.findMany({
         where: { organizationId: org, OR: [{ name: { contains: q } }, { phone: { contains: q } }] },
         take: 5,
@@ -28,6 +28,11 @@ export async function GET(req: Request) {
       }),
       prisma.job.findMany({
         where: { organizationId: org, OR: [{ title: { contains: q } }, { serviceName: { contains: q } }] },
+        take: 5,
+      }),
+      prisma.payment.findMany({
+        where: { organizationId: org, customer: { name: { contains: q } } },
+        include: { customer: true },
         take: 5,
       }),
     ]);
@@ -60,6 +65,13 @@ export async function GET(req: Request) {
         sublabel: j.serviceName ?? undefined,
         href: `/calendar`,
         icon: "Calendar",
+      })),
+      ...payments.map((p) => ({
+        type: "תשלום",
+        label: formatMoney(p.amount),
+        sublabel: `${p.customer?.name ?? ""} · ${p.status}`,
+        href: `/payments`,
+        icon: "Wallet",
       })),
     ];
     return NextResponse.json({ results });

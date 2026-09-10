@@ -23,6 +23,8 @@ export function buildNav(config: BusinessConfig): NavItem[] {
     { href: "/expenses", label: "הוצאות", icon: "Receipt", permission: "expenses:read" },
     { href: "/employees", label: t.employees, icon: "UserCog", permission: "employees:read" },
     { href: "/reviews", label: "ביקורות", icon: "Star", permission: "reviews:read" },
+    { href: "/messages", label: "הודעות", icon: "MessageCircle", permission: "customers:read" },
+    { href: "/automations", label: "אוטומציות", icon: "Zap", permission: "settings:read" },
     { href: "/marketing", label: "שיווק", icon: "Megaphone", permission: "marketing:read" },
     { href: "/assistant", label: "עוזר AI", icon: "Sparkles", permission: "ai:use" },
     { href: "/settings", label: "הגדרות", icon: "Settings", permission: "settings:read" },

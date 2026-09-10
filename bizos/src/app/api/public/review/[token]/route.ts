@@ -26,6 +26,7 @@ export async function POST(req: Request, { params }: { params: { token: string }
         type: "review_new",
         title: "ביקורת חדשה",
         body: `דירוג ${rating}/5`,
+        link: "/reviews",
       },
     });
     return NextResponse.json({ ok: true });

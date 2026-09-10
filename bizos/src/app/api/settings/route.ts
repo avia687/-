@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
 import { parseJSON } from "@/lib/utils";
 import { getTemplate } from "@/lib/business/templates";
 
@@ -18,6 +19,8 @@ const schema = z.object({
   serviceAreas: z.string().max(300).nullish(),
   currency: z.string().max(8).optional(),
   brandColor: z.string().max(20).optional(),
+  logo: z.string().max(3_000_000).nullish(), // data URI (≤~2MB image)
+  hours: z.string().max(2000).nullish(),
   terminologyOverrides: z.record(z.string()).optional(),
   aiInstructions: z.string().max(2000).nullish(),
 });
@@ -57,6 +60,7 @@ export async function PATCH(req: Request) {
           : undefined,
       },
     });
+    await audit(tenant, "settings.update", "businessProfile", profile.id);
     return NextResponse.json({ ok: true, profile });
   } catch (err) {
     return errorResponse(err);

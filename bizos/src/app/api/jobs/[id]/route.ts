@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
+import { dispatch } from "@/lib/automations/engine";
 
 const updateSchema = z.object({
   title: z.string().min(1).max(160).optional(),
@@ -36,6 +38,15 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       },
       include: { customer: true, employee: true },
     });
+    await audit(tenant, "job.update", "job", params.id);
+    // When a job is completed, run thank-you + review-request automations.
+    if (d.status === "done" && existing.status !== "done") {
+      await dispatch(tenant.organizationId, "job_completed", {
+        dedupeKey: `job_completed:${job.id}`,
+        customerId: job.customerId ?? undefined,
+        customerName: job.customer?.name,
+      });
+    }
     return NextResponse.json({ job });
   } catch (err) {
     return errorResponse(err);
@@ -50,6 +61,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     });
     if (!existing) return NextResponse.json({ error: "לא נמצא" }, { status: 404 });
     await prisma.job.delete({ where: { id: params.id } });
+    await audit(tenant, "job.delete", "job", params.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return errorResponse(err);

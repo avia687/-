@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
+import { audit } from "@/lib/audit";
 
 const updateSchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -30,6 +31,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       where: { id: params.id },
       data: { ...data, email: data.email === "" ? null : data.email },
     });
+    await audit(tenant, "customer.update", "customer", params.id);
     return NextResponse.json({ customer });
   } catch (err) {
     return errorResponse(err);
@@ -41,6 +43,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     const tenant = await requirePermission("customers:write");
     await owned(params.id, tenant.organizationId);
     await prisma.customer.delete({ where: { id: params.id } });
+    await audit(tenant, "customer.delete", "customer", params.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return errorResponse(err);

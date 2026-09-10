@@ -1,13 +1,15 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
 import { api } from "@/lib/client";
 import { formatDate } from "@/lib/utils";
 
-type Notif = { id: string; type: string; title: string; body?: string | null; read: boolean; createdAt: string };
+type Notif = { id: string; type: string; title: string; body?: string | null; link?: string | null; read: boolean; createdAt: string };
 
 export function NotificationsMenu() {
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [items, setItems] = React.useState<Notif[]>([]);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -67,11 +69,18 @@ export function NotificationsMenu() {
               <p className="py-6 text-center text-sm text-muted-foreground">אין התראות חדשות</p>
             )}
             {items.map((n) => (
-              <div key={n.id} className="rounded-lg px-2 py-2 hover:bg-secondary">
+              <button
+                key={n.id}
+                onClick={() => {
+                  setOpen(false);
+                  if (n.link) router.push(n.link);
+                }}
+                className="block w-full rounded-lg px-2 py-2 text-right hover:bg-secondary"
+              >
                 <p className="text-sm font-medium">{n.title}</p>
                 {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
                 <p className="mt-0.5 text-[11px] text-muted-foreground">{formatDate(n.createdAt, true)}</p>
-              </div>
+              </button>
             ))}
           </div>
         </div>

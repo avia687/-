@@ -37,6 +37,7 @@ export const leadsCfg = {
   createSchema: z.object({
     title: z.string().min(1).max(160),
     customerId: z.string().nullish(),
+    employeeId: z.string().nullish(),
     contactName: z.string().max(120).nullish(),
     contactPhone: z.string().max(40).nullish(),
     source: z.string().max(80).nullish(),

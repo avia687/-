@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { errorResponse } from "@/lib/api";
 import { requirePermission } from "@/lib/tenant";
 import { assertWithinLimit } from "@/lib/subscription";
+import { audit } from "@/lib/audit";
 
 const createSchema = z.object({
   name: z.string().min(1).max(120),
@@ -48,8 +49,10 @@ export async function POST(req: Request) {
         type: "new_customer",
         title: "לקוח חדש נוסף",
         body: customer.name,
+        link: `/customers/${customer.id}`,
       },
     });
+    await audit(tenant, "customer.create", "customer", customer.id);
     return NextResponse.json({ customer });
   } catch (err) {
     return errorResponse(err);

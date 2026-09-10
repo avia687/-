@@ -8,11 +8,12 @@ import { EmptyState, LoadingScreen } from "@/components/ui/states";
 import { PageHeader } from "@/components/app/page-header";
 import { useToast } from "@/components/ui/toast";
 import { useBusiness } from "@/components/business-context";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { api } from "@/lib/client";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { Plus, Receipt, Trash2 } from "lucide-react";
 
-type Expense = { id: string; category: string; description?: string | null; amount: number; spentAt: string };
+type Expense = { id: string; category: string; description?: string | null; amount: number; spentAt: string; receipt?: string | null };
 
 const CATEGORIES: Record<string, string> = {
   fuel: "דלק", equipment: "ציוד", materials: "חומרים", payroll: "עובדים",
@@ -40,7 +41,7 @@ export default function ExpensesPage() {
   async function save() {
     setSaving(true);
     try {
-      await api("/api/expenses", { method: "POST", body: { category: form.category, description: form.description, amount: Number(form.amount) || 0 } });
+      await api("/api/expenses", { method: "POST", body: { category: form.category, description: form.description, amount: Number(form.amount) || 0, receipt: form.receipt || null } });
       toast("הוצאה נרשמה");
       setOpen(false);
       setForm({ category: "materials", amount: 0 });
@@ -73,6 +74,10 @@ export default function ExpensesPage() {
                   <p className="font-medium">{e.description || CATEGORIES[e.category]}</p>
                   <p className="text-xs text-muted-foreground">{formatDate(e.spentAt)}</p>
                 </div>
+                {e.receipt && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <a href={e.receipt} target="_blank" rel="noreferrer"><img src={e.receipt} alt="קבלה" className="h-9 w-9 rounded border object-cover" /></a>
+                )}
                 <Badge color="violet">{CATEGORIES[e.category] ?? e.category}</Badge>
                 <p className="font-bold text-red-600">{formatMoney(e.amount, currency)}</p>
                 <button onClick={() => remove(e.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={15} /></button>
@@ -99,6 +104,10 @@ export default function ExpensesPage() {
           <div>
             <Label>תיאור</Label>
             <Input value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          </div>
+          <div>
+            <Label>קבלה (תמונה)</Label>
+            <ImageUpload value={form.receipt} onChange={(uri) => setForm({ ...form, receipt: uri })} label="קבלה" />
           </div>
           <Button onClick={save} disabled={saving} className="w-full">{saving ? "שומר..." : "שמור"}</Button>
         </div>

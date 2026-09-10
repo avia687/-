@@ -1,5 +1,6 @@
 import type { AIProvider } from "@/lib/ai/provider";
 import type {
+  AIAction,
   AssistantReply,
   BusinessSnapshot,
   ConfigProposal,
@@ -88,5 +89,12 @@ export class OpenAIProvider implements AIProvider {
     // Kept deterministic for a predictable confirm step; real JSON-mode
     // generation is a drop-in extension here.
     return this.fallback.proposeConfig(description);
+  }
+
+  async proposeAction(instruction: string, snapshot: BusinessSnapshot): Promise<AIAction> {
+    // Deterministic, grounded action parsing — a predictable confirm step
+    // matters more than free-form generation here. Real tool/JSON-mode calling
+    // plugs in at this seam.
+    return this.fallback.proposeAction(instruction, snapshot);
   }
 }
