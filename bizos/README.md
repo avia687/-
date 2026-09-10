@@ -5,6 +5,12 @@
 **הטרמינולוגיה, השירותים, השדות והסטטוסים** משתנים לפי סוג העסק, דרך
 **Business Configuration / Template Engine**.
 
+## 🚀 פריסה אונליין בלחיצה אחת
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Favia687%2F-&project-name=bizos&repository-name=bizos&root-directory=bizos&env=DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL)
+
+המדריך המלא צעד-אחר-צעד (כולל יצירת מסד נתונים ומשתני סביבה): ראה **[DEPLOY.md](./DEPLOY.md)**.
+
 ## הרצה מקומית
 
 ```bash
