@@ -8,7 +8,25 @@
 
 ---
 
-## אפשרות א' — כפתור בלחיצה אחת (הכי מהיר)
+## אפשרות ⭐ — Railway (מומלץ, Postgres בלחיצה)
+
+1. היכנס ל-[railway.app](https://railway.app) → **Login with GitHub**.
+2. **New Project → Deploy from GitHub repo** → בחר `avia687/-`.
+3. על השירות שנוצר: **Settings → Root Directory** → הזן `bizos` → שמור.
+   (במאגר יש כמה פרויקטים; זה מפנה את Railway ל-BizOS.)
+4. **New → Database → Add PostgreSQL** (לחיצה אחת — Railway יוצר מסד נתונים).
+5. חזור לשירות האפליקציה → לשונית **Variables** → הוסף:
+   - `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`  *(הפניה למסד שיצרת; Railway ישלים אוטומטית)*
+   - `NEXTAUTH_SECRET` = מחרוזת אקראית ארוכה (יש אחת מוכנה בצ'אט).
+   - `NEXTAUTH_URL` — **לא צריך!** נגזר אוטומטית מהדומיין של Railway.
+6. **Deploy**. ה-build יוצר את הטבלאות אוטומטית.
+7. **Settings → Networking → Generate Domain** → קבל כתובת ציבורית → פתח → הרשמה → מתחילים.
+
+> אם ה-build נכשל: ודא ש-`DATABASE_URL` מוגדר כ-`${{Postgres.DATABASE_URL}}` וש-Root Directory הוא `bizos`.
+
+---
+
+## אפשרות א' — כפתור בלחיצה אחת ל-Vercel
 
 לחץ על הכפתור, התחבר עם GitHub, ומלא את השדות שנבקש ממך:
 

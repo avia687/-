@@ -3,6 +3,14 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 
+// On Railway the service's public domain is stable and equals the host users
+// visit, so deriving NEXTAUTH_URL from it is safe (no NextAuth host mismatch)
+// and removes a manual env var + redeploy. Only applies when NEXTAUTH_URL is
+// unset and the Railway domain is present — never affects local/dev/tests/Vercel.
+if (!process.env.NEXTAUTH_URL && process.env.RAILWAY_PUBLIC_DOMAIN) {
+  process.env.NEXTAUTH_URL = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+}
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
