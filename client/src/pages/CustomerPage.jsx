@@ -9,6 +9,7 @@ import CartDrawer from '../components/CartDrawer';
 import FAQSection from '../components/FAQSection';
 import Footer from '../components/Footer';
 import WhatsAppFab from '../components/WhatsAppFab';
+import { IconCheck, IconLock, IconChat } from '../components/Icons';
 import './CustomerPage.css';
 
 const CART_KEY = 'hakaron.cart.v1';
@@ -77,7 +78,7 @@ export default function CustomerPage() {
       return [...prev, { ...line, uid: `${line.itemId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }];
     });
     bumpCart();
-    showToast(`${line.name} נוסף לסל 🛍️`);
+    showToast(`${line.name} נוסף לסל`);
   }
 
   function handleModalAdd(line) {
@@ -112,7 +113,7 @@ export default function CustomerPage() {
       uid: `${l.itemId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     })));
     setCartOpen(true);
-    showToast('ההזמנה הקודמת נוספה לסל ↻');
+    showToast('ההזמנה הקודמת נוספה לסל');
   }
 
   const recommendations = useMemo(() => {
@@ -183,14 +184,13 @@ export default function CustomerPage() {
     const timeLabel = orderResult.selectedTime === 'asap'
       ? `בעוד כ-${SITE_INFO.prepTimeMinutes} דקות`
       : `בשעה ${orderResult.selectedTime}`;
-    const paymentEmoji = { 'מזומן': '💵', 'ביט': '🔵', 'פייבוקס': '💙' }[payment] || '';
     const waText = [
       `הזמנה חדשה מהאתר! #${orderResult.orderId}`,
       ``,
       `שם: ${name}`,
       `טלפון: ${phone}`,
       `${orderResult.fulfillment === 'delivery' ? 'משלוח לכתובת: ' + address : 'איסוף עצמי'}`,
-      `תשלום: ${paymentEmoji} ${payment}`,
+      `תשלום: ${payment}`,
       ``,
       ...orderResult.lines.map(l => `• ${l.name}${l.addons.length ? ' - ' + l.addons.map(a => a.name).join(', ') : ''}: ${formatPrice(l.unitPrice * l.qty)}`),
       ``,
@@ -201,16 +201,16 @@ export default function CustomerPage() {
     return (
       <div className="success-wrap">
         <div className="success-card">
-          <div className="success-check">✓</div>
-          <h2 className="success-title">ההזמנה נשלחה בהצלחה!</h2>
+          <div className="success-check"><IconCheck size={30} /></div>
+          <h2 className="success-title">ההזמנה נשלחה בהצלחה</h2>
           <div className="success-num">מספר הזמנה #{orderResult.orderId}</div>
           <p className="success-msg">
             {orderResult.fulfillment === 'delivery' ? 'המשלוח בדרך אליכם' : 'ההזמנה תחכה לכם לאיסוף'}<br />
             {timeLabel}
           </p>
-          <p className="success-demo">🔒 זו הזמנת דמו — התשלום בפועל מתבצע מול המזנון, לא בוצע חיוב מקוון.</p>
+          <p className="success-demo"><IconLock size={13} /> זו הזמנת דמו — התשלום בפועל מתבצע מול המזנון, לא בוצע חיוב מקוון.</p>
           <a href={waUrl} className="whatsapp-btn" target="_blank" rel="noopener noreferrer">
-            שלחו לנו את ההזמנה בוואטסאפ 📲
+            <IconChat size={16} /> שלחו לנו את ההזמנה בוואטסאפ
           </a>
           <button className="success-btn" onClick={resetOrder}>הזמנה חדשה</button>
         </div>

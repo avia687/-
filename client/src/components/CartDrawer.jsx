@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { SITE_INFO } from '../data/menu';
 import { formatPrice, computeTotals, getItemPriceLabel } from '../lib/orderUtils';
-import FoodArt from './FoodArt';
+import { IconClose, IconArrowRight, IconTrash, IconBox, IconTruck, IconLock } from './Icons';
 
 const PAYMENT_METHODS = [
-  { id: 'מזומן',   label: 'מזומן',            icon: '💵' },
-  { id: 'ביט',      label: 'ביט',              icon: '🔵' },
-  { id: 'פייבוקס', label: 'פייבוקס',          icon: '💙' },
+  { id: 'מזומן',    label: 'מזומן' },
+  { id: 'ביט',      label: 'ביט' },
+  { id: 'פייבוקס', label: 'פייבוקס' },
 ];
 
 export default function CartDrawer({
@@ -50,16 +50,15 @@ export default function CartDrawer({
       >
         <div className="cart-drawer-head">
           {step === 'checkout' ? (
-            <button className="cart-back" onClick={() => setStep('cart')}>→ חזרה לסל</button>
+            <button className="cart-back" onClick={() => setStep('cart')}><IconArrowRight size={16} /> חזרה לסל</button>
           ) : (
             <h2>הסל שלי</h2>
           )}
-          <button className="modal-close" onClick={onClose} aria-label="סגור סל">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="סגור סל"><IconClose size={16} /></button>
         </div>
 
         {cart.length === 0 ? (
           <div className="cart-empty">
-            <span aria-hidden="true">🧺</span>
             <p>הסל ריק כרגע. בואו נבחר משהו טעים מהתפריט.</p>
             <button className="btn btn-primary" onClick={onClose}>לתפריט</button>
           </div>
@@ -68,9 +67,9 @@ export default function CartDrawer({
             {isDelivery && (
               <div className="free-delivery-bar">
                 {remainingForFree > 0 ? (
-                  <p>נשארו עוד <strong>{formatPrice(remainingForFree)}</strong> למשלוח חינם 🚴</p>
+                  <p>נשארו עוד <strong>{formatPrice(remainingForFree)}</strong> למשלוח חינם</p>
                 ) : (
-                  <p>🎉 קיבלתם משלוח חינם!</p>
+                  <p>קיבלתם משלוח חינם!</p>
                 )}
                 <div className="progress-track">
                   <div className="progress-fill" style={{ width: `${progressPct}%` }} />
@@ -81,7 +80,6 @@ export default function CartDrawer({
             <div className="cart-lines">
               {cart.map(line => (
                 <div key={line.uid} className="cart-line">
-                  <div className="cart-line-art"><FoodArt id={line.art} size={56} /></div>
                   <div className="cart-line-info">
                     <span className="cart-line-name">{line.name}</span>
                     {line.addons.length > 0 && (
@@ -97,7 +95,9 @@ export default function CartDrawer({
                   </div>
                   <div className="cart-line-right">
                     <span className="cart-line-price">{formatPrice(line.unitPrice * line.qty)}</span>
-                    <button className="cart-line-del" onClick={() => onRemove(line.uid)} aria-label="הסר מהסל">🗑</button>
+                    <button className="cart-line-del" onClick={() => onRemove(line.uid)} aria-label="הסר מהסל">
+                      <IconTrash size={15} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -105,11 +105,10 @@ export default function CartDrawer({
 
             {recommendations.length > 0 && (
               <div className="cart-recs">
-                <p className="modal-sub">רוצים גם לשתות? 🥤</p>
+                <p className="modal-sub">רוצים גם לשתות?</p>
                 <div className="cart-recs-row">
                   {recommendations.map(item => (
                     <button key={item.id} className="rec-chip" onClick={() => onOpenItem(item)}>
-                      <FoodArt id={item.art} size={34} />
                       <span>{item.name}</span>
                       <span className="rec-chip-price">{getItemPriceLabel(item)}</span>
                     </button>
@@ -134,11 +133,11 @@ export default function CartDrawer({
               <button
                 className={fulfillment === 'pickup' ? 'is-on' : ''}
                 onClick={() => setFulfillment('pickup')}
-              >📦 איסוף עצמי</button>
+              ><IconBox size={16} /> איסוף עצמי</button>
               <button
                 className={fulfillment === 'delivery' ? 'is-on' : ''}
                 onClick={() => setFulfillment('delivery')}
-              >🛵 משלוח</button>
+              ><IconTruck size={16} /> משלוח</button>
             </div>
 
             <label className="field">
@@ -179,13 +178,12 @@ export default function CartDrawer({
                   className={`payment-btn ${payment === p.id ? 'payment-btn--on' : ''}`}
                   onClick={() => setPayment(p.id)}
                 >
-                  <span className="payment-emoji">{p.icon}</span>
-                  <span>{p.label}</span>
+                  {p.label}
                 </button>
               ))}
             </div>
             <p className="demo-note">
-              🔒 אתר בדמו: לא מתבצע חיוב אונליין. התשלום בפועל מתבצע מול המזנון בעת {isDelivery ? 'המשלוח' : 'האיסוף'}.
+              <IconLock size={13} /> אתר בדמו: לא מתבצע חיוב אונליין. התשלום בפועל מתבצע מול המזנון בעת {isDelivery ? 'המשלוח' : 'האיסוף'}.
             </p>
 
             <div className="cart-summary cart-summary--checkout">

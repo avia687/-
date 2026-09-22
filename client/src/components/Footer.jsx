@@ -1,7 +1,8 @@
 import { SITE_INFO } from '../data/menu';
+import { IconPin, IconPhone, IconChat } from './Icons';
 
 export default function Footer() {
-  const waHref = `https://wa.me/${SITE_INFO.whatsapp}?text=${encodeURIComponent('היי! רציתי לשאול לגבי המזנון 🙂')}`;
+  const waHref = `https://wa.me/${SITE_INFO.whatsapp}?text=${encodeURIComponent('היי! רציתי לשאול לגבי המזנון')}`;
 
   return (
     <footer className="site-footer" id="contact">
@@ -16,10 +17,10 @@ export default function Footer() {
 
         <div className="footer-col">
           <h4>יצירת קשר</h4>
-          <p>📍 {SITE_INFO.address}</p>
-          <p dir="ltr" className="footer-phone">📞 {SITE_INFO.phoneDisplay}</p>
+          <p><IconPin size={14} /> {SITE_INFO.address}</p>
+          <p dir="ltr" className="footer-phone"><IconPhone size={14} /> {SITE_INFO.phoneDisplay}</p>
           <a href={waHref} className="footer-wa" target="_blank" rel="noopener noreferrer">
-            💬 שלחו לנו הודעת וואטסאפ
+            <IconChat size={14} /> שלחו לנו הודעת וואטסאפ
           </a>
         </div>
 

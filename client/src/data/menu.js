@@ -17,14 +17,13 @@ export const SITE_INFO = {
   ],
 };
 
-// art: מזהה איור (ראו FoodArt.jsx)
 // tags: popular | vegetarian | vegan | spicy
 
 export const CATEGORIES = [
-  { id: 'sandwiches', label: 'סנדוויצ׳ים', icon: '🥪' },
-  { id: 'toasts',     label: 'טוסטים',     icon: '🧀' },
-  { id: 'extras',     label: 'מנות נוספות', icon: '🥗' },
-  { id: 'drinks',     label: 'שתייה',      icon: '🥤' },
+  { id: 'sandwiches', label: 'סנדוויצ׳ים' },
+  { id: 'toasts',     label: 'טוסטים' },
+  { id: 'extras',     label: 'מנות נוספות' },
+  { id: 'drinks',     label: 'שתייה' },
 ];
 
 // ירקות חינמיות לבחירה על גבי הסנדוויצ'ים
@@ -62,49 +61,49 @@ export const PAID_ADDONS = [
 export const MENU = [
   // ── סנדוויצ'ים ──
   {
-    id: 'sw-league', category: 'sandwiches', art: 'omelette',
+    id: 'sw-league', category: 'sandwiches',
     name: 'חביתת ליגת האלופות', price: 30,
     desc: 'חביתה טרייה מטוגנת על המקום, בתוך לחמנייה פריכה וחמה — אלופה בכל ביס.',
     tags: ['popular', 'vegetarian'],
     vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-mushroom', category: 'sandwiches', art: 'mushroom',
+    id: 'sw-mushroom', category: 'sandwiches',
     name: 'חביתת פטריות היער הטוב', price: 33,
     desc: 'חביתה עם פטריות מוקפצות בחמאה, ריח של יער ובוקר טוב.',
     tags: ['vegetarian'],
     vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-shoshana', category: 'sandwiches', art: 'veggie',
+    id: 'sw-shoshana', category: 'sandwiches',
     name: 'חביתת ירק של שושנה מועלם', price: 33,
     desc: 'חביתת ירקות עשירה כמו שסבתא שושנה הייתה מכינה — נדיבה ומלאת טעם.',
     tags: ['popular', 'vegetarian'],
     vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-spanish', category: 'sandwiches', art: 'spanish',
+    id: 'sw-spanish', category: 'sandwiches',
     name: 'חביתה ספרדית מתנשאת', price: 33,
     desc: 'חביתה עם פלפלים קלויים וזיתים — קצת יומרנית, מאוד טעימה.',
     tags: ['vegetarian'],
     vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-jerusalem', category: 'sandwiches', art: 'cheese',
+    id: 'sw-jerusalem', category: 'sandwiches',
     name: 'חביתת ירושלים דכולא בה', price: 37,
     desc: 'נדיבות של גבינה בולגרית מלוחה על חביתה חמה — הכול בה, כמו שאומרים.',
     tags: ['popular', 'vegetarian'],
     vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-shakshuka', category: 'sandwiches', art: 'shakshuka',
+    id: 'sw-shakshuka', category: 'sandwiches',
     name: 'שקשוקה P.HD', price: 35,
     desc: 'ביצים ברוטב עגבניות פיקנטי ברמת דוקטורט — נספג יפה בתוך הלחמנייה.',
     tags: ['popular', 'vegetarian', 'spicy'],
     vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-tunisian', category: 'sandwiches', art: 'tunisian',
+    id: 'sw-tunisian', category: 'sandwiches',
     name: 'סנדוויץ׳ טוניסאי צפון אפריקאי', price: 35,
     desc: 'הריסה חריפה, ביצה וזיתים בסגנון צפון אפריקאי אותנטי — לאוהבי החריף.',
     tags: ['spicy'],
@@ -113,14 +112,14 @@ export const MENU = [
 
   // ── טוסטים ──
   {
-    id: 'ts-single', category: 'toasts', art: 'toast',
+    id: 'ts-single', category: 'toasts',
     name: 'טוסט', price: 28,
     desc: 'טוסט חם ופריך עם רוטב פיצה וגבינה צהובה, ותוספת אחת כלולה במחיר.',
     tags: ['vegetarian'],
     includedToppings: 1, toastToppings: true, sauces: true, paidAddons: true,
   },
   {
-    id: 'ts-dreamloaf', category: 'toasts', art: 'toast-egg',
+    id: 'ts-dreamloaf', category: 'toasts',
     name: 'טוסט כיכר החלומות', price: 35,
     desc: 'שילוב מנצח של טוסט פריך עם חביתה חמה בפנים — בדיוק כמו שחלמתם.',
     tags: ['popular', 'vegetarian'],
@@ -129,37 +128,37 @@ export const MENU = [
 
   // ── מנות נוספות ──
   {
-    id: 'ex-cheesemix', category: 'extras', art: 'cheesemix',
+    id: 'ex-cheesemix', category: 'extras',
     name: 'מיקס גבינות', price: 35,
     desc: 'מבחר גבינות משובחות, מוגש עם לחם טרי בצד.',
     tags: ['vegetarian'],
   },
   {
-    id: 'ex-feta', category: 'extras', art: 'feta',
+    id: 'ex-feta', category: 'extras',
     name: 'גבינה מלוחה', price: 34,
     desc: 'גבינה מלוחה איכותית, פרוסה נדיבה ומוגשת טרי.',
     tags: ['vegetarian'],
   },
   {
-    id: 'ex-avocado', category: 'extras', art: 'avocado',
+    id: 'ex-avocado', category: 'extras',
     name: 'אבו-קאדה', price: 34,
     desc: 'מנת אבוקדו טרי, במרקם קרמי ובתיבול עדין.',
     tags: ['vegan', 'vegetarian'],
   },
   {
-    id: 'ex-tuna', category: 'extras', art: 'tuna',
+    id: 'ex-tuna', category: 'extras',
     name: 'טונה מדושנת עונג', price: 35,
     desc: 'סלט טונה ביתי, נדיב ועשיר, מוכן טרי כל יום.',
     tags: [],
   },
   {
-    id: 'ex-creamcheese', category: 'extras', art: 'creamcheese',
+    id: 'ex-creamcheese', category: 'extras',
     name: 'גבינת שמנת', price: 28,
     desc: 'גבינת שמנת רכה וטרייה, קלאסית ומפנקת.',
     tags: ['vegetarian'],
   },
   {
-    id: 'ex-egg', category: 'extras', art: 'egg',
+    id: 'ex-egg', category: 'extras',
     name: 'ביצה קשה טרייה', price: 30,
     desc: 'ביצים קשות טריות כמו ביום היוולדה — מוגשות פרוסות עם תיבול קל.',
     tags: ['vegetarian'],
@@ -169,47 +168,47 @@ export const MENU = [
 // שתייה — מוצגת גם כקטגוריה משלה וגם כהצעה בסל ("רוצים גם לשתות?")
 export const DRINKS = [
   {
-    id: 'coke', category: 'drinks', art: 'cola',
+    id: 'coke', category: 'drinks',
     name: 'קולה', desc: 'קרה ומרעננת.', tags: [],
     sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
   },
   {
-    id: 'coke-zero', category: 'drinks', art: 'cola-zero',
+    id: 'coke-zero', category: 'drinks',
     name: 'קולה זירו', desc: 'כל הטעם, בלי הסוכר.', tags: [],
     sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
   },
   {
-    id: 'fanta', category: 'drinks', art: 'fanta',
+    id: 'fanta', category: 'drinks',
     name: 'פאנטה', desc: 'תפוזים תוססים וקרים.', tags: [],
     sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
   },
   {
-    id: 'sprite', category: 'drinks', art: 'sprite',
+    id: 'sprite', category: 'drinks',
     name: 'ספרייט', desc: 'לימון-ליים מצנן.', tags: [],
     sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
   },
   {
-    id: 'water-grape', category: 'drinks', art: 'water-grape',
+    id: 'water-grape', category: 'drinks',
     name: 'מים בטעם ענבים', desc: 'מים מוגזים בטעם פירותי קליל.', tags: ['vegan', 'vegetarian'],
     price: 10,
   },
   {
-    id: 'water-peach', category: 'drinks', art: 'water-peach',
+    id: 'water-peach', category: 'drinks',
     name: 'מים בטעם אפרסק', desc: 'מים מוגזים בטעם פירותי קליל.', tags: ['vegan', 'vegetarian'],
     price: 10,
   },
   {
-    id: 'excel', category: 'drinks', art: 'excel',
+    id: 'excel', category: 'drinks',
     name: 'אקסל', desc: 'משקה אנרגיה קלאסי.', tags: [],
     price: 7,
   },
   {
-    id: 'excel-black', category: 'drinks', art: 'excel-black',
+    id: 'excel-black', category: 'drinks',
     name: 'אקסל שחור', desc: 'משקה אנרגיה עז ועוצמתי.', tags: [],
     price: 7,
   },
   {
-    id: 'excel-blue', category: 'drinks', art: 'excel-blue',
+    id: 'excel-blue', category: 'drinks',
     name: 'אקסל בלו', desc: 'משקה אנרגיה מרענן.', tags: [],
     price: 7,
   },

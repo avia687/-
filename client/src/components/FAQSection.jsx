@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SITE_INFO } from '../data/menu';
+import { IconChevronDown } from './Icons';
 
 const FAQS = [
   {
@@ -41,7 +42,7 @@ export default function FAQSection() {
               aria-expanded={openIdx === i}
             >
               <span>{item.q}</span>
-              <span className="faq-arrow" aria-hidden="true">⌄</span>
+              <span className="faq-arrow"><IconChevronDown size={16} /></span>
             </button>
             <div className="faq-a-wrap">
               <p className="faq-a">{item.a}</p>

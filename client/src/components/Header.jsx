@@ -1,3 +1,5 @@
+import { IconBag } from './Icons';
+
 export default function Header({ openStatus, cartCount, cartBump, onCartClick }) {
   return (
     <header className="site-header">
@@ -24,7 +26,7 @@ export default function Header({ openStatus, cartCount, cartBump, onCartClick })
           onClick={onCartClick}
           aria-label={`פתח סל הזמנות, ${cartCount} פריטים`}
         >
-          <span className="cart-btn-icon" aria-hidden="true">🛍️</span>
+          <IconBag size={17} />
           <span className="cart-btn-label">הסל שלי</span>
           {cartCount > 0 && <span className="cart-btn-count">{cartCount}</span>}
         </button>

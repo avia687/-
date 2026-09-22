@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   SANDWICH_VEGETABLES, TOAST_TOPPINGS, TOAST_TOPPING_PRICE, TOAST_SAUCES, PAID_ADDONS,
 } from '../data/menu';
-import FoodArt from './FoodArt';
 import { formatPrice } from '../lib/orderUtils';
+import { IconClose } from './Icons';
 
 const TAG_LABELS = {
   popular: 'הכי אהוב',
@@ -68,7 +68,6 @@ export default function ItemModal({ item, onClose, onAdd }) {
     onAdd({
       itemId: item.id,
       name: isSized ? `${item.name} (${selectedSize.label})` : item.name,
-      art: item.art,
       basePrice,
       addons,
       unitPrice,
@@ -85,11 +84,7 @@ export default function ItemModal({ item, onClose, onAdd }) {
         aria-labelledby="modal-title"
         onClick={e => e.stopPropagation()}
       >
-        <button className="modal-close" onClick={onClose} aria-label="סגור">✕</button>
-
-        <div className="modal-hero">
-          <FoodArt id={item.art} size={118} />
-        </div>
+        <button className="modal-close" onClick={onClose} aria-label="סגור"><IconClose size={16} /></button>
 
         {item.tags.length > 0 && (
           <div className="item-tags modal-tags">
@@ -133,7 +128,6 @@ export default function ItemModal({ item, onClose, onAdd }) {
                   aria-pressed={vegSel.includes(v.id)}
                 >
                   <span>{v.name}</span>
-                  <span className="addon-price">{vegSel.includes(v.id) ? 'נבחר ✓' : 'חינם'}</span>
                 </button>
               ))}
             </div>
@@ -183,7 +177,6 @@ export default function ItemModal({ item, onClose, onAdd }) {
                   aria-pressed={sauceSel.includes(s.id)}
                 >
                   <span>{s.name}</span>
-                  <span className="addon-price">{sauceSel.includes(s.id) ? 'נבחר ✓' : 'חינם'}</span>
                 </button>
               ))}
             </div>

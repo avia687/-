@@ -1,41 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Suez+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Assistant:wght@400;500;600;700;800&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* פלטה חמה — שמנת, זית, חום עמוק, עגבנייה וחרדל */
-  --cream:        #FBF3E3;
-  --cream-2:      #F4E7CE;
-  --cream-deep:   #EADCBB;
-  --paper:        #FFFDF8;
-  --olive:        #5B6B34;
-  --olive-dark:   #3F4A24;
-  --olive-pale:   #EEF1E0;
-  --brown:        #4A3220;
-  --brown-2:      #6B4226;
-  --brown-soft:   #8A6A4C;
-  --tomato:       #C1442D;
-  --tomato-dark:  #9C3320;
-  --mustard:      #D9A441;
-  --ink:          #2E2216;
-  --ink-soft:     #6B5A46;
-  --line:         rgba(74,50,32,.12);
-  --line-soft:    rgba(74,50,32,.07);
-  --shadow-sm:    0 2px 8px rgba(74,50,32,.08);
-  --shadow-md:    0 10px 28px rgba(74,50,32,.14);
-  --shadow-lg:    0 22px 48px rgba(74,50,32,.20);
-  --radius-lg:    26px;
-  --radius-md:    18px;
-  --radius-sm:    12px;
-  --font-display: 'Suez One', 'Assistant', serif;
+  /* פלטה כהה, מודרנית ויוקרתית — שחור-חום עמוק, זהב וחרדל, בורדו עדין */
+  --bg:           #0C0A08;
+  --bg-2:         #14100B;
+  --surface:      #1A1610;
+  --surface-2:    #221C14;
+  --surface-3:    #2B2318;
+  --line:         rgba(201,162,39,.16);
+  --line-strong:  rgba(201,162,39,.32);
+  --gold:         #C9A227;
+  --gold-light:   #E7C765;
+  --gold-dim:     #8A6F22;
+  --gold-soft:    rgba(201,162,39,.10);
+  --wine:         #7C2333;
+  --wine-light:   #B04A5A;
+  --cream:        #F3ECDD;
+  --text-dim:     #B4A78D;
+  --text-faint:   #726650;
+  --shadow-sm:    0 2px 10px rgba(0,0,0,.35);
+  --shadow-md:    0 14px 34px rgba(0,0,0,.45);
+  --shadow-lg:    0 26px 60px rgba(0,0,0,.55);
+  --radius-lg:    22px;
+  --radius-md:    16px;
+  --radius-sm:    10px;
+  --font-display: 'Frank Ruhl Libre', 'Assistant', serif;
   --font-body:    'Assistant', -apple-system, 'Segoe UI', sans-serif;
 }
 
 html, body {
   direction: rtl;
   font-family: var(--font-body);
-  background: var(--cream);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--cream);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -48,7 +47,7 @@ a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
 :focus-visible {
-  outline: 3px solid var(--tomato);
+  outline: 2px solid var(--gold-light);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -70,9 +69,25 @@ img { max-width: 100%; display: block; }
 @keyframes slideInEnd { from { transform:translateX(100%); } to { transform:translateX(0); } }
 @keyframes spin       { to { transform:rotate(360deg); } }
 @keyframes bump       { 0%{transform:scale(1);} 35%{transform:scale(1.18);} 60%{transform:scale(.96);} 100%{transform:scale(1);} }
-@keyframes floatSlow  { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-14px) rotate(2deg);} }
-@keyframes floatSlow2 { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-10px) rotate(-3deg);} }
 @keyframes shimmerGlow{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
 @keyframes successPop { 0%{opacity:0; transform:scale(.7) rotate(-8deg);} 70%{transform:scale(1.1) rotate(3deg);} 100%{opacity:1; transform:scale(1) rotate(0);} }
-@keyframes marquee    { from { transform:translateX(0); } to { transform:translateX(-50%); } }
 @keyframes toastIn    { from { opacity:0; transform:translate(-50%, 12px);} to { opacity:1; transform:translate(-50%, 0);} }
+
+@keyframes auroraDrift1 {
+  0%, 100% { transform: translate(-6%, -4%) scale(1); }
+  50%      { transform: translate(6%, 4%) scale(1.15); }
+}
+@keyframes auroraDrift2 {
+  0%, 100% { transform: translate(4%, 6%) scale(1.1); }
+  50%      { transform: translate(-6%, -4%) scale(1); }
+}
+@keyframes particleDrift {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: .8; }
+  90%  { opacity: .8; }
+  100% { transform: translateY(-140px) translateX(18px); opacity: 0; }
+}
+@keyframes goldSweep {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}

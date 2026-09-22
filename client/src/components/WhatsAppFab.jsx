@@ -1,7 +1,8 @@
 import { SITE_INFO } from '../data/menu';
+import { IconChat } from './Icons';
 
 export default function WhatsAppFab() {
-  const href = `https://wa.me/${SITE_INFO.whatsapp}?text=${encodeURIComponent('היי! רציתי לשאול לגבי המזנון 🙂')}`;
+  const href = `https://wa.me/${SITE_INFO.whatsapp}?text=${encodeURIComponent('היי! רציתי לשאול לגבי המזנון')}`;
   return (
     <a
       href={href}
@@ -10,7 +11,8 @@ export default function WhatsAppFab() {
       rel="noopener noreferrer"
       aria-label="שלחו לנו הודעה בוואטסאפ"
     >
-      💬
+      <IconChat size={22} />
+      <span className="wa-fab-dot" aria-hidden="true" />
     </a>
   );
 }

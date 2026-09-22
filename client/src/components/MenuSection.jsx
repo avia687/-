@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { CATEGORIES } from '../data/menu';
-import FoodArt from './FoodArt';
 import { getItemPriceLabel } from '../lib/orderUtils';
+import { IconSearch, IconClose, IconHeart, IconHeartFilled } from './Icons';
 
 const DIET_FILTERS = [
-  { id: 'popular',    label: 'הכי אהוב', icon: '🔥' },
-  { id: 'vegetarian', label: 'צמחוני',   icon: '🌱' },
-  { id: 'vegan',      label: 'טבעוני',   icon: '🌿' },
-  { id: 'spicy',      label: 'חריף',     icon: '🌶️' },
+  { id: 'popular',    label: 'הכי אהוב' },
+  { id: 'vegetarian', label: 'צמחוני' },
+  { id: 'vegan',      label: 'טבעוני' },
+  { id: 'spicy',      label: 'חריף' },
 ];
 
 const TAG_LABELS = {
@@ -17,28 +17,23 @@ const TAG_LABELS = {
   spicy: 'חריף',
 };
 
-function ItemCard({ item, isFavorite, onToggleFavorite, onOpen, delay }) {
+function ItemRow({ item, isFavorite, onToggleFavorite, onOpen, delay }) {
   return (
     <article
-      className="item-card"
+      className="item-row"
       style={{ animationDelay: `${delay}ms` }}
       onClick={() => onOpen(item)}
+      tabIndex={0}
+      role="button"
+      onKeyDown={e => { if (e.key === 'Enter') onOpen(item); }}
     >
-      <button
-        type="button"
-        className={`fav-btn ${isFavorite ? 'fav-btn--on' : ''}`}
-        onClick={e => { e.stopPropagation(); onToggleFavorite(item.id); }}
-        aria-pressed={isFavorite}
-        aria-label={isFavorite ? 'הסר מהמועדפים' : 'הוסף למועדפים'}
-      >
-        {isFavorite ? '♥' : '♡'}
-      </button>
-
-      <div className="item-card-art">
-        <FoodArt id={item.art} size={104} />
-      </div>
-
-      <div className="item-card-body">
+      <div className="item-row-main">
+        <div className="item-row-head">
+          <h3 className="item-name">{item.name}</h3>
+          <span className="item-row-leader" aria-hidden="true" />
+          <span className="item-price">{getItemPriceLabel(item)}</span>
+        </div>
+        <p className="item-desc">{item.desc}</p>
         {item.tags.length > 0 && (
           <div className="item-tags">
             {item.tags.map(t => (
@@ -46,18 +41,20 @@ function ItemCard({ item, isFavorite, onToggleFavorite, onOpen, delay }) {
             ))}
           </div>
         )}
-        <h3 className="item-name">{item.name}</h3>
-        <p className="item-desc">{item.desc}</p>
       </div>
 
-      <div className="item-card-foot">
-        <span className="item-price">{getItemPriceLabel(item)}</span>
+      <div className="item-row-actions">
         <button
           type="button"
-          className="add-btn"
-          onClick={e => { e.stopPropagation(); onOpen(item); }}
+          className={`fav-btn ${isFavorite ? 'fav-btn--on' : ''}`}
+          onClick={e => { e.stopPropagation(); onToggleFavorite(item.id); }}
+          aria-pressed={isFavorite}
+          aria-label={isFavorite ? 'הסר מהמועדפים' : 'הוסף למועדפים'}
         >
-          הוסף <span aria-hidden="true">+</span>
+          {isFavorite ? <IconHeartFilled size={16} /> : <IconHeart size={16} />}
+        </button>
+        <button type="button" className="add-btn" onClick={e => { e.stopPropagation(); onOpen(item); }}>
+          הוספה
         </button>
       </div>
     </article>
@@ -115,7 +112,7 @@ export default function MenuSection({ menu, favorites, onToggleFavorite, onOpenI
 
       <div className="menu-controls">
         <label className="search-box">
-          <span aria-hidden="true">🔍</span>
+          <IconSearch size={17} />
           <input
             type="search"
             placeholder="חיפוש לפי מנה או מרכיב… כמו אבוקדו"
@@ -124,7 +121,9 @@ export default function MenuSection({ menu, favorites, onToggleFavorite, onOpenI
             aria-label="חיפוש בתפריט"
           />
           {query && (
-            <button type="button" className="search-clear" onClick={() => setQuery('')} aria-label="נקה חיפוש">✕</button>
+            <button type="button" className="search-clear" onClick={() => setQuery('')} aria-label="נקה חיפוש">
+              <IconClose size={14} />
+            </button>
           )}
         </label>
 
@@ -143,7 +142,7 @@ export default function MenuSection({ menu, favorites, onToggleFavorite, onOpenI
               onClick={() => setActiveCategory(cat.id)}
               role="tab" aria-selected={activeCategory === cat.id}
             >
-              <span aria-hidden="true">{cat.icon}</span> {cat.label}
+              {cat.label}
             </button>
           ))}
         </div>
@@ -156,7 +155,7 @@ export default function MenuSection({ menu, favorites, onToggleFavorite, onOpenI
               onClick={() => toggleDiet(f.id)}
               aria-pressed={activeDiet.has(f.id)}
             >
-              <span aria-hidden="true">{f.icon}</span> {f.label}
+              {f.label}
             </button>
           ))}
           <button
@@ -164,29 +163,28 @@ export default function MenuSection({ menu, favorites, onToggleFavorite, onOpenI
             onClick={() => setFavOnly(v => !v)}
             aria-pressed={favOnly}
           >
-            <span aria-hidden="true">❤️</span> אהובים שלי
+            אהובים שלי
           </button>
         </div>
       </div>
 
       {filtered.length === 0 ? (
         <div className="menu-empty">
-          <span aria-hidden="true">🥲</span>
           <p>לא מצאנו מנה שמתאימה לחיפוש. נסו מילה אחרת או נקו את הסינון.</p>
         </div>
       ) : (
         grouped.map(group => group.items.length > 0 && (
           <div className="menu-group" key={group.id}>
             {group.label && <h3 className="menu-group-title">{group.label}</h3>}
-            <div className="item-grid">
+            <div className="item-list">
               {group.items.map((item, i) => (
-                <ItemCard
+                <ItemRow
                   key={item.id}
                   item={item}
                   isFavorite={favorites.has(item.id)}
                   onToggleFavorite={onToggleFavorite}
                   onOpen={onOpenItem}
-                  delay={Math.min(i, 8) * 60}
+                  delay={Math.min(i, 8) * 50}
                 />
               ))}
             </div>
