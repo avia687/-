@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { SANDWICH_ADDONS, TOAST_ADDONS } from '../data/menu';
+import {
+  SANDWICH_VEGETABLES, TOAST_TOPPINGS, TOAST_TOPPING_PRICE, TOAST_SAUCES, PAID_ADDONS,
+} from '../data/menu';
 import FoodArt from './FoodArt';
 import { formatPrice } from '../lib/orderUtils';
 
@@ -11,7 +13,12 @@ const TAG_LABELS = {
 };
 
 export default function ItemModal({ item, onClose, onAdd }) {
-  const [selected, setSelected] = useState([]);
+  const isSized = Array.isArray(item.sizes) && item.sizes.length > 0;
+  const [sizeId, setSizeId] = useState(isSized ? item.sizes[0].id : null);
+  const [vegSel, setVegSel] = useState([]);
+  const [toppingSel, setToppingSel] = useState([]);
+  const [sauceSel, setSauceSel] = useState([]);
+  const [paidSel, setPaidSel] = useState([]);
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
@@ -20,43 +27,50 @@ export default function ItemModal({ item, onClose, onAdd }) {
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const catalog = item.addons === 'sandwich' ? SANDWICH_ADDONS
-    : item.addons === 'toast' ? TOAST_ADDONS
-    : [];
+  function toggle(id, list, setList) {
+    setList(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
   const freeCount = item.includedToppings || 0;
-
-  function toggleAddon(id) {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  }
-
-  function addonPriceLabel(id, index) {
-    const addon = catalog.find(a => a.id === id);
-    if (!addon) return '';
-    const isFree = freeCount > 0 && index < freeCount;
-    return isFree ? 'כלול' : `+${formatPrice(addon.price)}`;
-  }
-
-  const addonsExtra = catalog.length === 0 ? 0 : selected.reduce((sum, id, idx) => {
-    if (freeCount > 0 && idx < freeCount) return sum;
-    const addon = catalog.find(a => a.id === id);
+  const toppingsExtra = item.toastToppings ? toppingSel.reduce((sum, id, idx) => {
+    if (idx < freeCount) return sum;
+    return sum + TOAST_TOPPING_PRICE;
+  }, 0) : 0;
+  const paidExtra = item.paidAddons ? paidSel.reduce((sum, id) => {
+    const addon = PAID_ADDONS.find(a => a.id === id);
     return sum + (addon ? addon.price : 0);
-  }, 0);
+  }, 0) : 0;
 
-  const unitPrice = item.price + addonsExtra;
+  const selectedSize = isSized ? item.sizes.find(s => s.id === sizeId) : null;
+  const basePrice = isSized ? selectedSize.price : item.price;
+  const unitPrice = basePrice + toppingsExtra + paidExtra;
   const lineTotal = unitPrice * qty;
 
   function handleAdd() {
-    const addonObjs = selected.map((id, idx) => {
-      const addon = catalog.find(a => a.id === id);
-      const isFree = freeCount > 0 && idx < freeCount;
-      return { id, name: addon.name, price: isFree ? 0 : addon.price };
+    const addons = [];
+    vegSel.forEach(id => {
+      const v = SANDWICH_VEGETABLES.find(x => x.id === id);
+      if (v) addons.push({ id: v.id, name: v.name, price: 0 });
     });
+    toppingSel.forEach((id, idx) => {
+      const t = TOAST_TOPPINGS.find(x => x.id === id);
+      if (t) addons.push({ id: t.id, name: t.name, price: idx < freeCount ? 0 : TOAST_TOPPING_PRICE });
+    });
+    sauceSel.forEach(id => {
+      const s = TOAST_SAUCES.find(x => x.id === id);
+      if (s) addons.push({ id: s.id, name: s.name, price: 0 });
+    });
+    paidSel.forEach(id => {
+      const a = PAID_ADDONS.find(x => x.id === id);
+      if (a) addons.push({ id: a.id, name: a.name, price: a.price });
+    });
+
     onAdd({
       itemId: item.id,
-      name: item.name,
+      name: isSized ? `${item.name} (${selectedSize.label})` : item.name,
       art: item.art,
-      basePrice: item.price,
-      addons: addonObjs,
+      basePrice,
+      addons,
       unitPrice,
       qty,
     });
@@ -86,29 +100,112 @@ export default function ItemModal({ item, onClose, onAdd }) {
         <h3 id="modal-title" className="modal-title">{item.name}</h3>
         <p className="modal-desc">{item.desc}</p>
 
-        {catalog.length > 0 && (
+        {isSized && (
+          <div className="modal-addons">
+            <p className="modal-sub">גודל</p>
+            <div className="addon-grid">
+              {item.sizes.map(s => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`addon-btn ${sizeId === s.id ? 'addon-btn--on' : ''}`}
+                  onClick={() => setSizeId(s.id)}
+                  aria-pressed={sizeId === s.id}
+                >
+                  <span>{s.label}</span>
+                  <span className="addon-price">{formatPrice(s.price)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {item.vegetables && (
+          <div className="modal-addons">
+            <p className="modal-sub">ירקות לבחירה <span className="modal-note">· הכול חינם</span></p>
+            <div className="addon-grid">
+              {SANDWICH_VEGETABLES.map(v => (
+                <button
+                  key={v.id}
+                  type="button"
+                  className={`addon-btn ${vegSel.includes(v.id) ? 'addon-btn--on' : ''}`}
+                  onClick={() => toggle(v.id, vegSel, setVegSel)}
+                  aria-pressed={vegSel.includes(v.id)}
+                >
+                  <span>{v.name}</span>
+                  <span className="addon-price">{vegSel.includes(v.id) ? 'נבחר ✓' : 'חינם'}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {item.toastToppings && (
           <div className="modal-addons">
             <p className="modal-sub">
-              תוספות לבחירה
-              {freeCount > 0 && <span className="modal-note"> · התוספת הראשונה כלולה במחיר</span>}
+              תוספות לטוסט
+              {freeCount > 0 && <span className="modal-note"> · הראשונה כלולה, כל נוספת {formatPrice(TOAST_TOPPING_PRICE)}</span>}
             </p>
             <div className="addon-grid">
-              {catalog.map(a => {
-                const idx = selected.indexOf(a.id);
+              {TOAST_TOPPINGS.map(t => {
+                const idx = toppingSel.indexOf(t.id);
                 const on = idx !== -1;
+                const isFree = on && idx < freeCount;
                 return (
                   <button
-                    key={a.id}
+                    key={t.id}
                     type="button"
                     className={`addon-btn ${on ? 'addon-btn--on' : ''}`}
-                    onClick={() => toggleAddon(a.id)}
+                    onClick={() => toggle(t.id, toppingSel, setToppingSel)}
                     aria-pressed={on}
                   >
-                    <span>{a.name}</span>
-                    <span className="addon-price">{on ? addonPriceLabel(a.id, idx) : `+${formatPrice(a.price)}`}</span>
+                    <span>{t.name}</span>
+                    <span className="addon-price">
+                      {on ? (isFree ? 'כלול' : `+${formatPrice(TOAST_TOPPING_PRICE)}`) : `+${formatPrice(TOAST_TOPPING_PRICE)}`}
+                    </span>
                   </button>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {item.sauces && (
+          <div className="modal-addons">
+            <p className="modal-sub">רוטב לבחירה <span className="modal-note">· חינם</span></p>
+            <div className="addon-grid">
+              {TOAST_SAUCES.map(s => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`addon-btn ${sauceSel.includes(s.id) ? 'addon-btn--on' : ''}`}
+                  onClick={() => toggle(s.id, sauceSel, setSauceSel)}
+                  aria-pressed={sauceSel.includes(s.id)}
+                >
+                  <span>{s.name}</span>
+                  <span className="addon-price">{sauceSel.includes(s.id) ? 'נבחר ✓' : 'חינם'}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {item.paidAddons && (
+          <div className="modal-addons">
+            <p className="modal-sub">תוספות בתשלום</p>
+            <div className="addon-grid">
+              {PAID_ADDONS.map(a => (
+                <button
+                  key={a.id}
+                  type="button"
+                  className={`addon-btn ${paidSel.includes(a.id) ? 'addon-btn--on' : ''}`}
+                  onClick={() => toggle(a.id, paidSel, setPaidSel)}
+                  aria-pressed={paidSel.includes(a.id)}
+                >
+                  <span>{a.name}</span>
+                  <span className="addon-price">+{formatPrice(a.price)}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}

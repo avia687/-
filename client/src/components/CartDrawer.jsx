@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SITE_INFO } from '../data/menu';
-import { formatPrice, computeTotals } from '../lib/orderUtils';
+import { formatPrice, computeTotals, getItemPriceLabel } from '../lib/orderUtils';
 import FoodArt from './FoodArt';
 
 const PAYMENT_METHODS = [
@@ -105,13 +105,13 @@ export default function CartDrawer({
 
             {recommendations.length > 0 && (
               <div className="cart-recs">
-                <p className="modal-sub">אולי גם תאהבו</p>
+                <p className="modal-sub">רוצים גם לשתות? 🥤</p>
                 <div className="cart-recs-row">
                   {recommendations.map(item => (
                     <button key={item.id} className="rec-chip" onClick={() => onOpenItem(item)}>
                       <FoodArt id={item.art} size={34} />
                       <span>{item.name}</span>
-                      <span className="rec-chip-price">{formatPrice(item.price)}</span>
+                      <span className="rec-chip-price">{getItemPriceLabel(item)}</span>
                     </button>
                   ))}
                 </div>

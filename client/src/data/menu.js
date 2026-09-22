@@ -21,85 +21,110 @@ export const SITE_INFO = {
 // tags: popular | vegetarian | vegan | spicy
 
 export const CATEGORIES = [
-  { id: 'sandwiches', label: 'כריכים',        icon: '🥪' },
-  { id: 'toasts',     label: 'טוסטים',        icon: '🧀' },
-  { id: 'extras',     label: 'מנות נוספות',   icon: '🥗' },
+  { id: 'sandwiches', label: 'סנדוויצ׳ים', icon: '🥪' },
+  { id: 'toasts',     label: 'טוסטים',     icon: '🧀' },
+  { id: 'extras',     label: 'מנות נוספות', icon: '🥗' },
+  { id: 'drinks',     label: 'שתייה',      icon: '🥤' },
 ];
 
-export const SANDWICH_ADDONS = [
+// ירקות חינמיות לבחירה על גבי הסנדוויצ'ים
+export const SANDWICH_VEGETABLES = [
+  { id: 'tomato',   name: 'עגבניה' },
+  { id: 'cucumber', name: 'מלפפון' },
+  { id: 'lettuce',  name: 'חסה' },
+  { id: 'onion',    name: 'בצל' },
+  { id: 'olives',   name: 'זיתים' },
+  { id: 'pickles',  name: 'חמוצים' },
+];
+
+// תוספת ראשונה כלולה בטוסט, כל תוספת נוספת 2₪
+export const TOAST_TOPPINGS = [
+  { id: 'olives',      name: 'זיתים' },
+  { id: 'mushroom',    name: 'פטריות' },
+  { id: 'red-onion',   name: 'בצל סגול' },
+  { id: 'corn',        name: 'תירס' },
+];
+export const TOAST_TOPPING_PRICE = 2;
+
+// רטבים חינמיים לבחירה על הטוסט
+export const TOAST_SAUCES = [
+  { id: 'garlic',     name: 'שום אלף האיים' },
+  { id: 'vinaigrette', name: 'וינגרט' },
+];
+
+// תוספות בתשלום — זמינות גם על סנדוויץ' וגם על טוסט
+export const PAID_ADDONS = [
   { id: 'egg',   name: 'ביצה קשה',          price: 3 },
   { id: 'tuna',  name: 'טונה, קופסה שלמה',  price: 7 },
   { id: 'feta',  name: 'גבינה מלוחה',        price: 5 },
 ];
 
-export const TOAST_ADDONS = [
-  { id: 'olives',   name: 'זיתים',        price: 2 },
-  { id: 'mushroom', name: 'פטריות',       price: 2 },
-  { id: 'cheese',   name: 'גבינה צהובה',  price: 2 },
-  { id: 'onion',    name: 'בצל',          price: 2 },
-];
-
 export const MENU = [
-  // ── כריכים ──
+  // ── סנדוויצ'ים ──
   {
-    id: 'sw-omelette', category: 'sandwiches', art: 'omelette',
-    name: 'כריך חביתה', price: 30,
-    desc: 'חביתה טרייה מטוגנת על המקום, בתוך לחמנייה פריכה וחמה.',
+    id: 'sw-league', category: 'sandwiches', art: 'omelette',
+    name: 'חביתת ליגת האלופות', price: 30,
+    desc: 'חביתה טרייה מטוגנת על המקום, בתוך לחמנייה פריכה וחמה — אלופה בכל ביס.',
     tags: ['popular', 'vegetarian'],
-    addons: 'sandwich',
+    vegetables: true, paidAddons: true,
   },
   {
-    id: 'sw-avocado', category: 'sandwiches', art: 'avocado',
-    name: 'כריך אבוקדו', price: 33,
-    desc: 'אבוקדו בשל נמעך ברוטב לימון קליל, עגבנייה ובצל סגול.',
-    tags: ['popular', 'vegan', 'vegetarian'],
-    addons: 'sandwich',
-  },
-  {
-    id: 'sw-tuna', category: 'sandwiches', art: 'tuna',
-    name: 'כריך טונה', price: 33,
-    desc: 'סלט טונה ביתי ברוטב מיונז קליל, עם ירקות טריים.',
-    tags: [],
-    addons: 'sandwich',
-  },
-  {
-    id: 'sw-schnitzel', category: 'sandwiches', art: 'schnitzel',
-    name: 'כריך שניצל', price: 33,
-    desc: 'שניצל פריך וזהוב, חסה ועגבנייה, וקצת מיונז שום.',
-    tags: ['popular'],
-    addons: 'sandwich',
-  },
-  {
-    id: 'sw-bulgarian', category: 'sandwiches', art: 'cheese',
-    name: 'כריך גבינה בולגרית', price: 37,
-    desc: 'נדיבות של גבינה בולגרית מלוחה, עגבנייה ושמן זית.',
+    id: 'sw-mushroom', category: 'sandwiches', art: 'mushroom',
+    name: 'חביתת פטריות היער הטוב', price: 33,
+    desc: 'חביתה עם פטריות מוקפצות בחמאה, ריח של יער ובוקר טוב.',
     tags: ['vegetarian'],
-    addons: 'sandwich',
+    vegetables: true, paidAddons: true,
+  },
+  {
+    id: 'sw-shoshana', category: 'sandwiches', art: 'veggie',
+    name: 'חביתת ירק של שושנה מועלם', price: 33,
+    desc: 'חביתת ירקות עשירה כמו שסבתא שושנה הייתה מכינה — נדיבה ומלאת טעם.',
+    tags: ['popular', 'vegetarian'],
+    vegetables: true, paidAddons: true,
+  },
+  {
+    id: 'sw-spanish', category: 'sandwiches', art: 'spanish',
+    name: 'חביתה ספרדית מתנשאת', price: 33,
+    desc: 'חביתה עם פלפלים קלויים וזיתים — קצת יומרנית, מאוד טעימה.',
+    tags: ['vegetarian'],
+    vegetables: true, paidAddons: true,
+  },
+  {
+    id: 'sw-jerusalem', category: 'sandwiches', art: 'cheese',
+    name: 'חביתת ירושלים דכולא בה', price: 37,
+    desc: 'נדיבות של גבינה בולגרית מלוחה על חביתה חמה — הכול בה, כמו שאומרים.',
+    tags: ['popular', 'vegetarian'],
+    vegetables: true, paidAddons: true,
   },
   {
     id: 'sw-shakshuka', category: 'sandwiches', art: 'shakshuka',
-    name: 'כריך שקשוקה', price: 35,
-    desc: 'ביצים ברוטב עגבניות פיקנטי, נספג יפה בתוך הלחמנייה.',
+    name: 'שקשוקה P.HD', price: 35,
+    desc: 'ביצים ברוטב עגבניות פיקנטי ברמת דוקטורט — נספג יפה בתוך הלחמנייה.',
     tags: ['popular', 'vegetarian', 'spicy'],
-    addons: 'sandwich',
+    vegetables: true, paidAddons: true,
+  },
+  {
+    id: 'sw-tunisian', category: 'sandwiches', art: 'tunisian',
+    name: 'סנדוויץ׳ טוניסאי צפון אפריקאי', price: 35,
+    desc: 'הריסה חריפה, ביצה וזיתים בסגנון צפון אפריקאי אותנטי — לאוהבי החריף.',
+    tags: ['spicy'],
+    vegetables: true, paidAddons: true,
   },
 
   // ── טוסטים ──
   {
     id: 'ts-single', category: 'toasts', art: 'toast',
-    name: 'טוסט עם תוספת אחת', price: 28,
-    desc: 'טוסט חם ופריך עם רוטב פיצה וגבינה צהובה, ותוספת אחת לבחירתכם.',
+    name: 'טוסט', price: 28,
+    desc: 'טוסט חם ופריך עם רוטב פיצה וגבינה צהובה, ותוספת אחת כלולה במחיר.',
     tags: ['vegetarian'],
-    addons: 'toast',
-    includedToppings: 1,
+    includedToppings: 1, toastToppings: true, sauces: true, paidAddons: true,
   },
   {
-    id: 'ts-omelette', category: 'toasts', art: 'toast-egg',
-    name: 'טוסט כריך חביתה', price: 35,
-    desc: 'שילוב מנצח של טוסט פריך עם חביתה חמה בפנים.',
-    tags: ['vegetarian'],
-    addons: 'toast',
-    includedToppings: 1,
+    id: 'ts-dreamloaf', category: 'toasts', art: 'toast-egg',
+    name: 'טוסט כיכר החלומות', price: 35,
+    desc: 'שילוב מנצח של טוסט פריך עם חביתה חמה בפנים — בדיוק כמו שחלמתם.',
+    tags: ['popular', 'vegetarian'],
+    includedToppings: 1, toastToppings: true, sauces: true, paidAddons: true,
   },
 
   // ── מנות נוספות ──
@@ -117,21 +142,15 @@ export const MENU = [
   },
   {
     id: 'ex-avocado', category: 'extras', art: 'avocado',
-    name: 'אבוקדו', price: 34,
+    name: 'אבו-קאדה', price: 34,
     desc: 'מנת אבוקדו טרי, במרקם קרמי ובתיבול עדין.',
     tags: ['vegan', 'vegetarian'],
   },
   {
     id: 'ex-tuna', category: 'extras', art: 'tuna',
-    name: 'טונה', price: 35,
+    name: 'טונה מדושנת עונג', price: 35,
     desc: 'סלט טונה ביתי, נדיב ועשיר, מוכן טרי כל יום.',
     tags: [],
-  },
-  {
-    id: 'ex-salad', category: 'extras', art: 'salad',
-    name: 'סלט צנוניות, עגבנייה ומלפפון', price: 35,
-    desc: 'סלט קצוץ דק ורענן, מתובל בשמן זית ולימון.',
-    tags: ['vegan', 'vegetarian'],
   },
   {
     id: 'ex-creamcheese', category: 'extras', art: 'creamcheese',
@@ -141,8 +160,59 @@ export const MENU = [
   },
   {
     id: 'ex-egg', category: 'extras', art: 'egg',
-    name: 'ביצה קשה', price: 30,
-    desc: 'ביצים קשות טריות, מוגשות פרוסות עם תיבול קל.',
+    name: 'ביצה קשה טרייה', price: 30,
+    desc: 'ביצים קשות טריות כמו ביום היוולדה — מוגשות פרוסות עם תיבול קל.',
     tags: ['vegetarian'],
   },
 ];
+
+// שתייה — מוצגת גם כקטגוריה משלה וגם כהצעה בסל ("רוצים גם לשתות?")
+export const DRINKS = [
+  {
+    id: 'coke', category: 'drinks', art: 'cola',
+    name: 'קולה', desc: 'קרה ומרעננת.', tags: [],
+    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
+  },
+  {
+    id: 'coke-zero', category: 'drinks', art: 'cola-zero',
+    name: 'קולה זירו', desc: 'כל הטעם, בלי הסוכר.', tags: [],
+    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
+  },
+  {
+    id: 'fanta', category: 'drinks', art: 'fanta',
+    name: 'פאנטה', desc: 'תפוזים תוססים וקרים.', tags: [],
+    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
+  },
+  {
+    id: 'sprite', category: 'drinks', art: 'sprite',
+    name: 'ספרייט', desc: 'לימון-ליים מצנן.', tags: [],
+    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
+  },
+  {
+    id: 'water-grape', category: 'drinks', art: 'water-grape',
+    name: 'מים בטעם ענבים', desc: 'מים מוגזים בטעם פירותי קליל.', tags: ['vegan', 'vegetarian'],
+    price: 10,
+  },
+  {
+    id: 'water-peach', category: 'drinks', art: 'water-peach',
+    name: 'מים בטעם אפרסק', desc: 'מים מוגזים בטעם פירותי קליל.', tags: ['vegan', 'vegetarian'],
+    price: 10,
+  },
+  {
+    id: 'excel', category: 'drinks', art: 'excel',
+    name: 'אקסל', desc: 'משקה אנרגיה קלאסי.', tags: [],
+    price: 7,
+  },
+  {
+    id: 'excel-black', category: 'drinks', art: 'excel-black',
+    name: 'אקסל שחור', desc: 'משקה אנרגיה עז ועוצמתי.', tags: [],
+    price: 7,
+  },
+  {
+    id: 'excel-blue', category: 'drinks', art: 'excel-blue',
+    name: 'אקסל בלו', desc: 'משקה אנרגיה מרענן.', tags: [],
+    price: 7,
+  },
+];
+
+export const ALL_ITEMS = [...MENU, ...DRINKS];

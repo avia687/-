@@ -140,10 +140,79 @@ const ARTS = {
       <ellipse cx="75" cy="73" r="6" fill={YOLK} />
     </>
   ),
+  mushroom: (
+    <Bun>
+      <path d="M30 75 Q60 62 90 75 L88 81 Q60 71 32 81 Z" fill={YOLK} opacity="0.9" />
+      <ellipse cx="45" cy="72" rx="7" ry="5" fill={BROWN} />
+      <ellipse cx="45" cy="70" rx="3.5" ry="1.6" fill="#DDBFA0" opacity="0.8" />
+      <ellipse cx="62" cy="76" rx="8" ry="5.5" fill="#8B5E3C" />
+      <ellipse cx="62" cy="74" rx="4" ry="1.8" fill="#DDBFA0" opacity="0.8" />
+      <ellipse cx="78" cy="71" rx="6" ry="4.5" fill={BROWN} />
+    </Bun>
+  ),
+  veggie: (
+    <Bun>
+      <path d="M26 77 Q60 90 94 77 Q88 68 60 66 Q32 68 26 77 Z" fill={GREEN} opacity="0.4" />
+      <circle cx="44" cy="72" r="5.5" fill={TOMATO} />
+      <circle cx="60" cy="76" r="5" fill={TOMATO_D} />
+      <ellipse cx="76" cy="71" rx="6" ry="3" fill="#E9D3F0" stroke="#B98FCB" strokeWidth="1" />
+      <path d="M34 74 Q40 68 48 74" stroke={GREEN_D} strokeWidth="2.2" fill="none" strokeLinecap="round" />
+    </Bun>
+  ),
+  spanish: (
+    <Bun>
+      <path d="M30 76 Q60 64 90 76 L88 81 Q60 72 32 81 Z" fill="#F0C550" opacity="0.9" />
+      <rect x="38" y="70" width="14" height="5" rx="2.5" fill={TOMATO} transform="rotate(-8 45 72)" />
+      <rect x="58" y="68" width="16" height="5" rx="2.5" fill="#D9762A" transform="rotate(6 66 70)" />
+      <circle cx="50" cy="78" r="2.4" fill={OLIVE_D} />
+      <circle cx="70" cy="78" r="2.4" fill={OLIVE_D} />
+    </Bun>
+  ),
+  tunisian: (
+    <Bun>
+      <path d="M28 76 Q60 68 92 76 L90 82 Q60 76 30 82 Z" fill="#B23A22" />
+      <path d="M30 78 Q60 70 90 78" stroke="#8C2A18" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.7" />
+      <path d="M48 72 L58 72 L53 80 Z" fill={YOLK} stroke="#fff" strokeWidth="1" />
+      <circle cx="72" cy="74" r="2.6" fill={OLIVE_D} />
+      <circle cx="40" cy="75" r="2.6" fill={OLIVE_D} />
+    </Bun>
+  ),
+};
+
+function Bottle({ color, dark }) {
+  return (
+    <>
+      <rect x="47" y="30" width="14" height="14" rx="3" fill={dark} />
+      <path
+        d="M46 44 Q46 40 51 38 L57 38 Q62 40 62 44 L64 92 Q64 100 54 100 Q44 100 44 92 Z"
+        fill={color}
+        stroke={dark}
+        strokeWidth="2"
+      />
+      <rect x="44" y="58" width="20" height="26" fill="#fff" opacity="0.12" />
+      <path d="M50 46 L50 90" stroke="#fff" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
+      <rect x="42" y="52" width="24" height="10" rx="2" fill="#fff" opacity="0.85" />
+    </>
+  );
+}
+
+const DRINK_COLORS = {
+  cola: ['#B32020', '#7A1414'],
+  'cola-zero': ['#2B2B2B', '#111111'],
+  fanta: ['#E8792E', '#B85A1C'],
+  sprite: ['#4FA24A', '#33702F'],
+  'water-grape': ['#7C4FA6', '#583170'],
+  'water-peach': ['#E0965A', '#B56E38'],
+  excel: ['#3D7FBF', '#285A8C'],
+  'excel-black': ['#333333', '#161616'],
+  'excel-blue': ['#2E9CC4', '#1F6E8C'],
 };
 
 export default function FoodArt({ id, size = 96 }) {
-  const shape = ARTS[id] || ARTS.omelette;
+  const drinkColors = DRINK_COLORS[id];
+  const shape = drinkColors
+    ? <Bottle color={drinkColors[0]} dark={drinkColors[1]} />
+    : (ARTS[id] || ARTS.omelette);
   return (
     <svg
       className="food-art"

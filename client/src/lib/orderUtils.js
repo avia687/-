@@ -4,6 +4,21 @@ export function formatPrice(n) {
   return `${n % 1 === 0 ? n : n.toFixed(1)}₪`;
 }
 
+export function getItemPriceLabel(item) {
+  if (Array.isArray(item.sizes) && item.sizes.length > 0) {
+    const min = Math.min(...item.sizes.map(s => s.price));
+    return `מ-${formatPrice(min)}`;
+  }
+  return formatPrice(item.price);
+}
+
+export function getItemMinPrice(item) {
+  if (Array.isArray(item.sizes) && item.sizes.length > 0) {
+    return Math.min(...item.sizes.map(s => s.price));
+  }
+  return item.price;
+}
+
 // JS getDay(): 0=ראשון … 6=שבת
 const DAY_HOURS = {
   0: SITE_INFO.hours[0],

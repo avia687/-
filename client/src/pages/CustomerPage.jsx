@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MENU, SITE_INFO } from '../data/menu';
+import { DRINKS, ALL_ITEMS, SITE_INFO } from '../data/menu';
 import { getOpenStatus, generateTimeSlots, computeTotals, formatPrice } from '../lib/orderUtils';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
@@ -117,7 +117,7 @@ export default function CustomerPage() {
 
   const recommendations = useMemo(() => {
     const inCart = new Set(cart.map(l => l.itemId));
-    return MENU.filter(i => i.tags.includes('popular') && !inCart.has(i.id)).slice(0, 3);
+    return DRINKS.filter(i => !inCart.has(i.id)).slice(0, 4);
   }, [cart]);
 
   async function handleSubmit() {
@@ -236,7 +236,7 @@ export default function CustomerPage() {
 
       <main>
         <MenuSection
-          menu={MENU}
+          menu={ALL_ITEMS}
           favorites={favorites}
           onToggleFavorite={toggleFavorite}
           onOpenItem={setModalItem}

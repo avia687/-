@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CATEGORIES } from '../data/menu';
 import FoodArt from './FoodArt';
-import { formatPrice } from '../lib/orderUtils';
+import { getItemPriceLabel } from '../lib/orderUtils';
 
 const DIET_FILTERS = [
   { id: 'popular',    label: 'הכי אהוב', icon: '🔥' },
@@ -51,7 +51,7 @@ function ItemCard({ item, isFavorite, onToggleFavorite, onOpen, delay }) {
       </div>
 
       <div className="item-card-foot">
-        <span className="item-price">{formatPrice(item.price)}</span>
+        <span className="item-price">{getItemPriceLabel(item)}</span>
         <button
           type="button"
           className="add-btn"
