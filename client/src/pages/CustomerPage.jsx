@@ -1,210 +1,218 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { MENU, SITE_INFO } from '../data/menu';
+import { getOpenStatus, generateTimeSlots, computeTotals, formatPrice } from '../lib/orderUtils';
+import Header from '../components/Header';
+import Hero from '../components/Hero';
+import MenuSection from '../components/MenuSection';
+import ItemModal from '../components/ItemModal';
+import CartDrawer from '../components/CartDrawer';
+import FAQSection from '../components/FAQSection';
+import Footer from '../components/Footer';
+import WhatsAppFab from '../components/WhatsAppFab';
 import './CustomerPage.css';
 
-const FOOD = [
-  {
-    id: 'omelette', name: 'חביתה', icon: '🍳', basePrice: 28,
-    desc: 'חביתה טרייה',
-    spreads: [
-      { id: 'hummus', name: 'חומוס' },
-    ],
-  },
-  {
-    id: 'toast', name: 'טוסט', icon: '🥪', basePrice: 26,
-    desc: 'רוטב פיצה · גבינה צהובה',
-    note: 'תוספת ראשונה כלולה · כל תוספת נוספת +2₪',
-    toppings: [
-      { id: 'tomato',    name: 'עגבניה', free: false },
-      { id: 'onion',     name: 'בצל',    free: false },
-      { id: 'olives',    name: 'זיתים',  free: false },
-      { id: 'mushrooms', name: 'פטריות', free: false },
-      { id: 'pesto',     name: 'פסטו',   free: false },
-      { id: 'spicy',     name: 'חריף',   free: true  },
-    ]
-  },
-  {
-    id: 'veggie-omelette', name: 'חביתת ירק', icon: '🥬', basePrice: 33,
-    desc: 'חביתה עם כל הירקות',
-    note: 'כל הירקות כלולים במחיר',
-    spreads: [
-      { id: 'hummus', name: 'חומוס' },
-    ],
-    vegetables: [
-      { id: 'tomato',   name: 'עגבניה' },
-      { id: 'cucumber', name: 'מלפפון' },
-      { id: 'lettuce',  name: 'חסה'    },
-      { id: 'onion',    name: 'בצל'    },
-      { id: 'olives',   name: 'זיתים'  },
-      { id: 'pickles',  name: 'חמוצים' },
-    ]
-  },
-  {
-    id: 'mushroom-omelette', name: 'חביתת פטריות', icon: '🍄', basePrice: 31,
-    desc: 'חביתה עם פטריות',
-    spreads: [
-      { id: 'hummus', name: 'חומוס' },
-    ],
-  },
-  {
-    id: 'avocado', name: 'סנדביץ אבוקדו', icon: '🥑', basePrice: 33,
-    desc: 'אבוקדו טרי',
-    note: 'כל הירקות כלולים במחיר',
-    spreads: [
-      { id: 'cream-cheese', name: 'גבינת שמנת' },
-      { id: 'hummus',       name: 'חומוס' },
-      { id: 'pesto',        name: 'פסטו' },
-      { id: 'spicy',        name: 'חריף' },
-    ],
-    vegetables: [
-      { id: 'tomato',   name: 'עגבניה' },
-      { id: 'cucumber', name: 'מלפפון' },
-      { id: 'lettuce',  name: 'חסה'    },
-      { id: 'onion',    name: 'בצל'    },
-      { id: 'olives',   name: 'זיתים'  },
-      { id: 'pickles',  name: 'חמוצים' },
-    ]
-  },
-  {
-    id: 'cream-cheese', name: 'סנדביץ גבינת שמנת', icon: '🥖', basePrice: 25,
-    desc: 'גבינת שמנת טרייה',
-    note: 'כל הירקות כלולים במחיר',
-    spreads: [
-      { id: 'cream-cheese', name: 'גבינת שמנת' },
-      { id: 'hummus',       name: 'חומוס' },
-      { id: 'pesto',        name: 'פסטו' },
-      { id: 'spicy',        name: 'חריף' },
-    ],
-    vegetables: [
-      { id: 'tomato',   name: 'עגבניה' },
-      { id: 'cucumber', name: 'מלפפון' },
-      { id: 'lettuce',  name: 'חסה'    },
-      { id: 'onion',    name: 'בצל'    },
-      { id: 'olives',   name: 'זיתים'  },
-      { id: 'pickles',  name: 'חמוצים' },
-    ]
-  },
-];
+const CART_KEY = 'hakaron.cart.v1';
+const FAV_KEY = 'hakaron.favorites.v1';
+const LAST_ORDER_KEY = 'hakaron.lastOrder.v1';
 
-// drinks with sizes: can 8₪ / bottle 10₪
-// drinks without sizes: fixed price
-const DRINKS = [
-  { id: 'coke',         name: 'קולה',        bg: '#CC0000', sizes: true  },
-  { id: 'coke-zero',    name: 'קולה זירו',   bg: '#111111', sizes: true  },
-  { id: 'fanta',        name: 'פאנטה',       bg: '#E55A00', sizes: true  },
-  { id: 'sprite',       name: 'ספרייט',      bg: '#007A33', sizes: true  },
-  { id: 'water-grape',  name: 'מים ענבים',   bg: '#5B2D8E', price: 10, sizes: false },
-  { id: 'water-peach',  name: 'מים אפרסק',   bg: '#D4660A', price: 10, sizes: false },
-  { id: 'excel',        name: 'אקסל',        bg: '#1A4FA0', price: 7,  sizes: false },
-  { id: 'excel-black',  name: 'אקסל שחור',   bg: '#1A1A1A', price: 7,  sizes: false },
-  { id: 'excel-blue',   name: 'אקסל בלו',    bg: '#0A7EC2', price: 7,  sizes: false },
-];
+function loadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
-function calcToastPrice(sel) {
-  return 26 + Math.max(0, sel.filter(id => id !== 'spicy').length - 1) * 2;
+function addonsSignature(addons) {
+  return addons.map(a => a.id).sort().join(',');
 }
 
 export default function CustomerPage() {
-  const [modal,      setModal]      = useState(null);
-  const [toastSel,   setToastSel]   = useState([]);
-  const [omlSel,     setOmlSel]     = useState([]);
-  const [spreadSel,  setSpreadSel]  = useState([]);
-  const [cart,    setCart]    = useState([]);
-  const [name,    setName]    = useState('');
-  const [phone,   setPhone]   = useState('');
-  const [payment, setPayment] = useState('');
+  const [cart, setCart] = useState(() => loadJSON(CART_KEY, []));
+  const [favorites, setFavorites] = useState(() => new Set(loadJSON(FAV_KEY, [])));
+  const [lastOrder, setLastOrder] = useState(() => loadJSON(LAST_ORDER_KEY, null));
+
+  const [modalItem, setModalItem] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartBump, setCartBump] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const [fulfillment, setFulfillment] = useState('pickup');
+  const [selectedTime, setSelectedTime] = useState('asap');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [notes, setNotes] = useState('');
+  const [payment, setPayment] = useState('מזומן');
   const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState('');
-  const [orderId, setOrderId] = useState(null);
+  const [error, setError] = useState('');
+  const [orderResult, setOrderResult] = useState(null);
 
-  const total = cart.reduce((s, i) => s + i.price, 0);
+  const openStatus = useMemo(() => getOpenStatus(), []);
+  const timeSlots = useMemo(() => generateTimeSlots(), [cartOpen]);
 
-  function openModal(item) { setModal(item); setToastSel([]); setOmlSel([]); setSpreadSel([]); }
+  useEffect(() => { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }, [cart]);
+  useEffect(() => { localStorage.setItem(FAV_KEY, JSON.stringify([...favorites])); }, [favorites]);
 
-  function handleAdd(item) {
-    if (item.toppings || item.vegetables || item.spreads) {
-      openModal(item);
-    } else {
-      setCart(p => [...p, { uid: Date.now(), name: item.name, extras: [], price: item.basePrice }]);
-    }
+  const cartCount = cart.reduce((s, l) => s + l.qty, 0);
+
+  function showToast(message) {
+    setToast(message);
+    setTimeout(() => setToast(null), 1800);
   }
 
-  function toggle(id, sel, set) {
-    set(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  function bumpCart() {
+    setCartBump(true);
+    setTimeout(() => setCartBump(false), 500);
   }
 
-  function addFood() {
-    if (modal.toppings) {
-      const extras = toastSel.map(id => modal.toppings.find(t => t.id === id)?.name).filter(Boolean);
-      setCart(p => [...p, { uid: Date.now(), name: modal.name, extras, price: calcToastPrice(toastSel) }]);
-    } else {
-      // ממרח תמיד ראשון, אחר כך ירקות
-      const spreadExtras = (modal.spreads || [])
-        .filter(s => spreadSel.includes(s.id))
-        .map(s => s.name);
-      const vegExtras = omlSel.map(id => modal.vegetables?.find(v => v.id === id)?.name).filter(Boolean);
-      const extras = [...spreadExtras, ...vegExtras];
-      setCart(p => [...p, { uid: Date.now(), name: modal.name, extras, price: modal.basePrice }]);
-    }
-    setModal(null);
+  function addToCart(line) {
+    setCart(prev => {
+      const sig = addonsSignature(line.addons);
+      const existing = prev.find(l => l.itemId === line.itemId && addonsSignature(l.addons) === sig);
+      if (existing) {
+        return prev.map(l => l.uid === existing.uid ? { ...l, qty: l.qty + line.qty } : l);
+      }
+      return [...prev, { ...line, uid: `${line.itemId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }];
+    });
+    bumpCart();
+    showToast(`${line.name} נוסף לסל 🛍️`);
   }
 
-  function addDrink(drink, size, price) {
-    const name = size ? `${drink.name} ${size}` : drink.name;
-    setCart(p => [...p, { uid: Date.now(), name, extras: [], price }]);
+  function handleModalAdd(line) {
+    addToCart(line);
+    setModalItem(null);
   }
 
-  async function submit() {
-    if (!name.trim())                                       { setError('נא להכניס שם'); return; }
-    if (!/^0[0-9]{9}$/.test(phone.replace(/[-\s]/g, ''))) { setError('מספר טלפון לא תקין'); return; }
-    if (!payment)                                           { setError('נא לבחור אמצעי תשלום'); return; }
-    setError(''); setLoading(true);
+  function increaseLine(uid) {
+    setCart(prev => prev.map(l => l.uid === uid ? { ...l, qty: l.qty + 1 } : l));
+  }
+  function decreaseLine(uid) {
+    setCart(prev => prev
+      .map(l => l.uid === uid ? { ...l, qty: l.qty - 1 } : l)
+      .filter(l => l.qty > 0));
+  }
+  function removeLine(uid) {
+    setCart(prev => prev.filter(l => l.uid !== uid));
+  }
+
+  function toggleFavorite(id) {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function handleOrderAgain() {
+    if (!lastOrder) return;
+    setCart(lastOrder.lines.map(l => ({
+      ...l,
+      uid: `${l.itemId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    })));
+    setCartOpen(true);
+    showToast('ההזמנה הקודמת נוספה לסל ↻');
+  }
+
+  const recommendations = useMemo(() => {
+    const inCart = new Set(cart.map(l => l.itemId));
+    return MENU.filter(i => i.tags.includes('popular') && !inCart.has(i.id)).slice(0, 3);
+  }, [cart]);
+
+  async function handleSubmit() {
+    setError('');
+    if (!name.trim()) { setError('נא להכניס שם מלא'); return; }
+    if (!/^0[0-9]{8,9}$/.test(phone.replace(/[-\s]/g, ''))) { setError('מספר טלפון לא תקין'); return; }
+    if (fulfillment === 'delivery' && !address.trim()) { setError('נא להכניס כתובת למשלוח'); return; }
+
+    const { subtotal, deliveryFee, total } = computeTotals(cart, fulfillment);
+    setLoading(true);
     try {
-      const res  = await fetch('/api/orders', {
+      const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerName:  name.trim(),
+          customerName: name.trim(),
           customerPhone: phone.replace(/[-\s]/g, ''),
-          items: cart.map(i => ({ name: i.name, extras: i.extras, price: i.price })),
+          items: cart.map(l => ({
+            name: l.qty > 1 ? `${l.name} × ${l.qty}` : l.name,
+            extras: l.addons.map(a => a.name),
+            price: l.unitPrice * l.qty,
+          })),
+          subtotal,
+          deliveryFee,
           total,
-          payment
-        })
+          payment,
+          fulfillment,
+          address: fulfillment === 'delivery' ? address.trim() : null,
+          requestedTime: selectedTime,
+          notes: notes.trim(),
+        }),
       });
+      if (!res.ok) throw new Error('order-failed');
       const data = await res.json();
-      setOrderId(data.orderId);
-    } catch { setError('שגיאה בשליחה, נסה שוב'); }
-    finally  { setLoading(false); }
+
+      const result = {
+        orderId: data.orderId,
+        fulfillment,
+        selectedTime,
+        total,
+        lines: cart,
+      };
+      setOrderResult(result);
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify({ lines: cart }));
+      setLastOrder({ lines: cart });
+      setCart([]);
+      setCartOpen(false);
+      setNotes('');
+    } catch {
+      setError('הייתה תקלה בשליחת ההזמנה. נסו שוב בעוד רגע.');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  if (orderId) {
-    const paymentEmoji = { 'פיבוקס': '💙', 'ביט': '🔵', 'מזומן': '💵' }[payment] || '';
+  function resetOrder() {
+    setOrderResult(null);
+    setName(''); setPhone(''); setAddress(''); setNotes('');
+    setFulfillment('pickup'); setSelectedTime('asap');
+  }
+
+  if (orderResult) {
+    const timeLabel = orderResult.selectedTime === 'asap'
+      ? `בעוד כ-${SITE_INFO.prepTimeMinutes} דקות`
+      : `בשעה ${orderResult.selectedTime}`;
+    const paymentEmoji = { 'מזומן': '💵', 'ביט': '🔵', 'פייבוקס': '💙' }[payment] || '';
     const waText = [
-      `הזמנה חדשה! 🛵 #${orderId}`,
+      `הזמנה חדשה מהאתר! #${orderResult.orderId}`,
       ``,
       `שם: ${name}`,
       `טלפון: ${phone}`,
+      `${orderResult.fulfillment === 'delivery' ? 'משלוח לכתובת: ' + address : 'איסוף עצמי'}`,
       `תשלום: ${paymentEmoji} ${payment}`,
       ``,
-      ...cart.map(i => `• ${i.name}${i.extras.length ? ' - ' + i.extras.join(', ') : ''}: ${i.price}₪`),
+      ...orderResult.lines.map(l => `• ${l.name}${l.addons.length ? ' - ' + l.addons.map(a => a.name).join(', ') : ''}: ${formatPrice(l.unitPrice * l.qty)}`),
       ``,
-      `סה״כ: ${total}₪`
+      `סה״כ: ${formatPrice(orderResult.total)}`,
     ].join('\n');
-    const waUrl = `https://wa.me/972545414123?text=${encodeURIComponent(waText)}`;
+    const waUrl = `https://wa.me/${SITE_INFO.whatsapp}?text=${encodeURIComponent(waText)}`;
 
     return (
       <div className="success-wrap">
         <div className="success-card">
           <div className="success-check">✓</div>
-          <h2 className="success-title">ההזמנה מוכנה!</h2>
-          <div className="success-num">#{orderId}</div>
-          <p className="success-msg">לחץ על הכפתור כדי לשלוח<br/>את ההזמנה לשף בוואטסאפ</p>
+          <h2 className="success-title">ההזמנה נשלחה בהצלחה!</h2>
+          <div className="success-num">מספר הזמנה #{orderResult.orderId}</div>
+          <p className="success-msg">
+            {orderResult.fulfillment === 'delivery' ? 'המשלוח בדרך אליכם' : 'ההזמנה תחכה לכם לאיסוף'}<br />
+            {timeLabel}
+          </p>
+          <p className="success-demo">🔒 זו הזמנת דמו — התשלום בפועל מתבצע מול המזנון, לא בוצע חיוב מקוון.</p>
           <a href={waUrl} className="whatsapp-btn" target="_blank" rel="noopener noreferrer">
-            שלח הזמנה לשף 📲
+            שלחו לנו את ההזמנה בוואטסאפ 📲
           </a>
-          <button className="success-btn"
-            onClick={() => { setCart([]); setName(''); setPhone(''); setOrderId(null); }}>
-            הזמנה חדשה
-          </button>
+          <button className="success-btn" onClick={resetOrder}>הזמנה חדשה</button>
         </div>
       </div>
     );
@@ -212,184 +220,66 @@ export default function CustomerPage() {
 
   return (
     <div className="page">
+      <Header
+        openStatus={openStatus}
+        cartCount={cartCount}
+        cartBump={cartBump}
+        onCartClick={() => setCartOpen(true)}
+      />
 
-      {/* Header */}
-      <header className="header">
-        <div className="header-glow" />
-        <img src="/logo.svg" alt="הקרון" className="header-logo" />
-        <h1 className="header-title">הקרון</h1>
-      </header>
+      <Hero
+        openStatus={openStatus}
+        onOrderClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
+        onOrderAgain={handleOrderAgain}
+        hasLastOrder={!!lastOrder}
+      />
 
-      <main className="main">
-
-        {/* Food */}
-        <section className="section">
-          <p className="section-label">אוכל</p>
-          <div className="food-grid">
-            {FOOD.map((item, i) => (
-              <div key={item.id} className="food-card" style={{ animationDelay: `${i * 0.12}s` }}>
-                <span className="food-icon">{item.icon}</span>
-                <div className="food-body">
-                  <h3 className="food-name">{item.name}</h3>
-                  <p className="food-desc">{item.desc}</p>
-                  <p className="food-note">{item.note}</p>
-                </div>
-                <div className="food-right">
-                  <span className="food-price">{item.basePrice}₪</span>
-                  <button className="add-btn" onClick={() => handleAdd(item)}>הוסף +</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Drinks */}
-        <section className="section">
-          <p className="section-label">שתייה</p>
-          <div className="drinks-grid">
-            {DRINKS.map(d => (
-              <div key={d.id} className="drink-card">
-                <div className="drink-dot" style={{ background: d.bg }} />
-                <span className="drink-name">{d.name}</span>
-                {d.sizes ? (
-                  <div className="drink-sizes">
-                    <button className="drink-btn" onClick={() => addDrink(d, 'פחית', 8)}>
-                      <span>פחית</span><strong>8₪</strong>
-                    </button>
-                    <button className="drink-btn" onClick={() => addDrink(d, 'בקבוק', 10)}>
-                      <span>בקבוק</span><strong>10₪</strong>
-                    </button>
-                  </div>
-                ) : (
-                  <button className="drink-add" onClick={() => addDrink(d, null, d.price)}>
-                    {d.price}₪ +
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Cart */}
-        {cart.length > 0 && (
-          <section className="section">
-            <p className="section-label">ההזמנה שלי</p>
-            <div className="cart-box">
-              {cart.map(item => (
-                <div key={item.uid} className="cart-row">
-                  <div className="cart-info">
-                    <span className="cart-name">{item.name}</span>
-                    {item.extras.length > 0 &&
-                      <span className="cart-extras">{item.extras.join(' · ')}</span>}
-                  </div>
-                  <span className="cart-price">{item.price}₪</span>
-                  <button className="del-btn"
-                    onClick={() => setCart(p => p.filter(i => i.uid !== item.uid))}>✕</button>
-                </div>
-              ))}
-              <div className="cart-total">
-                <span>סה"כ</span>
-                <span className="cart-total-price">{total}₪</span>
-              </div>
-
-              <div className="form">
-                <p className="form-label">לאן לשלוח הודעה כשמוכן?</p>
-                <input className="inp" type="text" placeholder="שם" value={name}
-                  onChange={e => setName(e.target.value)} />
-                <input className="inp" type="tel" placeholder="מספר טלפון" value={phone}
-                  onChange={e => setPhone(e.target.value)} dir="ltr" />
-
-                <p className="form-label" style={{marginTop:'14px'}}>אמצעי תשלום</p>
-                <div className="payment-grid">
-                  {[
-                    { id: 'פיבוקס', emoji: '💙', color: '#1565C0' },
-                    { id: 'ביט',    emoji: '🔵', color: '#1565C0' },
-                    { id: 'מזומן',  emoji: '💵', color: '#2E7D32' },
-                  ].map(p => (
-                    <button key={p.id}
-                      className={`payment-btn ${payment === p.id ? 'payment-btn--on' : ''}`}
-                      style={payment === p.id ? { '--pay-color': p.color } : {}}
-                      onClick={() => setPayment(p.id)}>
-                      <span className="payment-emoji">{p.emoji}</span>
-                      <span className="payment-label">{p.id}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {error && <p className="err">{error}</p>}
-                <button className="submit-btn" onClick={submit} disabled={loading}>
-                  {loading ? <span className="spin" /> : `שלח הזמנה · ${total}₪`}
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
+      <main>
+        <MenuSection
+          menu={MENU}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+          onOpenItem={setModalItem}
+        />
+        <FAQSection />
       </main>
 
-      {/* Modal */}
-      {modal && (
-        <div className="overlay" onClick={() => setModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-bar" />
-            <button className="close-btn" onClick={() => setModal(null)}>✕</button>
-            <span className="modal-icon">{modal.icon}</span>
-            <h3 className="modal-title">{modal.name}</h3>
+      <Footer />
+      <WhatsAppFab />
 
-            {modal.toppings && (<>
-              <p className="modal-sub">בחר תוספות</p>
-              <p className="modal-note">תוספת ראשונה כלולה · חריף תמיד בחינם</p>
-              <div className="topping-grid">
-                {modal.toppings.map(t => (
-                  <button key={t.id}
-                    className={`top-btn ${toastSel.includes(t.id) ? 'top-btn--on' : ''}`}
-                    onClick={() => toggle(t.id, toastSel, setToastSel)}>
-                    {t.name}
-                    {t.free && <span className="free-tag">חינם</span>}
-                  </button>
-                ))}
-              </div>
-              <div className="modal-foot">
-                <span className="modal-price">{calcToastPrice(toastSel)}₪</span>
-                <button className="modal-add" onClick={addFood}>הוסף להזמנה</button>
-              </div>
-            </>)}
-
-            {(modal.vegetables || modal.spreads) && !modal.toppings && (<>
-              {modal.spreads && (<>
-                <p className="modal-sub">ממרח (אופציונלי)</p>
-                <div className="topping-grid" style={{marginBottom:'18px'}}>
-                  {modal.spreads.map(s => (
-                    <button key={s.id}
-                      className={`top-btn spread-btn ${spreadSel.includes(s.id) ? 'top-btn--on' : ''}`}
-                      onClick={() => toggle(s.id, spreadSel, setSpreadSel)}>
-                      🌿 {s.name}
-                      {spreadSel.includes(s.id) && <span className="free-tag">✓ נבחר</span>}
-                    </button>
-                  ))}
-                </div>
-              </>)}
-
-              {modal.vegetables && (<>
-                <p className="modal-sub">ירקות לבחירה</p>
-                <p className="modal-note">הכל כלול במחיר</p>
-                <div className="topping-grid">
-                  {modal.vegetables.map(v => (
-                    <button key={v.id}
-                      className={`top-btn ${omlSel.includes(v.id) ? 'top-btn--on' : ''}`}
-                      onClick={() => toggle(v.id, omlSel, setOmlSel)}>
-                      {v.name}
-                    </button>
-                  ))}
-                </div>
-              </>)}
-              <div className="modal-foot">
-                <span className="modal-price">{modal.basePrice}₪</span>
-                <button className="modal-add" onClick={addFood}>הוסף להזמנה</button>
-              </div>
-            </>)}
-          </div>
-        </div>
+      {modalItem && (
+        <ItemModal
+          item={modalItem}
+          onClose={() => setModalItem(null)}
+          onAdd={handleModalAdd}
+        />
       )}
+
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        cart={cart}
+        onIncrease={increaseLine}
+        onDecrease={decreaseLine}
+        onRemove={removeLine}
+        fulfillment={fulfillment}
+        setFulfillment={setFulfillment}
+        timeSlots={timeSlots}
+        selectedTime={selectedTime}
+        setSelectedTime={setSelectedTime}
+        name={name} setName={setName}
+        phone={phone} setPhone={setPhone}
+        address={address} setAddress={setAddress}
+        notes={notes} setNotes={setNotes}
+        payment={payment} setPayment={setPayment}
+        error={error}
+        loading={loading}
+        onSubmit={handleSubmit}
+        recommendations={recommendations}
+        onOpenItem={item => { setCartOpen(false); setModalItem(item); }}
+      />
+
+      {toast && <div className="add-toast" role="status">{toast}</div>}
     </div>
   );
 }

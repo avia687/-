@@ -23,16 +23,26 @@ function buildOrderMessage(order) {
     return `• ${item.name}${extras} — ${item.price}₪`;
   });
 
+  const fulfillmentLine = order.fulfillment === 'delivery'
+    ? `🛵 משלוח לכתובת: ${order.address || '—'}`
+    : `📦 איסוף עצמי`;
+  const timeLine = order.requestedTime && order.requestedTime !== 'asap'
+    ? `⏱ שעה מבוקשת: ${order.requestedTime}`
+    : `⏱ בהקדם האפשרי`;
+
   return [
     `🛵 הזמנה חדשה! #${order.id}`,
     `👤 ${order.customerName}`,
     `📞 ${order.customerPhone}`,
+    fulfillmentLine,
+    timeLine,
     ``,
     `📋 הזמנה:`,
     ...lines,
     ``,
+    order.notes ? `📝 הערות: ${order.notes}` : null,
     `💰 סה"כ: ${order.total}₪`
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 async function sendOrderToChefs(order) {

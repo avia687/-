@@ -8,7 +8,10 @@ const orders = [];
 let counter = 1;
 
 router.post('/', async (req, res) => {
-  const { customerName, customerPhone, items, total, payment } = req.body;
+  const {
+    customerName, customerPhone, items, total, payment,
+    subtotal, deliveryFee, fulfillment, address, requestedTime, notes
+  } = req.body;
 
   if (!customerName || !customerPhone || !items || !items.length) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -19,8 +22,14 @@ router.post('/', async (req, res) => {
     customerName,
     customerPhone,
     items,
+    subtotal: subtotal ?? total,
+    deliveryFee: deliveryFee || 0,
     total,
     payment: payment || '',
+    fulfillment: fulfillment || 'pickup',
+    address: address || null,
+    requestedTime: requestedTime || 'asap',
+    notes: notes || '',
     status: 'pending',
     createdAt: new Date()
   };

@@ -83,10 +83,16 @@ export default function ChefPage() {
                   <span className="chef-phone">📞 {order.customerPhone}</span>
                   {order.payment && (
                     <span className="chef-payment">
-                      {{ 'פיבוקס': '💙', 'ביט': '🔵', 'מזומן': '💵' }[order.payment] || '💳'} {order.payment}
+                      {{ 'פייבוקס': '💙', 'ביט': '🔵', 'מזומן': '💵' }[order.payment] || '💳'} {order.payment}
                     </span>
                   )}
                 </div>
+
+                <div className="chef-fulfillment">
+                  <span>{order.fulfillment === 'delivery' ? `🛵 משלוח${order.address ? ' · ' + order.address : ''}` : '📦 איסוף עצמי'}</span>
+                  <span>{order.requestedTime && order.requestedTime !== 'asap' ? `⏱ ${order.requestedTime}` : '⏱ בהקדם'}</span>
+                </div>
+                {order.notes && <p className="chef-notes">📝 {order.notes}</p>}
 
                 <div className="chef-items">
                   {order.items.map((item, idx) => (
