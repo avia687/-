@@ -5,7 +5,7 @@ import { IconChevronDown } from './Icons';
 const FAQS = [
   {
     q: 'מה שעות הפעילות שלכם?',
-    a: `אנחנו פתוחים בימים א׳–ה׳ בין 09:00–21:00, בימי שישי בין 09:00–15:00, ובשבת סגורים. שעת ההכנה המשוערת להזמנה היא כ-${SITE_INFO.prepTimeMinutes} דקות.`,
+    a: `אנחנו פתוחים בימים ${SITE_INFO.hours[0].days} בין ${SITE_INFO.hours[0].open}–${SITE_INFO.hours[0].close}, ובשבת סגורים. אפשר להזמין סנדוויצ׳ים עד השעה ${SITE_INFO.orderCutoff}. שעת ההכנה המשוערת היא כ-${SITE_INFO.prepTimeMinutes} דקות.`,
   },
   {
     q: 'עד איפה אתם מגיעים במשלוחים?',

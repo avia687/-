@@ -1,19 +1,21 @@
 // כל הפרטים כאן — שמות, מחירים ותיאורים — קלים לעריכה במקום אחד.
 
 export const SITE_INFO = {
-  name: 'המזנון של הקרון',
-  tagline: 'טרי, חם ומוכן במיוחד בשבילכם',
+  name: 'הקרון',
+  tagline: 'מזנון עם השראה',
+  marketingLine: 'טרי, חם ומוכן במיוחד בשבילכם',
   phoneDisplay: '054-541-4123',
   whatsapp: '972545414123',
-  address: 'רחוב אבא הלל 12, רמת גן',
+  address: 'הגבעה הצהובה',
   prepTimeMinutes: 20,
   deliveryFee: 15,
   freeDeliveryThreshold: 100,
   deliveryRadius: 'משלוחים עד 5 ק"מ מהמזנון',
+  orderCutoff: '15:00',
+  // המקום עצמו פתוח עד 16:00, אך הזמנת סנדוויצ'ים מתקבלת עד orderCutoff
   hours: [
-    { days: 'ראשון–חמישי', label: 'א׳–ה׳', open: '09:00', close: '21:00' },
-    { days: 'שישי',        label: 'ו׳',    open: '09:00', close: '15:00' },
-    { days: 'שבת',         label: 'שבת',   open: null,    close: null   },
+    { days: 'ראשון–שישי', label: 'א׳–ו׳', open: '07:30', close: '16:00' },
+    { days: 'שבת',        label: 'שבת',   open: null,    close: null   },
   ],
 };
 
@@ -166,51 +168,50 @@ export const MENU = [
 ];
 
 // שתייה — מוצגת גם כקטגוריה משלה וגם כהצעה בסל ("רוצים גם לשתות?")
+// שדה image מצביע ל-client/public/drinks/<file> — ברגע שהתמונה תתווסף לשם
+// היא תופיע אוטומטית בכרטיס ובחלון המנה (יש נפילה חינניים אם הקובץ עוד לא קיים).
+const CAN_BOTTLE = [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }];
+
 export const DRINKS = [
   {
     id: 'coke', category: 'drinks',
     name: 'קולה', desc: 'קרה ומרעננת.', tags: [],
-    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
+    sizes: CAN_BOTTLE, image: '/drinks/coke.jpg',
   },
   {
     id: 'coke-zero', category: 'drinks',
     name: 'קולה זירו', desc: 'כל הטעם, בלי הסוכר.', tags: [],
-    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
+    sizes: CAN_BOTTLE, image: '/drinks/coke-zero.jpg',
   },
   {
     id: 'fanta', category: 'drinks',
     name: 'פאנטה', desc: 'תפוזים תוססים וקרים.', tags: [],
-    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
-  },
-  {
-    id: 'sprite', category: 'drinks',
-    name: 'ספרייט', desc: 'לימון-ליים מצנן.', tags: [],
-    sizes: [{ id: 'can', label: 'פחית', price: 8 }, { id: 'bottle', label: 'בקבוק', price: 10 }],
-  },
-  {
-    id: 'water-grape', category: 'drinks',
-    name: 'מים בטעם ענבים', desc: 'מים מוגזים בטעם פירותי קליל.', tags: ['vegan', 'vegetarian'],
-    price: 10,
-  },
-  {
-    id: 'water-peach', category: 'drinks',
-    name: 'מים בטעם אפרסק', desc: 'מים מוגזים בטעם פירותי קליל.', tags: ['vegan', 'vegetarian'],
-    price: 10,
+    sizes: CAN_BOTTLE, image: '/drinks/fanta.jpg',
   },
   {
     id: 'excel', category: 'drinks',
     name: 'אקסל', desc: 'משקה אנרגיה קלאסי.', tags: [],
-    price: 7,
+    sizes: CAN_BOTTLE, image: '/drinks/excel.jpg',
   },
   {
-    id: 'excel-black', category: 'drinks',
-    name: 'אקסל שחור', desc: 'משקה אנרגיה עז ועוצמתי.', tags: [],
-    price: 7,
+    id: 'sprite', category: 'drinks',
+    name: 'ספרייט', desc: 'לימון-ליים מצנן.', tags: [],
+    sizes: CAN_BOTTLE, image: '/drinks/sprite.jpg',
   },
   {
-    id: 'excel-blue', category: 'drinks',
-    name: 'אקסל בלו', desc: 'משקה אנרגיה מרענן.', tags: [],
-    price: 7,
+    id: 'sprite-zero', category: 'drinks',
+    name: 'ספרייט זירו', desc: 'כל הרעננות, בלי הסוכר.', tags: [],
+    sizes: CAN_BOTTLE, image: '/drinks/sprite-zero.jpg',
+  },
+  {
+    id: 'fuze-tea', category: 'drinks',
+    name: 'פיוז טי', desc: 'תה קר פירותי ורענן.', tags: [],
+    sizes: CAN_BOTTLE, image: '/drinks/fuze-tea.jpg',
+  },
+  {
+    id: 'fuze-tea-zero', category: 'drinks',
+    name: 'פיוז טי זירו', desc: 'תה קר פירותי, בלי סוכר.', tags: [],
+    sizes: CAN_BOTTLE, image: '/drinks/fuze-tea-zero.jpg',
   },
 ];
 

@@ -19,15 +19,15 @@ export function getItemMinPrice(item) {
   return item.price;
 }
 
-// JS getDay(): 0=ראשון … 6=שבת
+// JS getDay(): 0=ראשון … 6=שבת. SITE_INFO.hours[0] = ראשון–שישי, hours[1] = שבת
 const DAY_HOURS = {
   0: SITE_INFO.hours[0],
   1: SITE_INFO.hours[0],
   2: SITE_INFO.hours[0],
   3: SITE_INFO.hours[0],
   4: SITE_INFO.hours[0],
-  5: SITE_INFO.hours[1],
-  6: SITE_INFO.hours[2],
+  5: SITE_INFO.hours[0],
+  6: SITE_INFO.hours[1],
 };
 
 export function getOpenStatus(now = new Date()) {
@@ -48,6 +48,10 @@ export function getOpenStatus(now = new Date()) {
     return { isOpen: false, text: `נפתח היום ב-${today.open}`, today };
   }
   return { isOpen: false, text: 'סגור כעת', today };
+}
+
+export function getOrderCutoffLabel() {
+  return `הזמנות מתקבלות עד ${SITE_INFO.orderCutoff}`;
 }
 
 export function generateTimeSlots(count = 8, stepMinutes = 10) {

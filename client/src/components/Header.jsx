@@ -1,3 +1,4 @@
+import { SITE_INFO } from '../data/menu';
 import { IconBag } from './Icons';
 
 export default function Header({ openStatus, cartCount, cartBump, onCartClick }) {
@@ -7,7 +8,7 @@ export default function Header({ openStatus, cartCount, cartBump, onCartClick })
         <a href="#top" className="brand">
           <img src="/logo.svg" alt="" className="brand-logo" />
           <span className="brand-text">
-            <span className="brand-name">המזנון של הקרון</span>
+            <span className="brand-name">{SITE_INFO.name}</span>
             <span className={`brand-status ${openStatus.isOpen ? 'is-open' : 'is-closed'}`}>
               <span className="status-dot" />
               {openStatus.text}

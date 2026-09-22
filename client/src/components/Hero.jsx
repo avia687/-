@@ -1,4 +1,5 @@
 import { SITE_INFO } from '../data/menu';
+import { getOrderCutoffLabel } from '../lib/orderUtils';
 import { IconClock, IconRefresh } from './Icons';
 
 export default function Hero({ openStatus, onOrderClick, onOrderAgain, hasLastOrder }) {
@@ -16,9 +17,9 @@ export default function Hero({ openStatus, onOrderClick, onOrderAgain, hasLastOr
       </div>
 
       <div className="hero-inner">
-        <p className="hero-eyebrow">מזנון שכונתי · אוכל טרי כל יום</p>
+        <p className="hero-eyebrow">{SITE_INFO.tagline} · הגבעה הצהובה</p>
         <h1 className="hero-title">
-          המזנון של הקרון
+          {SITE_INFO.name}
           <span className="hero-title-rule" aria-hidden="true" />
         </h1>
         <p className="hero-sub">
@@ -45,13 +46,14 @@ export default function Hero({ openStatus, onOrderClick, onOrderAgain, hasLastOr
           <div className="hero-meta-item">
             <IconClock size={15} /> זמן הכנה משוער {SITE_INFO.prepTimeMinutes} דק׳
           </div>
+          <div className="hero-meta-item">{getOrderCutoffLabel()}</div>
         </div>
       </div>
 
       <div className="hero-strip">
         <div className="hero-strip-track">
           {Array.from({ length: 6 }).map((_, i) => (
-            <span key={i}>טרי, חם ומוכן במיוחד בשבילכם</span>
+            <span key={i}>{SITE_INFO.marketingLine}</span>
           ))}
         </div>
       </div>

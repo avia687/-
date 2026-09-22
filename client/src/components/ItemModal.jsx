@@ -4,6 +4,7 @@ import {
 } from '../data/menu';
 import { formatPrice } from '../lib/orderUtils';
 import { IconClose } from './Icons';
+import ThumbImage from './ThumbImage';
 
 const TAG_LABELS = {
   popular: 'הכי אהוב',
@@ -85,6 +86,12 @@ export default function ItemModal({ item, onClose, onAdd }) {
         onClick={e => e.stopPropagation()}
       >
         <button className="modal-close" onClick={onClose} aria-label="סגור"><IconClose size={16} /></button>
+
+        {item.image && (
+          <div className="modal-hero">
+            <ThumbImage src={item.image} alt="" className="modal-hero-img" />
+          </div>
+        )}
 
         {item.tags.length > 0 && (
           <div className="item-tags modal-tags">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { SITE_INFO } from '../data/menu';
 import { formatPrice, computeTotals, getItemPriceLabel } from '../lib/orderUtils';
 import { IconClose, IconArrowRight, IconTrash, IconBox, IconTruck, IconLock } from './Icons';
+import ThumbImage from './ThumbImage';
 
 const PAYMENT_METHODS = [
   { id: 'מזומן',    label: 'מזומן' },
@@ -109,6 +110,7 @@ export default function CartDrawer({
                 <div className="cart-recs-row">
                   {recommendations.map(item => (
                     <button key={item.id} className="rec-chip" onClick={() => onOpenItem(item)}>
+                      <ThumbImage src={item.image} alt="" className="rec-chip-img" />
                       <span>{item.name}</span>
                       <span className="rec-chip-price">{getItemPriceLabel(item)}</span>
                     </button>

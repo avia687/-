@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { CATEGORIES } from '../data/menu';
 import { getItemPriceLabel } from '../lib/orderUtils';
 import { IconSearch, IconClose, IconHeart, IconHeartFilled } from './Icons';
+import ThumbImage from './ThumbImage';
 
 const DIET_FILTERS = [
   { id: 'popular',    label: 'הכי אהוב' },
@@ -27,6 +28,12 @@ function ItemRow({ item, isFavorite, onToggleFavorite, onOpen, delay }) {
       role="button"
       onKeyDown={e => { if (e.key === 'Enter') onOpen(item); }}
     >
+      {item.image && (
+        <div className="item-row-thumb">
+          <ThumbImage src={item.image} alt="" className="item-thumb-img" />
+        </div>
+      )}
+
       <div className="item-row-main">
         <div className="item-row-head">
           <h3 className="item-name">{item.name}</h3>

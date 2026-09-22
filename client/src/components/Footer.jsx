@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="footer-col">
           <div className="brand">
             <img src="/logo.svg" alt="" className="brand-logo" />
-            <span className="brand-name">המזנון של הקרון</span>
+            <span className="brand-name">{SITE_INFO.name}</span>
           </div>
           <p className="footer-tagline">{SITE_INFO.tagline}</p>
         </div>
@@ -31,11 +31,12 @@ export default function Footer() {
               {h.days}: {h.open ? `${h.open}–${h.close}` : 'סגור'}
             </p>
           ))}
+          <p className="footer-note">הזמנת סנדוויצ׳ים עד {SITE_INFO.orderCutoff}</p>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} המזנון של הקרון. כל הזכויות שמורות.</p>
+        <p>© {new Date().getFullYear()} {SITE_INFO.name}. כל הזכויות שמורות.</p>
       </div>
     </footer>
   );
