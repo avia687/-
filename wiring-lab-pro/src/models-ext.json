@@ -1,0 +1,186 @@
+{
+  "_doc": "הרחבות לכל דגם. שדות שמחושבים אוטומטית ב-build: testPoints, expectedValues, hallSequence, dataConfidence (לפי כללים + overrides כאן). conf: ok=✅ מאומת, typ=⚠️ טיפוסי/משוער, unk=❓ לא ידוע.",
+  "korshidi": {
+    "controllerAmpsNum": 20,
+    "displayProtocol": { "v": "לא פורסם (צג דיגיטלי גנרי)", "conf": "unk" },
+    "connectors": { "power": { "v": "XT60 / Anderson (טיפוסי לקטגוריה)", "conf": "typ" }, "charge": { "v": "שקע DC או XLR בצד הקורה", "conf": "typ" }, "motor": { "v": "Julet 9 או Bullet + Hall נפרד", "conf": "typ" }, "display": { "v": "Julet 5", "conf": "typ" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "סוג הצג לא פורסם. אם כתוב על הצג KT-LCD – השתמשו בקודי KT; אם Bafang – בקודי Bafang." },
+    "failureWeights": { "alarm_lock": 2.2, "motor_cable": 1.6, "water_ingress": 1.4, "brake_stuck": 1.3 },
+    "commonFailures": [
+      { "t": "אזעקה נעולה – המערכת לא מניעה", "cause": "alarm_lock", "w": 0.8 },
+      { "t": "כבל המנוע נמתח בציר הזרוע האחורית", "cause": "motor_cable", "w": 0.6 },
+      { "t": "מים בתיבת הבקר אחרי שטיפה בלחץ", "cause": "water_ingress", "w": 0.5 },
+      { "t": "חיישן בלם תקוע אחרי נפילה", "cause": "brake_stuck", "w": 0.4 }
+    ],
+    "confOverrides": { "motor": "typ", "controller": "typ" },
+    "specFlags": [ { "field": "מנוע", "issue": "הספק נומינלי 500W גבוה מ-250W שמותר לאופניים חשמליים בישראל. ייתכן שזה ערך שיא או דגם שאינו לכביש – לאמת מול היבואן.", "sev": "typ" } ],
+    "torqueExtra": []
+  },
+  "onebikeX4": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "לא פורסם", "conf": "unk" },
+    "connectors": { "power": { "v": "מגעי מתקן בסוללה הנשלפת", "conf": "typ" }, "charge": { "v": "שקע DC/XLR בסוללה", "conf": "typ" }, "motor": { "v": "Julet 9 (טיפוסי)", "conf": "typ" }, "display": { "v": "Julet 5 (טיפוסי)", "conf": "typ" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "קודי הצג לא פורסמו. אם אלה קודי KT (21–30) – השתמשו במאגר KT." },
+    "failureWeights": { "alarm_lock": 2.0, "key_lock": 1.6, "loose_harness": 1.2, "water_ingress": 1.3 },
+    "commonFailures": [
+      { "t": "אפליקציה או אזעקה במצב נעול", "cause": "alarm_lock", "w": 0.7 },
+      { "t": "סוללה לא ננעלת עד הסוף – ניתוקים", "cause": "key_lock", "w": 0.6 },
+      { "t": "מחברים ליד הציר האחורי חשופים לבוץ ומים", "cause": "water_ingress", "w": 0.4 }
+    ],
+    "confOverrides": { "motor": "ok" },
+    "specFlags": [],
+    "torqueExtra": []
+  },
+  "starkMach5": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "לא פורסם", "conf": "unk" },
+    "connectors": { "power": { "v": "לא פורסם", "conf": "unk" }, "charge": { "v": "שקע DC/XLR", "conf": "typ" }, "motor": { "v": "Julet 9 (טיפוסי)", "conf": "typ" }, "display": { "v": "Julet 5 (טיפוסי)", "conf": "typ" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "קודי הצג לא פורסמו. בדקו את החוברת של הצג." },
+    "failureWeights": { "loose_harness": 2.0, "display_comm": 1.5, "mech_drag": 1.3, "brake_wire": 1.3 },
+    "commonFailures": [
+      { "t": "כבלים נשחקים בציר הקיפול", "cause": "loose_harness", "w": 0.8 },
+      { "t": "כבל הצג בציר הקיפול", "cause": "display_comm", "w": 0.5 },
+      { "t": "בלאי רפידות בשימוש שליחויות", "cause": "mech_drag", "w": 0.4 }
+    ],
+    "confOverrides": { "battery": "typ" },
+    "specFlags": [ { "field": "סוללה", "issue": "מקורות שונים מציינים 18Ah, ‏23.4Ah או 24Ah. Wh תלוי בגרסה – בדקו את המדבקה על המארז.", "sev": "typ" } ],
+    "torqueExtra": ["tq_fold"]
+  },
+  "hunterX2": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "לא פורסם", "conf": "unk" },
+    "connectors": { "power": { "v": "לא פורסם", "conf": "unk" }, "charge": { "v": "שקע DC/XLR", "conf": "typ" }, "motor": { "v": "Julet 9 (טיפוסי)", "conf": "typ" }, "display": { "v": "Julet 5 (טיפוסי)", "conf": "typ" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "קודי הצג לא פורסמו." },
+    "failureWeights": { "batt_low": 1.4, "batt_aged": 1.4, "motor_cable": 1.6, "brake_stuck": 1.3, "loose_harness": 1.4 },
+    "commonFailures": [
+      { "t": "טווח קצר בשימוש כבד – סוללה קטנה (624Wh)", "cause": "batt_aged", "w": 0.6 },
+      { "t": "כבל מנוע חשוף ביציאה מהציר (חישוק מגנזיום)", "cause": "motor_cable", "w": 0.6 },
+      { "t": "חיישני בלם זזים אחרי נפילה", "cause": "brake_stuck", "w": 0.4 }
+    ],
+    "confOverrides": { "motor": "unk" },
+    "specFlags": [],
+    "torqueExtra": ["tq_fold"]
+  },
+  "alphaGT": {
+    "controllerAmpsNum": 40,
+    "displayProtocol": { "v": "LCD צבעוני – פרוטוקול לא פורסם", "conf": "unk" },
+    "connectors": { "power": { "v": "XT90 / Anderson (טיפוסי לזרם 40A)", "conf": "typ" }, "charge": { "v": "שקע XLR/DC", "conf": "typ" }, "motor": { "v": "Julet 9 / Higo (טיפוסי)", "conf": "typ" }, "display": { "v": "Julet 5 (טיפוסי)", "conf": "typ" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "קודי הצג לא פורסמו." },
+    "failureWeights": { "conn_power": 1.8, "phase_conn": 1.6, "ctrl_thermal": 1.4, "loose_harness": 1.3 },
+    "commonFailures": [
+      { "t": "מחברי הספק ופאזות מתחממים מזרם 40A", "cause": "conn_power", "w": 0.7 },
+      { "t": "מחבר פאזות מושחר", "cause": "phase_conn", "w": 0.6 },
+      { "t": "בקר חם בעליות ארוכות", "cause": "ctrl_thermal", "w": 0.4 }
+    ],
+    "confOverrides": { "battery": "typ", "controller": "typ" },
+    "specFlags": [
+      { "field": "סוללה", "issue": "משווקים מציינים 21Ah או 18Ah – ‏1260Wh או 1080Wh.", "sev": "typ" },
+      { "field": "מנוע", "issue": "שיא 800W לא מתיישב עם בקר 40A על 60V (עד כ-2400W תיאורטי). אחד הנתונים כנראה לא מדויק או שהבקר מוגבל בתוכנה.", "sev": "typ" }
+    ],
+    "torqueExtra": ["tq_fold"]
+  },
+  "mateX": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "צג MATE ייעודי", "conf": "typ" },
+    "connectors": { "power": { "v": "ייעודי MATE", "conf": "typ" }, "charge": { "v": "שקע ייעודי", "conf": "typ" }, "motor": { "v": "Higo/Julet (טיפוסי)", "conf": "typ" }, "display": { "v": "ייעודי", "conf": "typ" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "קודי MATE לא נכללו במאגר. בדקו את מדריך היצרן או פנו לשירות." },
+    "failureWeights": { "pas_gap": 2.0, "pas_sensor": 1.6, "loose_harness": 1.6, "display_comm": 1.4, "water_ingress": 1.3 },
+    "commonFailures": [
+      { "t": "חיישן PAS: מרווח או דיסק זזו – אין עזר", "cause": "pas_gap", "w": 0.8 },
+      { "t": "כבלים בציר הקיפול", "cause": "loose_harness", "w": 0.6 },
+      { "t": "תקלות צג אחרי חדירת מים", "cause": "water_ingress", "w": 0.4 }
+    ],
+    "confOverrides": { "range": "typ" },
+    "specFlags": [ { "field": "טווח", "issue": "עד 120 ק״מ על 696Wh = כ-5.8Wh לק״מ – אופטימי מאוד (רמת עזר נמוכה במיוחד). בפועל צפו ל-40–70 ק״מ.", "sev": "typ" } ],
+    "torqueExtra": ["tq_fold"]
+  },
+  "oxo": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "Inokim ייעודי", "conf": "typ" },
+    "connectors": { "power": { "v": "לא פורסם", "conf": "unk" }, "charge": { "v": "שקע עגול (GX16 טיפוסי)", "conf": "typ" }, "motor": { "v": "לא פורסם", "conf": "unk" }, "display": { "v": "ייעודי", "conf": "typ" } },
+    "errorCodes": { "families": ["Inokim"], "conf": "typ", "note": "קוד E1 מבוסס מקורות שירות. רשמו כל קוד אחר ופנו למשווק." },
+    "failureWeights": { "rear_ctrl_link": 1.8, "motor_front": 1.5, "water_ingress": 1.5, "conn_power": 1.3 },
+    "commonFailures": [
+      { "t": "רק גלגל אחד מניע – בקר, מנוע או כבל תקשורת", "cause": "rear_ctrl_link", "w": 0.8 },
+      { "t": "כבל המנוע הקדמי נשחק ליד הזרוע", "cause": "motor_front", "w": 0.6 },
+      { "t": "חדירת מים לפלטפורמה", "cause": "water_ingress", "w": 0.5 }
+    ],
+    "confOverrides": {},
+    "specFlags": [ { "field": "טעינה", "issue": "13.5 שעות ל-25.6Ah מרמזות על מטען של כ-2A בלבד. זה סביר למטען הבסיסי – לאמת.", "sev": "typ" } ],
+    "torqueExtra": ["tq_fold"]
+  },
+  "thunder3": {
+    "controllerAmpsNum": 50,
+    "displayProtocol": { "v": "Minimotors (EY/QS) – ייעודי", "conf": "typ" },
+    "connectors": { "power": { "v": "לא פורסם", "conf": "unk" }, "charge": { "v": "שני שקעי טעינה (טיפוסי לדגם)", "conf": "typ" }, "motor": { "v": "Higo (לפי המשווקים)", "conf": "ok" }, "display": { "v": "Higo (לפי המשווקים)", "conf": "ok" } },
+    "errorCodes": { "families": [], "conf": "unk", "note": "קודי Minimotors לא נכללו במאגר. בדגם 72V – כל עבודה חשמלית רק אצל טכנאי." },
+    "failureWeights": { "conn_power": 1.8, "phase_conn": 1.6, "ctrl_thermal": 1.6, "rear_ctrl_link": 1.4, "motor_front": 1.3 },
+    "commonFailures": [
+      { "t": "התחממות מחברים ובקרים בעומס", "cause": "ctrl_thermal", "w": 0.7 },
+      { "t": "מחברי הספק מתחממים", "cause": "conn_power", "w": 0.6 },
+      { "t": "משקל גבוה – עומס על ציר הקיפול והכבלים בו", "cause": "loose_harness", "w": 0.4 }
+    ],
+    "confOverrides": { "motor": "typ" },
+    "specFlags": [ { "field": "מנוע", "issue": "״עד 5400W כל מנוע״ גבוה מ-72V × 65A ≈ 4680W. כנראה ערך שיווקי – לא לתכנן לפיו.", "sev": "typ" } ],
+    "torqueExtra": ["tq_fold"]
+  },
+  "g30": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "Ninebot ייעודי (Dashboard)", "conf": "ok" },
+    "connectors": { "power": { "v": "ייעודי Ninebot", "conf": "typ" }, "charge": { "v": "שקע AC – מטען מובנה בפלטפורמה", "conf": "ok" }, "motor": { "v": "ייעודי", "conf": "typ" }, "display": { "v": "ייעודי (עובר בעמוד ההיגוי)", "conf": "typ" } },
+    "errorCodes": { "families": ["Xiaomi"], "conf": "typ", "note": "קודי Ninebot דומים ברובם לקודי Xiaomi, אבל לא זהים. אמתו במדריך G30." },
+    "failureWeights": { "display_comm": 1.8, "loose_harness": 1.5, "charge_port": 1.4, "charger_fault": 0.8, "water_ingress": 1.3 },
+    "commonFailures": [
+      { "t": "קוד 10 – כבל התקשורת בעמוד ההיגוי/ציר הקיפול", "cause": "display_comm", "w": 0.8 },
+      { "t": "רפיון בציר הקיפול – כבלים נשחקים", "cause": "loose_harness", "w": 0.5 },
+      { "t": "חדירת מים דרך שקע הטעינה", "cause": "water_ingress", "w": 0.4 }
+    ],
+    "confOverrides": { "range": "typ" },
+    "specFlags": [ { "field": "טווח", "issue": "65 ק״מ על 551Wh = כ-8.5Wh לק״מ – בתנאי יצרן (רוכב קל, מהירות נמוכה). בפועל 35–45 ק״מ.", "sev": "typ" } ],
+    "builtInCharger": true,
+    "torqueExtra": ["tq_fold"]
+  },
+  "g2": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "Ninebot ייעודי", "conf": "typ" },
+    "connectors": { "power": { "v": "ייעודי Ninebot", "conf": "typ" }, "charge": { "v": "מטען מובנה (לפי המשווקים)", "conf": "typ" }, "motor": { "v": "ייעודי", "conf": "typ" }, "display": { "v": "ייעודי", "conf": "typ" } },
+    "errorCodes": { "families": ["Xiaomi"], "conf": "typ", "note": "קודים בסגנון Ninebot/Xiaomi – אמתו במדריך G2." },
+    "failureWeights": { "display_comm": 1.6, "loose_harness": 1.6, "mech_drag": 1.2 },
+    "commonFailures": [
+      { "t": "כבלי האיתות והתאורה בציר הקיפול", "cause": "loose_harness", "w": 0.6 },
+      { "t": "כבל הצג בעמוד ההיגוי", "cause": "display_comm", "w": 0.5 }
+    ],
+    "confOverrides": { "motor": "typ", "range": "typ" },
+    "specFlags": [],
+    "builtInCharger": true,
+    "torqueExtra": ["tq_fold"]
+  },
+  "xiaomi4pro": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "Xiaomi ייעודי", "conf": "ok" },
+    "connectors": { "power": { "v": "ייעודי Xiaomi", "conf": "typ" }, "charge": { "v": "שקע עגול למטען 42V", "conf": "typ" }, "motor": { "v": "ייעודי", "conf": "typ" }, "display": { "v": "ייעודי (עובר בעמוד)", "conf": "typ" } },
+    "errorCodes": { "families": ["Xiaomi"], "conf": "typ", "note": "קודי Xiaomi – נבדקו בעיקר בסדרת M365. ב-4 Pro אמתו במדריך." },
+    "failureWeights": { "display_comm": 1.6, "loose_harness": 1.4 },
+    "commonFailures": [
+      { "t": "כבלים נשחקים ליד עמוד ההיגוי", "cause": "loose_harness", "w": 0.6 },
+      { "t": "קוד 10 – תקשורת צג/בקר", "cause": "display_comm", "w": 0.5 }
+    ],
+    "confOverrides": {},
+    "specFlags": [ { "field": "סוללה", "issue": "446Wh על 12.4Ah מתאים ל-36V. אם המדבקה בכלי שלכם שונה – עדכנו.", "sev": "typ" } ],
+    "torqueExtra": ["tq_fold"]
+  },
+  "light2": {
+    "controllerAmpsNum": null,
+    "displayProtocol": { "v": "Inokim ייעודי", "conf": "typ" },
+    "connectors": { "power": { "v": "לא פורסם", "conf": "unk" }, "charge": { "v": "שקע עגול למטען 42V", "conf": "typ" }, "motor": { "v": "לא פורסם", "conf": "unk" }, "display": { "v": "ייעודי", "conf": "typ" } },
+    "errorCodes": { "families": ["Inokim"], "conf": "typ", "note": "רשמו את הקוד המדויק ופנו למשווק המורשה." },
+    "failureWeights": { "loose_harness": 1.8, "display_comm": 1.4, "batt_aged": 1.2 },
+    "commonFailures": [
+      { "t": "כבלים בציר הקיפול של הכידון", "cause": "loose_harness", "w": 0.7 },
+      { "t": "טווח קצר בשימוש כבד", "cause": "batt_aged", "w": 0.4 }
+    ],
+    "confOverrides": { "battery": "typ" },
+    "specFlags": [ { "field": "סוללה", "issue": "מיקום הסוללה בעמוד ההיגוי הוא הנחה של המודל – אמתו בכלי.", "sev": "typ" } ],
+    "torqueExtra": ["tq_fold"]
+  }
+}

@@ -1,0 +1,5681 @@
+{
+ "_doc": "מעבדת החיווט – 12 הדגמים עם שדות מורחבים. conf: ok=✅ מאומת, typ=⚠️ טיפוסי/משוער, unk=❓ לא ידוע.",
+ "confLegend": {
+  "ok": {
+   "icon": "✅",
+   "name": "מאומת",
+   "desc": "מפרט פומבי של היצרן או של משווק מורשה, או עובדה פיזיקלית (למשל 4.2V לתא מלא)."
+  },
+  "typ": {
+   "icon": "⚠️",
+   "name": "טיפוסי / משוער",
+   "desc": "ערך נפוץ לקטגוריה, הערכה, או מקורות שסותרים זה את זה. לאמת מול הכלי שלכם."
+  },
+  "unk": {
+   "icon": "❓",
+   "name": "לא ידוע",
+   "desc": "לא פורסם ולא מצאנו מקור. אל תסתמכו על הערך – מדדו או שאלו את היצרן."
+  }
+ },
+ "torqueRef": {
+  "tq_caliper": {
+   "part": "ברגי קליפר בלם דיסק",
+   "nm": "6–8 Nm",
+   "conf": "typ"
+  },
+  "tq_rotor": {
+   "part": "ברגי דיסק בלם (Torx T25)",
+   "nm": "4–6 Nm",
+   "conf": "typ"
+  },
+  "tq_lever": {
+   "part": "תפסנית ידית בלם",
+   "nm": "4–6 Nm",
+   "conf": "typ"
+  },
+  "tq_bar": {
+   "part": "תפסניות על הכידון (מצערת/צג)",
+   "nm": "2–4 Nm (פלסטיק – עדין)",
+   "conf": "typ"
+  },
+  "tq_stem": {
+   "part": "סטם / תפסנית כידון",
+   "nm": "5–8 Nm",
+   "conf": "typ"
+  },
+  "tq_crank": {
+   "part": "בורג זרוע פדל (Square/ISIS)",
+   "nm": "35–50 Nm",
+   "conf": "typ"
+  },
+  "tq_axle": {
+   "part": "אומי ציר מנוע Hub",
+   "nm": "30–45 Nm באופניים; בקורקינט – לפי היצרן",
+   "conf": "typ"
+  },
+  "tq_ctrl": {
+   "part": "ברגי תושבת בקר",
+   "nm": "לפי היצרן (בלי הידוק יתר על אלומיניום)",
+   "conf": "unk"
+  },
+  "tq_fold": {
+   "part": "מנגנון קיפול בקורקינט",
+   "nm": "לפי היצרן בלבד",
+   "conf": "unk"
+  }
+ },
+ "models": {
+  "korshidi": {
+   "cat": "ebike",
+   "layout": "fatFull",
+   "brand": "Korshidi Bike",
+   "name": "Korshidi Bike 48/20 שיכוך מלא",
+   "short": "כורשידי 48/20",
+   "kind": "מיני פאט עם שיכוך מלא",
+   "voltage": 48,
+   "ah": 20,
+   "wh": 960,
+   "motor": {
+    "nominal": "500W",
+    "peak": "לא פורסם",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "20A",
+    "loc": "בתיבה שמתחת למושב הספה"
+   },
+   "tires": "20 אינץ׳, צמיג רחב (מיני פאט)",
+   "brakes": "דיסק הידראוליים Tektro עם ניתוק מנוע",
+   "suspension": "מזלג קדמי ובולם אוויר אחורי (A5); אופציה למזלג דאונהיל",
+   "weight": "לא פורסם",
+   "range": "לא פורסם",
+   "speed": "25 קמ״ש לפי החוק בישראל",
+   "charging": "מטען 54.6V, שקע בצד הקורה",
+   "display": "צג דיגיטלי חכם במרכז הכידון",
+   "lights": "פנס קדמי על כתר המזלג, LED אחורי בגב המושב",
+   "extras": "אזעקה מובנית עם שלט, צופר, כידון מתכוונן ומתקפל, מושב ספה",
+   "overview": "מיני פאט ישראלי קלאסי: שלדת Big Foot עם קורה ראשית עבה שבתוכה הסוללה, זרוע אחורית עם בולם אוויר, מזלג קדמי עם שיכוך ומושב ספה ארוך. הדגם נמכר ישירות מהיבואן בראשון לציון, ומגיע במגוון צבעים (אדום מט במודל).",
+   "electric": "סוללת 48V ‏(13S) מזינה בקר 20A שיושב בתיבה מתחת למושב. מהבקר יוצאים שלושה חוטי פאזה וחמישה חוטי Hall למנוע האחורי, ו-5V למצערת, ל-PAS ולחיישני הבלם. מודול האזעקה יושב ליד הבקר ויכול לנעול את ההנעה – לכן כשהאופניים ״מתים״, בודקים קודם את האזעקה.",
+   "strengths": [
+    "סוללה גדולה (960Wh) יחסית למחיר",
+    "שיכוך מלא ונוחות ישיבה",
+    "בלמים הידראוליים",
+    "אזעקה מובנית"
+   ],
+   "faults": [
+    "אזעקה נעולה – המערכת לא מניעה",
+    "כבל המנוע נמתח בציר הזרוע האחורית אם לא הושאר רפיון",
+    "מים בתיבת הבקר אחרי שטיפה בלחץ",
+    "חיישן בלם תקוע אחרי נפילה"
+   ],
+   "maintenance": [
+    "בדיקת לחץ אוויר בבולם האחורי כל חודש",
+    "ניקוי ושימון שרשרת כל 300 ק״מ",
+    "בדיקת רפידות הבלם ההידראולי",
+    "לא לשטוף בלחץ את אזור הבקר והמחברים"
+   ],
+   "compNotes": {
+    "alarm": "האזעקה מחוברת לבקר בשלושה חוטים. במצב נעול היא חוסמת את ההנעה."
+   },
+   "omit": [],
+   "geom": {
+    "frame": "#9e1a1f",
+    "rough": 0.62,
+    "metal": 0.3,
+    "wheels": "spoke",
+    "tireR": 0.042,
+    "R": 0.28,
+    "seat": "sofa",
+    "fork": "std",
+    "fold": false,
+    "shock": "air",
+    "shockColor": "#e8e8e8"
+   },
+   "sources": "דפי המוצר של כורשידי בייק ומשווקים. מידות המודל משוערות.",
+   "controllerAmpsNum": 20,
+   "displayProtocol": {
+    "v": "לא פורסם (צג דיגיטלי גנרי)",
+    "conf": "unk"
+   },
+   "connectors": {
+    "power": {
+     "v": "XT60 / Anderson (טיפוסי לקטגוריה)",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "שקע DC או XLR בצד הקורה",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Julet 9 או Bullet + Hall נפרד",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "Julet 5",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "סוג הצג לא פורסם. אם כתוב על הצג KT-LCD – השתמשו בקודי KT; אם Bafang – בקודי Bafang."
+   },
+   "failureWeights": {
+    "alarm_lock": 2.2,
+    "motor_cable": 1.6,
+    "water_ingress": 1.4,
+    "brake_stuck": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "אזעקה נעולה – המערכת לא מניעה",
+     "cause": "alarm_lock",
+     "w": 0.8
+    },
+    {
+     "t": "כבל המנוע נמתח בציר הזרוע האחורית",
+     "cause": "motor_cable",
+     "w": 0.6
+    },
+    {
+     "t": "מים בתיבת הבקר אחרי שטיפה בלחץ",
+     "cause": "water_ingress",
+     "w": 0.5
+    },
+    {
+     "t": "חיישן בלם תקוע אחרי נפילה",
+     "cause": "brake_stuck",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "מנוע",
+     "issue": "הספק נומינלי 500W גבוה מ-250W שמותר לאופניים חשמליים בישראל. ייתכן שזה ערך שיא או דגם שאינו לכביש – לאמת מול היבואן.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "typ",
+    "controller": "typ",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "unk",
+    "range": "unk",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "39–54.6V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-39V: סוללה פרוקה. מעל 54.6V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 53.4,
+     "max": 55.8,
+     "expect": "≈ 54.6V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_5v",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אספקת 5V ל-PAS",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-PAS",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: כבל PAS קרוע ליד הציר.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_sig",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אות PAS בסיבוב פדלים",
+     "mode": "DC V · 20V",
+     "red": "חוט האות (כחול/ירוק/לבן)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "פולסים 0V ↔ כ-5V עם כל מגנט",
+     "bad": "אין פולסים: מרווח/דיסק הפוך/חיישן.",
+     "meas": "m_pas",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    },
+    {
+     "id": "tp_alarm",
+     "comp": "alarm",
+     "bundle": "alarm",
+     "name": "מצב האזעקה",
+     "mode": "שלט",
+     "red": "—",
+     "black": "—",
+     "live": false,
+     "unit": "",
+     "expect": "פתוחה: ההנעה זמינה",
+     "bad": "נעולה: המערכת לא מניעה גם כשהכול תקין.",
+     "meas": "m_alarm",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 48,
+     "cells": "13S",
+     "full": 54.6,
+     "empty": 39,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 54.6,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": 20,
+     "conf": "ok"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    },
+    "pas": {
+     "v": "פולסים 0/5V",
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_stem",
+    "tq_crank",
+    "tq_axle"
+   ]
+  },
+  "onebikeX4": {
+   "cat": "ebike",
+   "layout": "fatFull",
+   "brand": "One Bike",
+   "name": "One Bike Fat X4",
+   "short": "One Bike X4",
+   "kind": "ביג פוט עם שיכוך מלא (דגם 2026)",
+   "voltage": 48,
+   "ah": 18.5,
+   "wh": 888,
+   "motor": {
+    "nominal": "250W (נומינלי, לפי התקן)",
+    "peak": "לא פורסם",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "מתחת למושב (משוער)"
+   },
+   "tires": "צמיגי FAT ברוחב 4 אינץ׳ (ביג פוט)",
+   "brakes": "דיסק הידראוליים",
+   "suspension": "שיכוך מלא",
+   "weight": "לא פורסם",
+   "range": "לא פורסם",
+   "speed": "25 קמ״ש לפי החוק בישראל",
+   "charging": "מטען 54.6V; טעינת USB Type-C לטלפון",
+   "display": "צג דיגיטלי",
+   "lights": "פנס קדמי ותאורה אחורית",
+   "extras": "סוללה נגד גניבה, נעילת גלגל בפטנט, אזעקה עם אפליקציה",
+   "overview": "לפי משווקים, ה-One Bike Fat X4 הוא אחד מאופני הביג פוט הנמכרים בישראל. זה דגם 2026 של המותג One Bike, עם צמיגים רחבים, שיכוך מלא ומערכת נגד גניבה: סוללה נעולה, נעילת גלגל ואזעקה שמתחברת לאפליקציה.",
+   "electric": "סוללת 48V ‏18.5Ah ‏(כ-888Wh, ‏13S). המערכת כוללת בקר, מנוע Hub אחורי, צג, מצערת, PAS וחיישני בלם, כמו ברוב אופני הביג פוט. מודול האזעקה והאפליקציה מוסיפים עוד רכיב אלקטרוני לרתמה – כשמשהו לא נדלק, בודקים גם אותו.",
+   "strengths": [
+    "מערכת נגד גניבה מקיפה",
+    "סוללה גדולה לטווח טוב",
+    "צמיגים רחבים ויציבים",
+    "שקע USB Type-C"
+   ],
+   "faults": [
+    "אפליקציה או אזעקה במצב נעול",
+    "סוללה לא ננעלת עד הסוף במגעים – ניתוקים",
+    "מחברים ליד הציר האחורי נחשפים לבוץ ומים"
+   ],
+   "maintenance": [
+    "בדיקה שהסוללה ננעלת עד הקליק",
+    "לחץ אוויר נכון בצמיגים הרחבים (לפי הכתוב על הצמיג)",
+    "ניקוי מגעי הסוללה",
+    "עדכון האפליקציה"
+   ],
+   "compNotes": {},
+   "omit": [],
+   "geom": {
+    "frame": "#1f2429",
+    "rough": 0.5,
+    "metal": 0.45,
+    "accent": "#1fb6d6",
+    "wheels": "spoke",
+    "tireR": 0.05,
+    "R": 0.305,
+    "seat": "sofa",
+    "fork": "std",
+    "fold": false,
+    "shock": "coil",
+    "shockColor": "#e0342b"
+   },
+   "sources": "משווקים ישראליים (Wheel-E, ‏Smart Move). חלק מהנתונים לא פורסמו – מסומנים כך.",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "לא פורסם",
+    "conf": "unk"
+   },
+   "connectors": {
+    "power": {
+     "v": "מגעי מתקן בסוללה הנשלפת",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "שקע DC/XLR בסוללה",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Julet 9 (טיפוסי)",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "Julet 5 (טיפוסי)",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "קודי הצג לא פורסמו. אם אלה קודי KT (21–30) – השתמשו במאגר KT."
+   },
+   "failureWeights": {
+    "alarm_lock": 2,
+    "key_lock": 1.6,
+    "loose_harness": 1.2,
+    "water_ingress": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "אפליקציה או אזעקה במצב נעול",
+     "cause": "alarm_lock",
+     "w": 0.7
+    },
+    {
+     "t": "סוללה לא ננעלת עד הסוף – ניתוקים",
+     "cause": "key_lock",
+     "w": 0.6
+    },
+    {
+     "t": "מחברים ליד הציר האחורי חשופים לבוץ ומים",
+     "cause": "water_ingress",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "ok",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "unk",
+    "range": "unk",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "39–54.6V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-39V: סוללה פרוקה. מעל 54.6V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 53.4,
+     "max": 55.8,
+     "expect": "≈ 54.6V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_5v",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אספקת 5V ל-PAS",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-PAS",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: כבל PAS קרוע ליד הציר.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_sig",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אות PAS בסיבוב פדלים",
+     "mode": "DC V · 20V",
+     "red": "חוט האות (כחול/ירוק/לבן)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "פולסים 0V ↔ כ-5V עם כל מגנט",
+     "bad": "אין פולסים: מרווח/דיסק הפוך/חיישן.",
+     "meas": "m_pas",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    },
+    {
+     "id": "tp_alarm",
+     "comp": "alarm",
+     "bundle": "alarm",
+     "name": "מצב האזעקה",
+     "mode": "שלט",
+     "red": "—",
+     "black": "—",
+     "live": false,
+     "unit": "",
+     "expect": "פתוחה: ההנעה זמינה",
+     "bad": "נעולה: המערכת לא מניעה גם כשהכול תקין.",
+     "meas": "m_alarm",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 48,
+     "cells": "13S",
+     "full": 54.6,
+     "empty": 39,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 54.6,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    },
+    "pas": {
+     "v": "פולסים 0/5V",
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_stem",
+    "tq_crank",
+    "tq_axle"
+   ]
+  },
+  "starkMach5": {
+   "cat": "ebike",
+   "layout": "fatFull",
+   "brand": "Stark",
+   "name": "Stark Mach 5 Plus",
+   "short": "Stark Mach 5+",
+   "kind": "אופניים מתקפלים עם שיכוך מלא",
+   "voltage": 48,
+   "ah": 23.4,
+   "wh": 1123,
+   "motor": {
+    "nominal": "250W (דגם 2025)",
+    "peak": "750W",
+    "pos": "rear",
+    "type": "Hub אחורי ללא מברשות"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בשלדה (משוער)"
+   },
+   "tires": "20 אינץ׳, צמיג רחב",
+   "brakes": "דיסק הידראוליים Tektro קדמי ואחורי, עם ניתוק מנוע",
+   "suspension": "שיכוך מלא; גרסת DH עם מזלג דאונהיל",
+   "weight": "לא פורסם",
+   "range": "לא פורסם",
+   "speed": "25 קמ״ש לפי החוק בישראל",
+   "charging": "מטען 54.6V",
+   "display": "צג דיגיטלי רחב במרכז: מהירות, ק״מ, סוללה והילוכים חשמליים; שקע USB",
+   "lights": "פנס קדמי ואחורי",
+   "extras": "שלדת אלומיניום 6061, מתקפלים בשלושה שלבים",
+   "overview": "Stark הוא מותג ישראלי. ה-Mach 5 Plus הוא דגם הדגל שלו לרכיבה עירונית ולשליחויות: סוללה גדולה במיוחד (עד כ-24Ah), שלדה מתקפלת, שיכוך מלא ובלמים הידראוליים Tektro. משווקים שונים מציינים סוללות של 18Ah, ‏23.4Ah או 24Ah, לפי שנת הדגם.",
+   "electric": "סוללת 48V עם BMS שמנטר כל תא ומגן מפני טעינת יתר, פריקת יתר וקצר. יש בה כ-800–1000 מחזורי טעינה. המנוע הוא Hub אחורי ללא מברשות, 250W נומינלי ו-750W בשיא. חיישני הניתוק בידיות הבלם מנתקים את המנוע בכל בלימה.",
+   "strengths": [
+    "סוללה גדולה מאוד – טווח ארוך",
+    "מתקפלים בשלושה שלבים",
+    "Tektro הידראולי עם ניתוק מנוע",
+    "צג רחב עם USB"
+   ],
+   "faults": [
+    "ציר הקיפול: כבלים שנמתחים או נשחקים בקיפול חוזר",
+    "בלאי רפידות מהיר בשימוש שליחויות",
+    "רפיון בציר הקיפול – חריקות"
+   ],
+   "maintenance": [
+    "בדיקת נעילת ציר הקיפול לפני כל רכיבה",
+    "בדיקת הכבלים באזור הקיפול",
+    "החלפת רפידות לפי הצורך",
+    "טעינה אחרי כל יום עבודה, לא אחסון בסוללה ריקה"
+   ],
+   "compNotes": {
+    "frame": "בשלדה מתקפלת עוברים כבלים דרך ציר הקיפול – נקודת בלאי מספר 1."
+   },
+   "omit": [
+    "alarm"
+   ],
+   "geom": {
+    "frame": "#20252b",
+    "rough": 0.45,
+    "metal": 0.55,
+    "accent": "#f2b705",
+    "wheels": "spoke",
+    "tireR": 0.05,
+    "R": 0.305,
+    "seat": "sofa",
+    "fork": "dh",
+    "fold": true,
+    "shock": "coil",
+    "shockColor": "#f2b705"
+   },
+   "sources": "Stark ומשווקים (Softride, ‏קורקיפיקס, אקופאן). חלק מהנתונים לא פורסמו – מסומנים כך.",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "לא פורסם",
+    "conf": "unk"
+   },
+   "connectors": {
+    "power": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "charge": {
+     "v": "שקע DC/XLR",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Julet 9 (טיפוסי)",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "Julet 5 (טיפוסי)",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "קודי הצג לא פורסמו. בדקו את החוברת של הצג."
+   },
+   "failureWeights": {
+    "loose_harness": 2,
+    "display_comm": 1.5,
+    "mech_drag": 1.3,
+    "brake_wire": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "כבלים נשחקים בציר הקיפול",
+     "cause": "loose_harness",
+     "w": 0.8
+    },
+    {
+     "t": "כבל הצג בציר הקיפול",
+     "cause": "display_comm",
+     "w": 0.5
+    },
+    {
+     "t": "בלאי רפידות בשימוש שליחויות",
+     "cause": "mech_drag",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "סוללה",
+     "issue": "מקורות שונים מציינים 18Ah, ‏23.4Ah או 24Ah. Wh תלוי בגרסה – בדקו את המדבקה על המארז.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "typ",
+    "motor": "ok",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "unk",
+    "range": "unk",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "39–54.6V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-39V: סוללה פרוקה. מעל 54.6V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 53.4,
+     "max": 55.8,
+     "expect": "≈ 54.6V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_5v",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אספקת 5V ל-PAS",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-PAS",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: כבל PAS קרוע ליד הציר.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_sig",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אות PAS בסיבוב פדלים",
+     "mode": "DC V · 20V",
+     "red": "חוט האות (כחול/ירוק/לבן)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "פולסים 0V ↔ כ-5V עם כל מגנט",
+     "bad": "אין פולסים: מרווח/דיסק הפוך/חיישן.",
+     "meas": "m_pas",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 48,
+     "cells": "13S",
+     "full": 54.6,
+     "empty": 39,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 54.6,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    },
+    "pas": {
+     "v": "פולסים 0/5V",
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_stem",
+    "tq_crank",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "hunterX2": {
+   "cat": "ebike",
+   "layout": "fatFull",
+   "brand": "Jager",
+   "name": "Hunter X2 (Jager)",
+   "short": "Hunter X2",
+   "kind": "מיני פאט עם שיכוך מלא (דגם 2025)",
+   "voltage": 48,
+   "ah": 13,
+   "wh": 624,
+   "motor": {
+    "nominal": "לא פורסם",
+    "peak": "לא פורסם",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בשלדה (משוער)"
+   },
+   "tires": "20 אינץ׳ רחבים על חישוקי מגנזיום",
+   "brakes": "הידראוליים",
+   "suspension": "שיכוך מלא הידראולי",
+   "weight": "לא פורסם",
+   "range": "לא פורסם",
+   "speed": "25 קמ״ש לפי החוק בישראל",
+   "charging": "מטען 54.6V",
+   "display": "צג דיגיטלי",
+   "lights": "תאורה קדמית ואחורית חזקה",
+   "extras": "מושב מחוזק להרכבת ילד או מטען",
+   "overview": "ה-Hunter X2 הוא דגם של Jager, שמשווקים ממליצים עליו למתחילים ולמי שמחפש מחיר נגיש. יש לו שיכוך מלא הידראולי, חישוקי מגנזיום ומושב מחוזק.",
+   "electric": "סוללת 48V ‏13Ah ‏(כ-624Wh). זו סוללה קטנה יחסית בקטגוריה, ולכן הטווח קצר יותר, והיא נפרקת עמוק מהר יותר בשימוש יומיומי ארוך. חישוקי מגנזיום יצוקים לא משנים את החשמל, אבל כבל המנוע יוצא מהציר בלי חישורים שמגנים עליו – צריך לוודא שהוא מקובע היטב.",
+   "strengths": [
+    "מחיר נגיש לקטגוריה",
+    "שיכוך מלא",
+    "חישוקי מגנזיום בלי חישורים לכוונן",
+    "מושב מחוזק"
+   ],
+   "faults": [
+    "טווח שנגמר מהר בשימוש כבד – סוללה קטנה",
+    "כבל מנוע חשוף ביציאה מהציר",
+    "חיישני בלם שזזים אחרי נפילה"
+   ],
+   "maintenance": [
+    "טעינה אחרי כל נסיעה ארוכה",
+    "בדיקת קיבוע כבל המנוע ליד הציר",
+    "בדיקת בולמים ורפידות"
+   ],
+   "compNotes": {},
+   "omit": [
+    "alarm"
+   ],
+   "geom": {
+    "frame": "#2e5d34",
+    "rough": 0.6,
+    "metal": 0.3,
+    "accent": "#d9d9d9",
+    "wheels": "mag",
+    "tireR": 0.042,
+    "R": 0.28,
+    "seat": "long",
+    "fork": "std",
+    "fold": true,
+    "shock": "coil",
+    "shockColor": "#ff7a00"
+   },
+   "sources": "משווקים ישראליים (Wheel-E, ‏Urbanico, ‏Pumba). חלק מהנתונים לא פורסמו – מסומנים כך.",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "לא פורסם",
+    "conf": "unk"
+   },
+   "connectors": {
+    "power": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "charge": {
+     "v": "שקע DC/XLR",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Julet 9 (טיפוסי)",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "Julet 5 (טיפוסי)",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "קודי הצג לא פורסמו."
+   },
+   "failureWeights": {
+    "batt_low": 1.4,
+    "batt_aged": 1.4,
+    "motor_cable": 1.6,
+    "brake_stuck": 1.3,
+    "loose_harness": 1.4
+   },
+   "commonFailures": [
+    {
+     "t": "טווח קצר בשימוש כבד – סוללה קטנה (624Wh)",
+     "cause": "batt_aged",
+     "w": 0.6
+    },
+    {
+     "t": "כבל מנוע חשוף ביציאה מהציר (חישוק מגנזיום)",
+     "cause": "motor_cable",
+     "w": 0.6
+    },
+    {
+     "t": "חיישני בלם זזים אחרי נפילה",
+     "cause": "brake_stuck",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "unk",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "unk",
+    "range": "unk",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "39–54.6V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-39V: סוללה פרוקה. מעל 54.6V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 53.4,
+     "max": 55.8,
+     "expect": "≈ 54.6V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_5v",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אספקת 5V ל-PAS",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-PAS",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: כבל PAS קרוע ליד הציר.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_sig",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אות PAS בסיבוב פדלים",
+     "mode": "DC V · 20V",
+     "red": "חוט האות (כחול/ירוק/לבן)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "פולסים 0V ↔ כ-5V עם כל מגנט",
+     "bad": "אין פולסים: מרווח/דיסק הפוך/חיישן.",
+     "meas": "m_pas",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 48,
+     "cells": "13S",
+     "full": 54.6,
+     "empty": 39,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 54.6,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    },
+    "pas": {
+     "v": "פולסים 0/5V",
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_stem",
+    "tq_crank",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "alphaGT": {
+   "cat": "ebike",
+   "layout": "fatFull",
+   "brand": "Jager / Neuron",
+   "name": "AlphaGT X2 Sport",
+   "short": "AlphaGT X2",
+   "kind": "מיני פאט ספורטיבי עם שיכוך מלא",
+   "voltage": 60,
+   "ah": 21,
+   "wh": 1260,
+   "motor": {
+    "nominal": "250W",
+    "peak": "800W",
+    "pos": "rear",
+    "type": "Hub אחורי מחוזק ללא מברשות"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "40A (Jager)",
+    "loc": "בשלדה (משוער)"
+   },
+   "tires": "20 × 3 אינץ׳ על חישוקי מגנזיום",
+   "brakes": "דיסק הידראוליים",
+   "suspension": "שיכוך מלא, מזלג קדמי רחב",
+   "weight": "27 ק״ג",
+   "range": "40–50 ק״מ (לפי המשווק)",
+   "speed": "25 קמ״ש לפי החוק בישראל",
+   "charging": "מטען 67.2V (לסוללת 60V)",
+   "display": "LCD צבעוני: מהירות, סוללה, מרחק ותאורה",
+   "lights": "פנס קדמי ואחורי",
+   "extras": "שלדת אלומיניום 6061, עומס מרבי 120 ק״ג",
+   "overview": "ה-AlphaGT X2 Sport הוא דגם ספורטיבי של Jager: סוללת 60V, בקר 40A ומנוע של 800W בשיא. משווקים ממליצים עליו לרוכבים מנוסים. יש משווקים שמציינים סוללה של 21Ah ויש שמציינים 18Ah.",
+   "electric": "זה אחד הדגמים היחידים בקטגוריה עם 60V ‏(16S): מלאה 67.2V וריקה כ-48V. בקר של 40A הוא זרם גבוה, ולכן יש חשיבות גדולה למחברים איכותיים ולכבלי הספק ופאזות עבים. מחבר רופף יתחמם כאן מהר יותר מאשר בדגם 48V ‏20A.",
+   "strengths": [
+    "מתח 60V – הספק שיא גבוה",
+    "בקר 40A",
+    "חישוקי מגנזיום",
+    "LCD צבעוני"
+   ],
+   "faults": [
+    "מחברי הספק ופאזות מתחממים מזרם גבוה",
+    "חשוב לטעון רק במטען של 60V ‏(67.2V)",
+    "בלאי מהיר של צמיג אחורי ורפידות"
+   ],
+   "maintenance": [
+    "בדיקת מחברי XT או Anderson להשחרה",
+    "מטען מקורי בלבד",
+    "בדיקת בלמים תכופה",
+    "לא להגדיר מגבלות מהירות מעבר לחוק"
+   ],
+   "compNotes": {
+    "controller": "40A הוא זרם גבוה לאופניים. מחבר שמתחמם הוא סימן אזהרה – לעצור ולבדוק."
+   },
+   "omit": [
+    "alarm"
+   ],
+   "geom": {
+    "frame": "#15181c",
+    "rough": 0.42,
+    "metal": 0.6,
+    "accent": "#ff3b3b",
+    "wheels": "mag",
+    "tireR": 0.042,
+    "R": 0.28,
+    "seat": "sofa",
+    "fork": "dh",
+    "fold": true,
+    "shock": "coil",
+    "shockColor": "#ff3b3b"
+   },
+   "sources": "משווקים ישראליים (Wheel-E, ‏אופני דניאל, ‏Softride, אקופאן).",
+   "controllerAmpsNum": 40,
+   "displayProtocol": {
+    "v": "LCD צבעוני – פרוטוקול לא פורסם",
+    "conf": "unk"
+   },
+   "connectors": {
+    "power": {
+     "v": "XT90 / Anderson (טיפוסי לזרם 40A)",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "שקע XLR/DC",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Julet 9 / Higo (טיפוסי)",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "Julet 5 (טיפוסי)",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "קודי הצג לא פורסמו."
+   },
+   "failureWeights": {
+    "conn_power": 1.8,
+    "phase_conn": 1.6,
+    "ctrl_thermal": 1.4,
+    "loose_harness": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "מחברי הספק ופאזות מתחממים מזרם 40A",
+     "cause": "conn_power",
+     "w": 0.7
+    },
+    {
+     "t": "מחבר פאזות מושחר",
+     "cause": "phase_conn",
+     "w": 0.6
+    },
+    {
+     "t": "בקר חם בעליות ארוכות",
+     "cause": "ctrl_thermal",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "סוללה",
+     "issue": "משווקים מציינים 21Ah או 18Ah – ‏1260Wh או 1080Wh.",
+     "sev": "typ"
+    },
+    {
+     "field": "מנוע",
+     "issue": "שיא 800W לא מתיישב עם בקר 40A על 60V (עד כ-2400W תיאורטי). אחד הנתונים כנראה לא מדויק או שהבקר מוגבל בתוכנה.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "typ",
+    "motor": "ok",
+    "controller": "typ",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "typ",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "48–67.2V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-48V: סוללה פרוקה. מעל 67.2V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 66,
+     "max": 68.4,
+     "expect": "≈ 67.2V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_5v",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אספקת 5V ל-PAS",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-PAS",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: כבל PAS קרוע ליד הציר.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_sig",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אות PAS בסיבוב פדלים",
+     "mode": "DC V · 20V",
+     "red": "חוט האות (כחול/ירוק/לבן)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "פולסים 0V ↔ כ-5V עם כל מגנט",
+     "bad": "אין פולסים: מרווח/דיסק הפוך/חיישן.",
+     "meas": "m_pas",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 60,
+     "cells": "16S",
+     "full": 67.2,
+     "empty": 48,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 67.2,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": 40,
+     "conf": "ok"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    },
+    "pas": {
+     "v": "פולסים 0/5V",
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_stem",
+    "tq_crank",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "mateX": {
+   "cat": "ebike",
+   "layout": "fatFull",
+   "brand": "MATE.Bike",
+   "name": "MATE X",
+   "short": "MATE X",
+   "kind": "אופניים מתקפלים עם צמיגים רחבים ושיכוך מלא",
+   "voltage": 48,
+   "ah": 14.5,
+   "wh": 696,
+   "motor": {
+    "nominal": "250W",
+    "peak": "לא פורסם",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בשלדה (משוער)"
+   },
+   "tires": "20 × 4 אינץ׳",
+   "brakes": "דיסק הידראוליים",
+   "suspension": "מזלג קדמי ובולם אחורי",
+   "weight": "לא פורסם",
+   "range": "עד 120 ק״מ (לפי היצרן, תלוי ברמת העזר)",
+   "speed": "25 קמ״ש",
+   "charging": "מטען 54.6V; סוללות של 12–17.5Ah לפי גרסה",
+   "display": "צג צבעוני חכם",
+   "lights": "תאורה משולבת",
+   "extras": "7 רמות עזר עם חיישן סל״ד (Cadence), שלדה מתקפלת, תיבת הילוכים",
+   "overview": "MATE הוא מותג דני שהפך לפופולרי גם בישראל. ה-MATE X משלב שלדה מתקפלת, צמיגים של 4 אינץ׳ ושיכוך מלא בעיצוב נקי, עם תאורה משולבת בשלדה. בגרסה האירופית אין מצערת – רק עזר דיווש (PAS).",
+   "electric": "סוללת 48V (בגרסאות 12–17.5Ah; כאן 14.5Ah ‏≈696Wh) מזינה מנוע Hub אחורי של 250W. ההנעה מבוססת על חיישן סל״ד (Cadence) עם 7 רמות עזר: הבקר מזהה שהפדלים מסתובבים ומוסיף הספק לפי הרמה. בלי מצערת אין אות מצערת ברתמה, והאבחון של ״אין הנעה״ מתחיל מה-PAS ומהבלמים.",
+   "strengths": [
+    "עיצוב נקי ותאורה משולבת",
+    "מתקפלים",
+    "7 רמות עזר",
+    "טווח טוב ביחס לסוללה"
+   ],
+   "faults": [
+    "חיישן PAS: מרווח או דיסק שזזו – אין עזר",
+    "כבלים בציר הקיפול",
+    "בגרסאות מסוימות: תקלות צג אחרי חדירת מים"
+   ],
+   "maintenance": [
+    "בדיקת מרווח חיישן ה-PAS",
+    "בדיקת כבלים בציר הקיפול",
+    "כוונון הילוכים ושרשרת"
+   ],
+   "compNotes": {
+    "pas": "ב-MATE X אין מצערת, ולכן ה-PAS הוא המקור היחיד לפקודת הנעה."
+   },
+   "omit": [
+    "alarm",
+    "throttle"
+   ],
+   "geom": {
+    "frame": "#3b4a52",
+    "rough": 0.55,
+    "metal": 0.35,
+    "accent": "#e7e2d4",
+    "wheels": "spoke",
+    "tireR": 0.05,
+    "R": 0.305,
+    "seat": "saddle",
+    "fork": "std",
+    "fold": true,
+    "shock": "coil",
+    "shockColor": "#e7e2d4",
+    "gears": true
+   },
+   "sources": "mate.bike, ‏Eway ומשווקים. חלק מהנתונים לא פורסמו – מסומנים כך.",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "צג MATE ייעודי",
+    "conf": "typ"
+   },
+   "connectors": {
+    "power": {
+     "v": "ייעודי MATE",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "שקע ייעודי",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Higo/Julet (טיפוסי)",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "ייעודי",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "קודי MATE לא נכללו במאגר. בדקו את מדריך היצרן או פנו לשירות."
+   },
+   "failureWeights": {
+    "pas_gap": 2,
+    "pas_sensor": 1.6,
+    "loose_harness": 1.6,
+    "display_comm": 1.4,
+    "water_ingress": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "חיישן PAS: מרווח או דיסק זזו – אין עזר",
+     "cause": "pas_gap",
+     "w": 0.8
+    },
+    {
+     "t": "כבלים בציר הקיפול",
+     "cause": "loose_harness",
+     "w": 0.6
+    },
+    {
+     "t": "תקלות צג אחרי חדירת מים",
+     "cause": "water_ingress",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "טווח",
+     "issue": "עד 120 ק״מ על 696Wh = כ-5.8Wh לק״מ – אופטימי מאוד (רמת עזר נמוכה במיוחד). בפועל צפו ל-40–70 ק״מ.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "typ",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "unk",
+    "range": "typ",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "39–54.6V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-39V: סוללה פרוקה. מעל 54.6V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 53.4,
+     "max": 55.8,
+     "expect": "≈ 54.6V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 39,
+     "max": 54.6,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_5v",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אספקת 5V לחיישנים (במחבר ה-PAS)",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-PAS",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_pas_sig",
+     "comp": "pas",
+     "bundle": "pas",
+     "name": "אות PAS בסיבוב פדלים",
+     "mode": "DC V · 20V",
+     "red": "חוט האות (כחול/ירוק/לבן)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "פולסים 0V ↔ כ-5V עם כל מגנט",
+     "bad": "אין פולסים: מרווח/דיסק הפוך/חיישן.",
+     "meas": "m_pas",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 48,
+     "cells": "13S",
+     "full": 54.6,
+     "empty": 39,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 54.6,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "pas": {
+     "v": "פולסים 0/5V",
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_stem",
+    "tq_crank",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "oxo": {
+   "cat": "scooter",
+   "layout": "scooterDual",
+   "brand": "Inokim",
+   "name": "Inokim OXO",
+   "short": "Inokim OXO",
+   "kind": "קורקינט הנעה כפולה עם שיכוך קדמי ואחורי",
+   "voltage": 60,
+   "ah": 25.6,
+   "wh": 1536,
+   "motor": {
+    "nominal": "2 × 1000W",
+    "peak": "2 × 1300W",
+    "pos": "dual",
+    "type": "שני מנועי Hub, קדמי ואחורי"
+   },
+   "controller": {
+    "count": 2,
+    "amps": "לא פורסם",
+    "loc": "בתוך הפלטפורמה, אחד לכל מנוע (משוער)"
+   },
+   "tires": "10 אינץ׳ פנאומטיים",
+   "brakes": "דיסק הידראוליים קדמי ואחורי",
+   "suspension": "זרועות מתנדנדות מתכווננות, קדמי ואחורי",
+   "weight": "33.5 ק״ג",
+   "range": "עד כ-110 ק״מ (לפי היצרן)",
+   "speed": "עד כ-65 קמ״ש בגרסה פתוחה – בישראל מוגבל ל-25 קמ״ש",
+   "charging": "מטען 67.2V, כ-13.5 שעות במטען רגיל",
+   "display": "LCD עם תאורה אחורית מתכווננת: מהירות, סוללה, מרחק, מצב ושיוט",
+   "lights": "פנס קדמי ואור אחורי",
+   "extras": "מידות 122 × 59 × 130 ס״מ, כידון מתקפל",
+   "overview": "ה-OXO הוא ספינת הדגל של Inokim, מותג שנוסד בישראל: שני מנועים של 1000W, סוללת LG של 60V ‏25.6Ah ושיכוך מתכוונן מלפנים ומאחור. הוא כבד (33.5 ק״ג) וחזק מאוד, ובגרסה הישראלית מוגבל בחוק ל-25 קמ״ש.",
+   "electric": "בתוך הפלטפורמה יש סוללה אחת שמזינה שני בקרים – אחד לכל מנוע. הבקר הקדמי מקבל את הכבלים מהכידון (מצערת, בלמים, צג) ומעביר פקודות לבקר האחורי בכבל תקשורת. תקלה בבקר, במנוע או בכבל התקשורת גורמת לכך שרק גלגל אחד מניע.",
+   "strengths": [
+    "הנעה כפולה – אחיזה וטיפוס מצוינים",
+    "סוללה גדולה מאוד",
+    "שיכוך מתכוונן",
+    "איכות בנייה גבוהה"
+   ],
+   "faults": [
+    "רק גלגל אחד מניע: בקר, מנוע או כבל תקשורת",
+    "כבל המנוע הקדמי נשחק ליד הזרוע",
+    "חדירת מים לפלטפורמה"
+   ],
+   "maintenance": [
+    "כוונון השיכוך לפי משקל הרוכב",
+    "בדיקת כבלים ליד הזרועות",
+    "בדיקת בלמים הידראוליים",
+    "טעינה במטען המקורי בלבד"
+   ],
+   "compNotes": {},
+   "omit": [],
+   "geom": {
+    "body": "#2b3037",
+    "trim": "#3a4149",
+    "can": "#c9772b",
+    "R": 0.128,
+    "tireR": 0.034,
+    "stem": "single",
+    "deckLights": false,
+    "fitW": 1.35,
+    "fitH": 1.42
+   },
+   "sources": "מפרטים פומביים של Inokim ומשווקים. המידות הכלליות אמיתיות; פרטים פנימיים משוערים.",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "Inokim ייעודי",
+    "conf": "typ"
+   },
+   "connectors": {
+    "power": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "charge": {
+     "v": "שקע עגול (GX16 טיפוסי)",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "display": {
+     "v": "ייעודי",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [
+     "Inokim"
+    ],
+    "conf": "typ",
+    "note": "קוד E1 מבוסס מקורות שירות. רשמו כל קוד אחר ופנו למשווק."
+   },
+   "failureWeights": {
+    "rear_ctrl_link": 1.8,
+    "motor_front": 1.5,
+    "water_ingress": 1.5,
+    "conn_power": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "רק גלגל אחד מניע – בקר, מנוע או כבל תקשורת",
+     "cause": "rear_ctrl_link",
+     "w": 0.8
+    },
+    {
+     "t": "כבל המנוע הקדמי נשחק ליד הזרוע",
+     "cause": "motor_front",
+     "w": 0.6
+    },
+    {
+     "t": "חדירת מים לפלטפורמה",
+     "cause": "water_ingress",
+     "w": 0.5
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "טעינה",
+     "issue": "13.5 שעות ל-25.6Ah מרמזות על מטען של כ-2A בלבד. זה סביר למטען הבסיסי – לאמת.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "ok",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "ok",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "48–67.2V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-48V: סוללה פרוקה. מעל 67.2V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר הקדמי",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrlR_in",
+     "comp": "controllerRear",
+     "bundle": "powerR",
+     "name": "מתח בכניסת הבקר האחורי",
+     "mode": "DC V · 200V",
+     "red": "אדום בכניסת הבקר האחורי",
+     "black": "שחור בכניסת הבקר האחורי",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "0V: מחבר או נתיך של הבקר האחורי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 66,
+     "max": 68.4,
+     "expect": "≈ 67.2V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 48,
+     "max": 67.2,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall – מנוע אחורי",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי – מנוע אחורי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות – מנוע אחורי",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע – מנוע אחורי",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_hall_5vF",
+     "comp": "motorFront",
+     "bundle": "hallF",
+     "name": "אספקת 5V לחיישני Hall – מנוע קדמי",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sigF",
+     "comp": "motorFront",
+     "bundle": "hallF",
+     "name": "אותות Hall בסיבוב איטי – מנוע קדמי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": null,
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_rF",
+     "comp": "motorFront",
+     "bundle": "phaseF",
+     "name": "התנגדות בין פאזות – מנוע קדמי",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": null,
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axleF",
+     "comp": "motorFront",
+     "bundle": "phaseF",
+     "name": "בידוד פאזה לגוף המנוע – מנוע קדמי",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    },
+    {
+     "id": "tp_link",
+     "comp": "controllerRear",
+     "bundle": "link",
+     "name": "כבל התקשורת בין הבקרים",
+     "mode": "רציפות (צפצוף)",
+     "red": "פין בקצה אחד",
+     "black": "אותו פין בקצה השני",
+     "live": false,
+     "unit": "",
+     "expect": "רציפות בכל החוטים",
+     "bad": "אין רציפות: כבל קרוע/מחבר רטוב – רק גלגל אחד מניע.",
+     "meas": "m_link",
+     "conf": "typ"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 60,
+     "cells": "16S",
+     "full": 67.2,
+     "empty": 48,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 67.2,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_bar",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "thunder3": {
+   "cat": "scooter",
+   "layout": "scooterDual",
+   "brand": "Minimotors (Dualtron)",
+   "name": "Dualtron Thunder 3",
+   "short": "Dualtron Thunder 3",
+   "kind": "קורקינט ביצועים עם הנעה כפולה",
+   "voltage": 72,
+   "ah": 40,
+   "wh": 2880,
+   "motor": {
+    "nominal": "2 מנועי BLDC",
+    "peak": "עד 5400W כל אחד",
+    "pos": "dual",
+    "type": "שני מנועי Hub, קדמי ואחורי"
+   },
+   "controller": {
+    "count": 2,
+    "amps": "2 × 50A (עד 65A בשיא)",
+    "loc": "בפלטפורמה (משוער)"
+   },
+   "tires": "11 אינץ׳ רחבים, ללא פנימית, עם שכבה אוטומטית נגד תקרים",
+   "brakes": "הידראוליים NUTT עם 4 בוכנות ודיסקים של 160 מ״מ",
+   "suspension": "קדמי ואחורי מתכוונן, עם 5 אפשרויות מחסנית",
+   "weight": "כ-51 ק״ג (112 ליברות)",
+   "range": "עד 170 ק״מ (לפי היצרן)",
+   "speed": "עד כ-100 קמ״ש – אסור לרכיבה בכביש בישראל",
+   "charging": "מטען 84V (לסוללת 72V)",
+   "display": "LCD מרכזי IPX7 עם Bluetooth",
+   "lights": "תאורה קדמית ואחורית ופסי LED",
+   "extras": "מחברי Higo, עמידות IPX5, מנגנון קיפול חדש",
+   "overview": "ה-Thunder 3 הוא אחד הקורקינטים החזקים בשוק: סוללת LG של 72V ‏40Ah, שני בקרים של 50A ושני מנועים. הוא מוכר מאוד בקרב חובבי ביצועים בישראל. המהירות שלו חורגת בהרבה מהמותר בחוק, ולכן אסור לרכוב עליו בכביש.",
+   "electric": "72V ‏(20S) הוא מתח מסוכן במגע: מלאה 84V. שני בקרים של 50A ומחברי Higo אטומים. בזרמים כאלה כל מחבר רופף מתחמם במהירות. עבודה על החשמל של כלי כזה – רק במעבדה מוסמכת.",
+   "strengths": [
+    "ביצועים ועוצמה חריגים",
+    "סוללה עצומה (2880Wh)",
+    "בלמים הידראוליים חזקים",
+    "מחברים אטומים"
+   ],
+   "faults": [
+    "התחממות מחברים ובקרים בעומס",
+    "משקל גבוה – עומס על ציר הקיפול",
+    "רכיבה בכביש אינה חוקית בישראל"
+   ],
+   "maintenance": [
+    "עבודת חשמל רק אצל טכנאי",
+    "בדיקת הידוק ציר הקיפול",
+    "בדיקת בלמים ושיכוך תכופה"
+   ],
+   "compNotes": {
+    "battery": "72V – מתח מסוכן. אין לעבוד על המערכת בבית."
+   },
+   "omit": [],
+   "legal": "המהירות והעוצמה של הדגם חורגות מהמותר לרכיבה בכביש בישראל. המעבדה מציגה אותו לצורכי לימוד בלבד.",
+   "geom": {
+    "body": "#1a1c20",
+    "trim": "#2c2f35",
+    "can": "#d7263d",
+    "R": 0.14,
+    "tireR": 0.042,
+    "stem": "double",
+    "deckLights": true,
+    "fitW": 1.45,
+    "fitH": 1.45
+   },
+   "sources": "Minimotors ומשווקים בינלאומיים (Dualtron USA, ‏Fatdaddy).",
+   "controllerAmpsNum": 50,
+   "displayProtocol": {
+    "v": "Minimotors (EY/QS) – ייעודי",
+    "conf": "typ"
+   },
+   "connectors": {
+    "power": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "charge": {
+     "v": "שני שקעי טעינה (טיפוסי לדגם)",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "Higo (לפי המשווקים)",
+     "conf": "ok"
+    },
+    "display": {
+     "v": "Higo (לפי המשווקים)",
+     "conf": "ok"
+    }
+   },
+   "errorCodes": {
+    "families": [],
+    "conf": "unk",
+    "note": "קודי Minimotors לא נכללו במאגר. בדגם 72V – כל עבודה חשמלית רק אצל טכנאי."
+   },
+   "failureWeights": {
+    "conn_power": 1.8,
+    "phase_conn": 1.6,
+    "ctrl_thermal": 1.6,
+    "rear_ctrl_link": 1.4,
+    "motor_front": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "התחממות מחברים ובקרים בעומס",
+     "cause": "ctrl_thermal",
+     "w": 0.7
+    },
+    {
+     "t": "מחברי הספק מתחממים",
+     "cause": "conn_power",
+     "w": 0.6
+    },
+    {
+     "t": "משקל גבוה – עומס על ציר הקיפול והכבלים בו",
+     "cause": "loose_harness",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "מנוע",
+     "issue": "״עד 5400W כל מנוע״ גבוה מ-72V × 65A ≈ 4680W. כנראה ערך שיווקי – לא לתכנן לפיו.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "typ",
+    "controller": "typ",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "ok",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 60,
+     "max": 84,
+     "expect": "60–84V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-60V: סוללה פרוקה. מעל 84V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר הקדמי",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 60,
+     "max": 84,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrlR_in",
+     "comp": "controllerRear",
+     "bundle": "powerR",
+     "name": "מתח בכניסת הבקר האחורי",
+     "mode": "DC V · 200V",
+     "red": "אדום בכניסת הבקר האחורי",
+     "black": "שחור בכניסת הבקר האחורי",
+     "live": true,
+     "unit": "V",
+     "min": 60,
+     "max": 84,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "0V: מחבר או נתיך של הבקר האחורי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 82.8,
+     "max": 85.2,
+     "expect": "≈ 84V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 60,
+     "max": 84,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall – מנוע אחורי",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי – מנוע אחורי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות – מנוע אחורי",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע – מנוע אחורי",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_hall_5vF",
+     "comp": "motorFront",
+     "bundle": "hallF",
+     "name": "אספקת 5V לחיישני Hall – מנוע קדמי",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sigF",
+     "comp": "motorFront",
+     "bundle": "hallF",
+     "name": "אותות Hall בסיבוב איטי – מנוע קדמי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": null,
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_rF",
+     "comp": "motorFront",
+     "bundle": "phaseF",
+     "name": "התנגדות בין פאזות – מנוע קדמי",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": null,
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axleF",
+     "comp": "motorFront",
+     "bundle": "phaseF",
+     "name": "בידוד פאזה לגוף המנוע – מנוע קדמי",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    },
+    {
+     "id": "tp_link",
+     "comp": "controllerRear",
+     "bundle": "link",
+     "name": "כבל התקשורת בין הבקרים",
+     "mode": "רציפות (צפצוף)",
+     "red": "פין בקצה אחד",
+     "black": "אותו פין בקצה השני",
+     "live": false,
+     "unit": "",
+     "expect": "רציפות בכל החוטים",
+     "bad": "אין רציפות: כבל קרוע/מחבר רטוב – רק גלגל אחד מניע.",
+     "meas": "m_link",
+     "conf": "typ"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 72,
+     "cells": "20S",
+     "full": 84,
+     "empty": 60,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 84,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": 50,
+     "conf": "ok"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_bar",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "g30": {
+   "cat": "scooter",
+   "layout": "scooter",
+   "brand": "Segway-Ninebot",
+   "name": "Segway Ninebot MAX G30",
+   "short": "Ninebot MAX G30",
+   "kind": "קורקינט עירוני לטווח ארוך",
+   "voltage": 36,
+   "ah": 15.3,
+   "wh": 551,
+   "motor": {
+    "nominal": "350W",
+    "peak": "לא פורסם",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בפלטפורמה, בחלק הקדמי (משוער)"
+   },
+   "tires": "10 אינץ׳ פנאומטיים ללא פנימית",
+   "brakes": "תוף קדמי ובלם חשמלי אחורי",
+   "suspension": "ללא",
+   "weight": "18.7 ק״ג",
+   "range": "עד 65 ק״מ (לפי היצרן)",
+   "speed": "25 קמ״ש בישראל",
+   "charging": "מטען מובנה בפלטפורמה – מחברים כבל חשמל רגיל",
+   "display": "צג משולב בכידון",
+   "lights": "פנס קדמי ואור אחורי",
+   "extras": "Smart-BMS, אפליקציה",
+   "overview": "ה-MAX G30 הוא אחד הקורקינטים הנפוצים בעולם ובישראל, ומוכר בעמידות ובטווח שלו. אין לו שיכוך, אבל הצמיגים הם 10 אינץ׳ ללא פנימית, והבלמים (תוף ובלם חשמלי) דורשים תחזוקה מועטה.",
+   "electric": "סוללת 36V ‏(10S) ‏15.3Ah ‏(551Wh) עם Smart-BMS. מה שמיוחד בדגם הוא המטען המובנה: הוא יושב בתוך הפלטפורמה, ולכן שקע הטעינה מקבל חשמל ביתי (AC) ולא מתח DC נמוך. אסור לפתוח את הפלטפורמה כשהקורקינט מחובר לחשמל. הבלם האחורי חשמלי – הבקר בולם בעזרת המנוע.",
+   "strengths": [
+    "טווח ארוך",
+    "עמידות ותחזוקה נמוכה",
+    "מטען מובנה – אין מטען חיצוני לסחוב",
+    "צמיגים ללא פנימית"
+   ],
+   "faults": [
+    "קודי שגיאה של Ninebot: 10 תקשורת, 14 מצערת, 15 בלם, 18 Hall",
+    "רפיון בציר הקיפול",
+    "חדירת מים דרך שקע הטעינה"
+   ],
+   "maintenance": [
+    "כוונון בלם התוף הקדמי",
+    "הידוק ציר הקיפול",
+    "סגירת מכסה שקע הטעינה"
+   ],
+   "compNotes": {
+    "chargePort": "שקע AC – המטען בפנים. לא לפתוח את הפלטפורמה כשהקורקינט מחובר לחשמל.",
+    "brakes": "הבלם האחורי חשמלי (דרך המנוע), והקדמי תוף מכני."
+   },
+   "omit": [],
+   "geom": {
+    "body": "#3a3f45",
+    "accent": "#d9dde2",
+    "R": 0.127,
+    "tireR": 0.03,
+    "deckLen": 0.62,
+    "deckW": 0.18,
+    "deckY": 0.115,
+    "stemTop": 1.02,
+    "stemR": 0.02,
+    "motor": "rear",
+    "battery": "deck",
+    "susp": false,
+    "brakeF": "drum",
+    "fitW": 1.3,
+    "fitH": 1.25
+   },
+   "sources": "Segway (G30LP / G30P) וסקירות (EScooterNerds, ‏RiderGuide).",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "Ninebot ייעודי (Dashboard)",
+    "conf": "ok"
+   },
+   "connectors": {
+    "power": {
+     "v": "ייעודי Ninebot",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "שקע AC – מטען מובנה בפלטפורמה",
+     "conf": "ok"
+    },
+    "motor": {
+     "v": "ייעודי",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "ייעודי (עובר בעמוד ההיגוי)",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [
+     "Xiaomi"
+    ],
+    "conf": "typ",
+    "note": "קודי Ninebot דומים ברובם לקודי Xiaomi, אבל לא זהים. אמתו במדריך G30."
+   },
+   "failureWeights": {
+    "display_comm": 1.8,
+    "loose_harness": 1.5,
+    "charge_port": 1.4,
+    "charger_fault": 0.8,
+    "water_ingress": 1.3
+   },
+   "commonFailures": [
+    {
+     "t": "קוד 10 – כבל התקשורת בעמוד ההיגוי/ציר הקיפול",
+     "cause": "display_comm",
+     "w": 0.8
+    },
+    {
+     "t": "רפיון בציר הקיפול – כבלים נשחקים",
+     "cause": "loose_harness",
+     "w": 0.5
+    },
+    {
+     "t": "חדירת מים דרך שקע הטעינה",
+     "cause": "water_ingress",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "טווח",
+     "issue": "65 ק״מ על 551Wh = כ-8.5Wh לק״מ – בתנאי יצרן (רוכב קל, מהירות נמוכה). בפועל 35–45 ק״מ.",
+     "sev": "typ"
+    }
+   ],
+   "builtInCharger": true,
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "typ",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "typ",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "30–42V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-30V: סוללה פרוקה. מעל 42V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "שקע טעינה (מטען מובנה – AC)",
+     "mode": "—",
+     "red": "—",
+     "black": "—",
+     "live": false,
+     "unit": "",
+     "expect": "אין מדידת DC בשקע – זה חשמל ביתי",
+     "bad": "לא פותחים את הפלטפורמה כשהקורקינט מחובר לחשמל. תקלת טעינה – לשירות.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 36,
+     "cells": "10S",
+     "full": 42,
+     "empty": 30,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": "מטען מובנה (שקע AC)",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_lever",
+    "tq_bar",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "g2": {
+   "cat": "scooter",
+   "layout": "scooter",
+   "brand": "Segway-Ninebot",
+   "name": "Segway Ninebot MAX G2",
+   "short": "Ninebot MAX G2",
+   "kind": "קורקינט עירוני עם שיכוך",
+   "voltage": 36,
+   "ah": 15.3,
+   "wh": 551,
+   "motor": {
+    "nominal": "450W",
+    "peak": "כ-1000W",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בפלטפורמה (משוער)"
+   },
+   "tires": "10 אינץ׳ ללא פנימית",
+   "brakes": "תוף קדמי ובלימה חשמלית רגנרטיבית",
+   "suspension": "הידראולי קדמי וקפיצים אחוריים",
+   "weight": "24.3 ק״ג",
+   "range": "עד כ-70 ק״מ (לפי היצרן)",
+   "speed": "25 קמ״ש בישראל",
+   "charging": "מטען מובנה (לפי המשווקים)",
+   "display": "צג משולב",
+   "lights": "פנס קדמי, אור אחורי ואיתותים",
+   "extras": "עומס מרבי כ-120 ק״ג",
+   "overview": "הדור הבא של ה-MAX: מנוע חזק יותר (450W), שיכוך קדמי ואחורי ואיתותים. משווקים בישראל ממליצים עליו למי שמחפש טווח ארוך ונוחות.",
+   "electric": "אותה סוללה כמו ב-G30: ‏36V ‏15.3Ah ‏(551Wh), אבל עם מנוע של 450W. בגלל המנוע החזק הזרם גבוה יותר, ולכן הטווח בפועל תלוי מאוד בסגנון הרכיבה. הבלימה הרגנרטיבית מחזירה קצת אנרגיה לסוללה. האיתותים מוסיפים לרתמה כבלים לכידון ולאחור.",
+   "strengths": [
+    "שיכוך קדמי ואחורי",
+    "מנוע חזק יותר מה-G30",
+    "איתותים",
+    "צמיגים ללא פנימית"
+   ],
+   "faults": [
+    "כבלי האיתות והתאורה בציר הקיפול",
+    "בלאי במזלג ההידראולי",
+    "קודי שגיאה בסגנון Ninebot"
+   ],
+   "maintenance": [
+    "בדיקת המזלג הקדמי",
+    "כוונון בלם התוף",
+    "בדיקת האיתותים לפני רכיבת לילה"
+   ],
+   "compNotes": {
+    "lightFront": "ב-G2 יש גם איתותים בכידון – כבלים נוספים שעוברים בעמוד."
+   },
+   "omit": [],
+   "geom": {
+    "body": "#2e3238",
+    "accent": "#e7e7e7",
+    "R": 0.127,
+    "tireR": 0.032,
+    "deckLen": 0.64,
+    "deckW": 0.19,
+    "deckY": 0.13,
+    "stemTop": 1.04,
+    "stemR": 0.022,
+    "motor": "rear",
+    "battery": "deck",
+    "susp": true,
+    "signals": true,
+    "brakeF": "drum",
+    "fitW": 1.32,
+    "fitH": 1.27
+   },
+   "sources": "סקירות ומפרטים (ERideHero, ‏RiderGuide, ‏Electric Kicks).",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "Ninebot ייעודי",
+    "conf": "typ"
+   },
+   "connectors": {
+    "power": {
+     "v": "ייעודי Ninebot",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "מטען מובנה (לפי המשווקים)",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "ייעודי",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "ייעודי",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [
+     "Xiaomi"
+    ],
+    "conf": "typ",
+    "note": "קודים בסגנון Ninebot/Xiaomi – אמתו במדריך G2."
+   },
+   "failureWeights": {
+    "display_comm": 1.6,
+    "loose_harness": 1.6,
+    "mech_drag": 1.2
+   },
+   "commonFailures": [
+    {
+     "t": "כבלי האיתות והתאורה בציר הקיפול",
+     "cause": "loose_harness",
+     "w": 0.6
+    },
+    {
+     "t": "כבל הצג בעמוד ההיגוי",
+     "cause": "display_comm",
+     "w": 0.5
+    }
+   ],
+   "specFlags": [],
+   "builtInCharger": true,
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "typ",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "typ",
+    "speed": "ok",
+    "charging": "typ",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "30–42V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-30V: סוללה פרוקה. מעל 42V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "שקע טעינה (מטען מובנה – AC)",
+     "mode": "—",
+     "red": "—",
+     "black": "—",
+     "live": false,
+     "unit": "",
+     "expect": "אין מדידת DC בשקע – זה חשמל ביתי",
+     "bad": "לא פותחים את הפלטפורמה כשהקורקינט מחובר לחשמל. תקלת טעינה – לשירות.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 36,
+     "cells": "10S",
+     "full": 42,
+     "empty": 30,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": "מטען מובנה (שקע AC)",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_lever",
+    "tq_bar",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "xiaomi4pro": {
+   "cat": "scooter",
+   "layout": "scooter",
+   "brand": "Xiaomi",
+   "name": "Xiaomi Electric Scooter 4 Pro",
+   "short": "Xiaomi 4 Pro",
+   "kind": "קורקינט עירוני קל ונייד",
+   "voltage": 36,
+   "ah": 12.4,
+   "wh": 446,
+   "motor": {
+    "nominal": "350W",
+    "peak": "700W",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בפלטפורמה (משוער)"
+   },
+   "tires": "10 אינץ׳ DuraGel ללא פנימית, עם ג׳ל אוטם עצמי",
+   "brakes": "דיסק אחורי דו-צדדי ובלימה רגנרטיבית E-ABS",
+   "suspension": "ללא",
+   "weight": "17 ק״ג",
+   "range": "עד 55 ק״מ (לפי היצרן)",
+   "speed": "25 קמ״ש בישראל",
+   "charging": "מטען חיצוני 42V",
+   "display": "צג משולב בכידון",
+   "lights": "פנס קדמי ואור אחורי",
+   "extras": "שלדת אלומיניום, השבת אנרגיה מתכווננת באפליקציית Xiaomi Home, עומס מרבי 120 ק״ג",
+   "overview": "משווקים בישראל ממליצים על ה-4 Pro כאפשרות הניידת והקלה. הוא שוקל 17 ק״ג, והצמיגים שלו אוטמים את עצמם בתקר קטן.",
+   "electric": "סוללה של 446Wh מזינה מנוע אחורי של 350W (700W בשיא). 446Wh על 12.4Ah מתאים ל-36V – בדקו את המדבקה בכלי שלכם. בלימת E-ABS רגנרטיבית: הבקר בולם דרך המנוע ומחזיר אנרגיה לסוללה. את עוצמת ההשבה מכוונים באפליקציה.",
+   "strengths": [
+    "קל ונייד",
+    "צמיגים שאוטמים תקרים קטנים",
+    "בלם דיסק ובלימה רגנרטיבית",
+    "אפליקציה"
+   ],
+   "faults": [
+    "קודי שגיאה בסגנון Xiaomi: 10 תקשורת, 14 מצערת, 15 בלם, 18 Hall, 21 BMS",
+    "ציר הקיפול",
+    "כבלים נשחקים ליד עמוד ההיגוי"
+   ],
+   "maintenance": [
+    "כוונון בלם הדיסק",
+    "בדיקת ציר הקיפול",
+    "שמירה על לחץ אוויר"
+   ],
+   "compNotes": {},
+   "omit": [],
+   "geom": {
+    "body": "#26292e",
+    "accent": "#e2231a",
+    "R": 0.127,
+    "tireR": 0.03,
+    "deckLen": 0.58,
+    "deckW": 0.17,
+    "deckY": 0.12,
+    "stemTop": 1.03,
+    "stemR": 0.019,
+    "motor": "rear",
+    "battery": "deck",
+    "susp": false,
+    "brakeF": "none",
+    "brakeR": "disc",
+    "fitW": 1.25,
+    "fitH": 1.25
+   },
+   "sources": "Xiaomi (mi.com) וסקירות.",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "Xiaomi ייעודי",
+    "conf": "ok"
+   },
+   "connectors": {
+    "power": {
+     "v": "ייעודי Xiaomi",
+     "conf": "typ"
+    },
+    "charge": {
+     "v": "שקע עגול למטען 42V",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "ייעודי",
+     "conf": "typ"
+    },
+    "display": {
+     "v": "ייעודי (עובר בעמוד)",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [
+     "Xiaomi"
+    ],
+    "conf": "typ",
+    "note": "קודי Xiaomi – נבדקו בעיקר בסדרת M365. ב-4 Pro אמתו במדריך."
+   },
+   "failureWeights": {
+    "display_comm": 1.6,
+    "loose_harness": 1.4
+   },
+   "commonFailures": [
+    {
+     "t": "כבלים נשחקים ליד עמוד ההיגוי",
+     "cause": "loose_harness",
+     "w": 0.6
+    },
+    {
+     "t": "קוד 10 – תקשורת צג/בקר",
+     "cause": "display_comm",
+     "w": 0.5
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "סוללה",
+     "issue": "446Wh על 12.4Ah מתאים ל-36V. אם המדבקה בכלי שלכם שונה – עדכנו.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "ok",
+    "motor": "ok",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "ok",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "30–42V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-30V: סוללה פרוקה. מעל 42V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 40.8,
+     "max": 43.2,
+     "expect": "≈ 42V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 36,
+     "cells": "10S",
+     "full": 42,
+     "empty": 30,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 42,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_caliper",
+    "tq_rotor",
+    "tq_lever",
+    "tq_bar",
+    "tq_axle",
+    "tq_fold"
+   ]
+  },
+  "light2": {
+   "cat": "scooter",
+   "layout": "scooter",
+   "brand": "Inokim",
+   "name": "Inokim Light 2",
+   "short": "Inokim Light 2",
+   "kind": "קורקינט אולטרה-נייד",
+   "voltage": 36,
+   "ah": 10.4,
+   "wh": 374,
+   "motor": {
+    "nominal": "350W",
+    "peak": "650W",
+    "pos": "rear",
+    "type": "Hub אחורי"
+   },
+   "controller": {
+    "count": 1,
+    "amps": "לא פורסם",
+    "loc": "בבסיס העמוד (משוער)"
+   },
+   "tires": "גלגלים קטנים; השיכוך הוא הצמיגים עצמם",
+   "brakes": "שני בלמי תוף",
+   "suspension": "אין שיכוך מכני – רק הצמיגים",
+   "weight": "13.7 ק״ג",
+   "range": "עד כ-32 ק״מ",
+   "speed": "25 קמ״ש בישראל",
+   "charging": "מטען 42V",
+   "display": "צג קטן בכידון",
+   "lights": "פנס קדמי ואור אחורי",
+   "extras": "שלדה מתקפלת וכידון מתקפל",
+   "overview": "ה-Light 2 של Inokim, מותג שנוסד בישראל, נבנה כדי להיות קטן וקל ככל האפשר: 13.7 ק״ג, כידון מתקפל ושלדה מתקפלת. מתאים לשילוב עם תחבורה ציבורית.",
+   "electric": "סוללה קטנה של 36V ‏10.4Ah ‏(374Wh) ומנוע אחורי של 350W. במודל הסוללה ממוקמת בעמוד ההיגוי העבה והפלטפורמה דקה – זה מבנה נפוץ בקורקינטים ניידים. אמתו את המיקום בכלי שלכם. בשני בלמי התוף אין דיסקים לכוונן, אבל חיישן הניתוק בידית עדיין חשוב.",
+   "strengths": [
+    "קל מאוד ומתקפל",
+    "כידון מתקפל",
+    "בלמי תוף שלא דורשים הרבה תחזוקה",
+    "עיצוב נקי"
+   ],
+   "faults": [
+    "טווח קצר בשימוש כבד",
+    "כבלים בציר הקיפול של הכידון",
+    "בלאי בצמיגים הקטנים"
+   ],
+   "maintenance": [
+    "בדיקת צמיגים",
+    "כוונון בלמי התוף",
+    "בדיקת ציר הקיפול והכידון"
+   ],
+   "compNotes": {
+    "battery": "במודל הסוללה בתוך עמוד ההיגוי (משוער) – לכן הכבלים ממנה עוברים לבסיס העמוד."
+   },
+   "omit": [],
+   "geom": {
+    "body": "#e9eaec",
+    "accent": "#2b2f35",
+    "R": 0.1,
+    "tireR": 0.026,
+    "deckLen": 0.5,
+    "deckW": 0.15,
+    "deckY": 0.1,
+    "stemTop": 1,
+    "stemR": 0.03,
+    "motor": "rear",
+    "battery": "stem",
+    "susp": false,
+    "brakeF": "drum",
+    "fitW": 1.15,
+    "fitH": 1.2
+   },
+   "sources": "Inokim וסקירות (EScooterNerds, ‏RiderGuide).",
+   "controllerAmpsNum": null,
+   "displayProtocol": {
+    "v": "Inokim ייעודי",
+    "conf": "typ"
+   },
+   "connectors": {
+    "power": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "charge": {
+     "v": "שקע עגול למטען 42V",
+     "conf": "typ"
+    },
+    "motor": {
+     "v": "לא פורסם",
+     "conf": "unk"
+    },
+    "display": {
+     "v": "ייעודי",
+     "conf": "typ"
+    }
+   },
+   "errorCodes": {
+    "families": [
+     "Inokim"
+    ],
+    "conf": "typ",
+    "note": "רשמו את הקוד המדויק ופנו למשווק המורשה."
+   },
+   "failureWeights": {
+    "loose_harness": 1.8,
+    "display_comm": 1.4,
+    "batt_aged": 1.2
+   },
+   "commonFailures": [
+    {
+     "t": "כבלים בציר הקיפול של הכידון",
+     "cause": "loose_harness",
+     "w": 0.7
+    },
+    {
+     "t": "טווח קצר בשימוש כבד",
+     "cause": "batt_aged",
+     "w": 0.4
+    }
+   ],
+   "specFlags": [
+    {
+     "field": "סוללה",
+     "issue": "מיקום הסוללה בעמוד ההיגוי הוא הנחה של המודל – אמתו בכלי.",
+     "sev": "typ"
+    }
+   ],
+   "dataConfidence": {
+    "brand": "ok",
+    "kind": "ok",
+    "battery": "typ",
+    "motor": "ok",
+    "controller": "unk",
+    "tires": "ok",
+    "brakes": "ok",
+    "suspension": "ok",
+    "weight": "ok",
+    "range": "ok",
+    "speed": "ok",
+    "charging": "ok",
+    "display": "ok",
+    "lights": "ok",
+    "extras": "ok"
+   },
+   "testPoints": [
+    {
+     "id": "tp_batt",
+     "comp": "battery",
+     "bundle": "power",
+     "name": "מתח הסוללה ביציאה",
+     "mode": "DC V · 200V",
+     "red": "+ במחבר ההספק (צד הסוללה)",
+     "black": "− באותו מחבר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "30–42V",
+     "bad": "0V: מפתח כבוי / BMS ניתק / נתיך. נמוך מ-30V: סוללה פרוקה. מעל 42V: מטען או סוללה לא תואמים.",
+     "meas": "m_batt",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_ctrl_in",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "מתח בכניסת הבקר",
+     "mode": "DC V · 200V",
+     "red": "אדום עבה בכניסת הבקר (Back-probe)",
+     "black": "שחור עבה בכניסת הבקר",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה (±0.5V)",
+     "bad": "נמוך מהסוללה ב-0.5V ומעלה: התנגדות במחבר ההספק או בנתיך. 0V: נתק בקו ההספק.",
+     "meas": "m_ctrl_in",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_cap",
+     "comp": "controller",
+     "bundle": "power",
+     "name": "פריקת קבלים לפני מגע",
+     "mode": "DC V · 200V",
+     "red": "+ בצד הבקר של מחבר ההספק",
+     "black": "− בצד הבקר",
+     "live": false,
+     "unit": "V",
+     "min": 0,
+     "max": 2,
+     "expect": "פחות מ-2V אחרי 2 דקות",
+     "bad": "מתח שנשאר גבוה: הקבלים לא נפרקו – ממתינים ובודקים שוב, לא נוגעים.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_charge",
+     "comp": "chargePort",
+     "bundle": "charge",
+     "name": "מתח המטען בלי עומס",
+     "mode": "DC V · 200V",
+     "red": "+ בתקע המטען",
+     "black": "− בתקע המטען",
+     "live": true,
+     "unit": "V",
+     "min": 40.8,
+     "max": 43.2,
+     "expect": "≈ 42V (±1V)",
+     "bad": "0V או נמוך: מטען תקול. גבוה: מטען לא מתאים – לא לטעון!",
+     "meas": "m_charger",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_disp_v",
+     "comp": "display",
+     "bundle": "display",
+     "name": "V+ במחבר הצג",
+     "mode": "DC V · 200V",
+     "red": "פין V+ (לרוב אדום)",
+     "black": "פין GND (לרוב שחור)",
+     "live": true,
+     "unit": "V",
+     "min": 30,
+     "max": 42,
+     "expect": "כמו מתח הסוללה",
+     "bad": "0V: כבל הצג/מחבר/יציאת הבקר.",
+     "meas": "m_disp",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_disp_k",
+     "comp": "display",
+     "bundle": "display",
+     "name": "חוט ההדלקה (Power Lock)",
+     "mode": "DC V · 200V",
+     "red": "חוט ההדלקה (לרוב כחול)",
+     "black": "GND",
+     "live": true,
+     "unit": "V",
+     "expect": "כבוי: 0V · דולק: כמו מתח הסוללה",
+     "bad": "אין מתח כשהצג ״דולק״: צג/כפתור/חוט הדלקה.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_5v",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אספקת 5V למצערת",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר המצערת",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "נמוך/0V: קצר באחד החיישנים או ספק 5V בבקר.",
+     "meas": "m_5v",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_thr_sig",
+     "comp": "throttle",
+     "bundle": "throttle",
+     "name": "אות המצערת",
+     "mode": "DC V · 20V",
+     "red": "ירוק (אות)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "כ-0.8V במנוחה ← 3.4–4.3V בפתיחה מלאה",
+     "bad": "מעל 1.2V במנוחה: מצערת תקועה – סכנת האצה. לא עולה: מצערת תקולה.",
+     "meas": "m_thr_rest",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_5v",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אספקת 5V לחיישני Hall",
+     "mode": "DC V · 20V",
+     "red": "אדום במחבר ה-Hall",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "min": 4.8,
+     "max": 5.2,
+     "expect": "4.8–5.2V",
+     "bad": "0V: חוט אדום קרוע או קצר ב-5V.",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_hall_sig",
+     "comp": "motor",
+     "bundle": "hall",
+     "name": "אותות Hall בסיבוב איטי",
+     "mode": "DC V · 20V",
+     "red": "צהוב / ירוק / כחול – כל אחד בתורו",
+     "black": "שחור במחבר ה-Hall",
+     "live": true,
+     "unit": "V",
+     "expect": "כל אות מתחלף 0V ↔ כ-5V",
+     "bad": "אות תקוע על 0V או 5V: חיישן Hall או חוט ביציאה מהציר.",
+     "meas": "m_hall",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_r",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "התנגדות בין פאזות",
+     "mode": "Ω · 200Ω",
+     "red": "פאזה אחת (צד המנוע, מחבר מנותק)",
+     "black": "פאזה שנייה",
+     "live": false,
+     "unit": "Ω",
+     "min": 0.1,
+     "max": 1,
+     "expect": "שלושה ערכים נמוכים ודומים (כ-0.1–1Ω)",
+     "bad": "ערך פתוח (OL) או שונה מאוד: חוט פאזה קרוע או מחבר שרוף.",
+     "meas": "m_phase_r",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_phase_axle",
+     "comp": "motor",
+     "bundle": "phase",
+     "name": "בידוד פאזה לגוף המנוע",
+     "mode": "Ω · 20MΩ / רציפות",
+     "red": "כל פאזה בתורה",
+     "black": "ציר המנוע (מתכת נקייה)",
+     "live": false,
+     "unit": "Ω",
+     "expect": "אין רציפות (OL)",
+     "bad": "יש רציפות: קצר לגוף – לא מחברים לבקר, לטכנאי.",
+     "conf": "ok"
+    },
+    {
+     "id": "tp_brake",
+     "comp": "brakes",
+     "bundle": "brakeL",
+     "name": "חיישן בלם",
+     "mode": "רציפות (צפצוף) / DC V · 20V",
+     "red": "פין האות",
+     "black": "פין GND",
+     "live": false,
+     "unit": "",
+     "expect": "NO: משוחרר – אין צפצוף, לחוץ – צפצוף (NC הפוך). חיישן Hall: 5V ← 0V בלחיצה",
+     "bad": "לא משתנה: חוט קרוע – אין ניתוק (לא לרכוב). תקוע ״לחוץ״: אין הנעה.",
+     "meas": "m_brake",
+     "conf": "typ"
+    },
+    {
+     "id": "tp_light",
+     "comp": "lightFront",
+     "bundle": "lightF",
+     "name": "מתח יציאת התאורה",
+     "mode": "DC V · 200V",
+     "red": "אדום (+ תאורה)",
+     "black": "שחור",
+     "live": true,
+     "unit": "V",
+     "expect": "6V / 12V / מתח סוללה – משתנה בין דגמים",
+     "bad": "מדדו לפני החלפת פנס. מתח לא תואם = פנס שרוף.",
+     "conf": "unk"
+    }
+   ],
+   "expectedValues": {
+    "battery": {
+     "nominal": 36,
+     "cells": "10S",
+     "full": 42,
+     "empty": 30,
+     "conf": "ok"
+    },
+    "charger": {
+     "v": 42,
+     "unit": "V",
+     "conf": "ok"
+    },
+    "sensor5v": {
+     "min": 4.8,
+     "max": 5.2,
+     "conf": "typ"
+    },
+    "hall": {
+     "low": 0,
+     "high": 5,
+     "conf": "typ"
+    },
+    "phaseOhm": {
+     "min": 0.1,
+     "max": 1,
+     "conf": "typ"
+    },
+    "controllerAmps": {
+     "v": null,
+     "conf": "unk"
+    },
+    "lights": {
+     "v": "6V / 12V / מתח סוללה",
+     "conf": "unk"
+    },
+    "throttle": {
+     "rest": [
+      0.6,
+      1.1
+     ],
+     "full": [
+      3.4,
+      4.3
+     ],
+     "conf": "typ"
+    }
+   },
+   "hallSequence": {
+    "type": "120°",
+    "states": [
+     "101",
+     "100",
+     "110",
+     "010",
+     "011",
+     "001"
+    ],
+    "conf": "typ",
+    "note": "רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי."
+   },
+   "torque": [
+    "tq_lever",
+    "tq_bar",
+    "tq_axle",
+    "tq_fold"
+   ]
+  }
+ }
+}
