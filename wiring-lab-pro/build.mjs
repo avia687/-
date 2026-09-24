@@ -162,10 +162,12 @@ patch('    <nav class="modes" role="tablist" aria-label="מצב עבודה" id="
       </div>
       <button type="button" class="toggle" id="quickBtn" aria-pressed="false" hidden title="מצב מהיר: בלי הסברים">מהיר</button>
       <button type="button" class="toggle" id="workshopBtn" aria-pressed="false" title="מצב סדנה: טקסט וכפתורים גדולים">סדנה</button>
+      <span class="save-state" id="saveState" role="status" aria-live="polite"></span>
     </div>
     <nav class="modes" role="tablist" aria-label="מצב עבודה" id="modeTabs">`, 'prefs');
 patch('aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>',
   'aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>\n      <button type="button" role="tab" id="tab-tools" data-mode="tools" aria-controls="modeView" aria-selected="false" tabindex="-1">כלים</button>', 'tools tab');
+patch('  <main class="workspace">', '  <div class="notices" id="notices"></div>\n  <main class="workspace">', 'notices');
 patch('  <div class="toast" id="toast" role="status" aria-live="polite"></div>',
   '  <div class="gtip" id="gtip" role="tooltip" hidden></div>\n  <div class="toast" id="toast" role="status" aria-live="polite"></div>', 'gtip');
 // Store + Modes + boot
@@ -218,8 +220,8 @@ patch("onVehicle() { reset(); }, abort() { if (symId)", "onVehicle() { reset(); 
 
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
-  ['p06_sec.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
-  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p14_boot_pro.js', 1]
+  ['p06_sec.js', 1], ['p06b_storage.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
+  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p14_boot_pro.js', 1]
 ];
 let js = MODS.filter(([, s]) => s <= STAGE).map(([f]) => read(f)).join('\n');
 if (STAGE < 4) js = read('stubs.js') + '\n' + js;

@@ -6,18 +6,14 @@ const IN_FRAME = (() => { try { return window.self !== window.top; } catch (e) {
 
 /** אחסון העדפות Pro (נפרד מ-Store הקיים), עטוף ב-try/catch */
 const ProStore = {
-  KEY: 'wiring-lab.pro.v1',
-  _d: null,
-  _load() {
-    if (this._d) return this._d;
-    try { this._d = JSON.parse(window.localStorage.getItem(this.KEY)) || {}; } catch (e) { this._d = {}; }
-    if (typeof this._d !== 'object' || !this._d) this._d = {};
-    return this._d;
+  // העדפות ב-Persist('prefs'), התקדמות האקדמיה ב-Persist('progress') – IndexedDB
+  get(k, d) {
+    const o = k === 'acad' ? Persist.get('progress') : Persist.get('prefs');
+    const v = Sec.own(o, k) ? o[k] : undefined; return v === undefined ? d : v;
   },
-  get(k, d) { const o = this._load(); const v = Sec.own(o, k) ? o[k] : undefined; return v === undefined ? d : v; },
   set(k, v) {
-    this._load()[k] = v;
-    try { window.localStorage.setItem(this.KEY, JSON.stringify(this._d)); } catch (e) { /* אחסון לא זמין */ }
+    const ns = k === 'acad' ? 'progress' : 'prefs';
+    Persist.set(ns, Object.assign({}, Persist.get(ns), { [k]: v }));
   }
 };
 
@@ -217,22 +213,17 @@ const ProUI = (() => {
 
 /* ---------- יומן תיקונים (משותף לאבחון ולכלים) ---------- */
 const RepairLog = (() => {
-  const KEY = 'wiring-lab.log.v1';
-  let items = null;
-  function load() {
-    if (items) return items;
-    try { items = JSON.parse(window.localStorage.getItem(KEY)) || []; } catch (e) { items = []; }
-    if (!Array.isArray(items)) items = [];
-    return items;
-  }
-  function save() { try { window.localStorage.setItem(KEY, JSON.stringify(items)); return true; } catch (e) { UI.toast('האחסון המקומי לא זמין – ייצאו JSON כדי לשמור'); return false; } }
+  // נשמר ב-Persist('log') – IndexedDB, מוצפן כשיש PIN
+  let items = [];
+  function load() { items = Persist.get('log'); return items; }
+  function save() { return Persist.set('log', items); }
   function add(rec) {
     load();
-    const r = Object.assign({ id: 'r' + Date.now().toString(36), date: new Date().toISOString().slice(0, 10), model: State.model, modelName: M().name, customer: '', serial: '', symptoms: '', measurements: '', replaced: '', notes: '', status: 'פתוח' }, rec || {});
+    const r = Object.assign({ id: 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), updated: new Date().toISOString(), date: new Date().toISOString().slice(0, 10), model: State.model, modelName: M().name, customer: '', serial: '', symptoms: '', measurements: '', replaced: '', notes: '', status: 'פתוח' }, rec || {});
     items.unshift(r); save();
     return r;
   }
-  function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch); save(); } return r; }
+  function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch, { updated: new Date().toISOString() }); save(); } return r; }
   function remove(id) { load(); items = items.filter(x => x.id !== id); save(); }
   function all() { return load(); }
   const S = (max, o) => Object.assign({ t: 'str', max, opt: true }, o);

@@ -178,6 +178,348 @@ const Vault = (() => {
 })();
 
 /* =====================================================================
+   p06b · Persist – אחסון מקומי בלבד
+   · IndexedDB (מסד 'ev-lab'), נפילה ל-localStorage ואז לזיכרון – הכול ב-try/catch.
+   · מטמון סינכרוני: הקוד הקיים קורא/כותב מיד, הכתיבה לדיסק נדחית ב-250ms
+     ומדווחת במחוון ״נשמר״.
+   · נעילת PIN (אופציונלית): כל הנתונים האישיים נשמרים כרשומה אחת מוצפנת
+     (AES-GCM, מפתח מ-PBKDF2). ה-PIN לא נשמר; המפתח חי רק בזיכרון.
+   · גיבוי: JSON עם גרסת סכמה + SHA-256, אופציה להצפנה בסיסמה, Web Share.
+   · שחזור: תצוגה מקדימה של השינויים, מיזוג או החלפה, הגירה אוטומטית מגרסאות קודמות.
+   ===================================================================== */
+const Persist = (() => {
+  const SCHEMA = 2;
+  const DBNAME = 'ev-lab', STORE = 'kv', BLOBS = 'blobs';
+  /** מרחבים אישיים – מוצפנים כשיש PIN, נכללים בגיבוי ובמחיקה */
+  const PERSONAL = ['log', 'vehicles', 'projects', 'reminders', 'quotes', 'cards', 'escalations'];
+  /** מרחבים לא רגישים – העדפות והתקדמות (גם הם בגיבוי ובמחיקה) */
+  const PLAIN = ['prefs', 'progress', 'consent'];
+  const DEFAULTS = { log: [], vehicles: [], projects: [], reminders: [], quotes: [], cards: {}, escalations: [], prefs: {}, progress: {}, consent: {} };
+  const LEGACY = { log: 'wiring-lab.log.v1', prefs: 'wiring-lab.pro.v1' };
+  const LS_PREFIX = 'ev-lab.kv.';
+
+  let backend = 'mem', db = null;
+  const cache = {}; const meta = { lock: null, lastBackup: 0, schema: SCHEMA, created: 0 };
+  let key = null, locked = false, dirty = new Set(), timer = null, lastSaved = 0, failed = false;
+  const listeners = new Set();
+  const clone = v => (v === undefined ? v : JSON.parse(JSON.stringify(v)));
+  const fresh = ns => clone(DEFAULTS[ns]);
+
+  /* ---------- שכבת גישה ---------- */
+  function idbOpen() {
+    return new Promise((res, rej) => {
+      if (!window.indexedDB) { rej(new Error('no-idb')); return; }
+      let req;
+      try { req = indexedDB.open(DBNAME, 1); } catch (e) { rej(e); return; }
+      req.onupgradeneeded = () => { const d = req.result; if (!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE); if (!d.objectStoreNames.contains(BLOBS)) d.createObjectStore(BLOBS); };
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error || new Error('idb-open'));
+      req.onblocked = () => rej(new Error('idb-blocked'));
+      setTimeout(() => rej(new Error('idb-timeout')), 4000);
+    });
+  }
+  function tx(store, mode, fn) {
+    return new Promise((res, rej) => {
+      try {
+        const t = db.transaction(store, mode), s = t.objectStore(store);
+        const r = fn(s);
+        t.oncomplete = () => res(r && 'result' in r ? r.result : undefined);
+        t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('abort'));
+      } catch (e) { rej(e); }
+    });
+  }
+  const mem = {}, memBlobs = {};
+  async function rawGet(k) {
+    if (backend === 'idb') return tx(STORE, 'readonly', s => s.get(k));
+    if (backend === 'ls') { const v = localStorage.getItem(LS_PREFIX + k); return v == null ? undefined : JSON.parse(v); }
+    return clone(mem[k]);
+  }
+  async function rawSetMany(entries) {
+    if (backend === 'idb') return tx(STORE, 'readwrite', s => { entries.forEach(([k, v]) => (v === undefined ? s.delete(k) : s.put(v, k))); });
+    if (backend === 'ls') { entries.forEach(([k, v]) => (v === undefined ? localStorage.removeItem(LS_PREFIX + k) : localStorage.setItem(LS_PREFIX + k, JSON.stringify(v)))); return; }
+    entries.forEach(([k, v]) => { if (v === undefined) delete mem[k]; else mem[k] = clone(v); });
+  }
+  async function rawClear() {
+    if (backend === 'idb') { await tx(STORE, 'readwrite', s => s.clear()); await tx(BLOBS, 'readwrite', s => s.clear()); return; }
+    if (backend === 'ls') { Object.keys(localStorage).filter(k => k.startsWith(LS_PREFIX)).forEach(k => localStorage.removeItem(k)); return; }
+    Object.keys(mem).forEach(k => delete mem[k]); Object.keys(memBlobs).forEach(k => delete memBlobs[k]);
+  }
+
+  /* ---------- אתחול ---------- */
+  let readyResolve; const ready = new Promise(r => { readyResolve = r; });
+  async function init() {
+    try { db = await idbOpen(); backend = 'idb'; }
+    catch (e) {
+      try { localStorage.setItem(LS_PREFIX + '_t', '1'); localStorage.removeItem(LS_PREFIX + '_t'); backend = 'ls'; } catch (e2) { backend = 'mem'; }
+    }
+    try {
+      const m = await rawGet('meta');
+      if (m && typeof m === 'object') Object.assign(meta, { lock: m.lock || null, lastBackup: Number(m.lastBackup) || 0, schema: Number(m.schema) || 1, created: Number(m.created) || 0 });
+      if (!meta.created) meta.created = Date.now();
+      for (const ns of PLAIN) cache[ns] = sanitizeNs(ns, await rawGet('ns:' + ns));
+      if (meta.lock) { locked = true; PERSONAL.forEach(ns => { cache[ns] = fresh(ns); }); }
+      else for (const ns of PERSONAL) cache[ns] = sanitizeNs(ns, await rawGet('ns:' + ns));
+      await migrateLegacy();
+      if (meta.schema !== SCHEMA) { meta.schema = SCHEMA; await rawSetMany([['meta', clone(meta)]]); }
+    } catch (e) {
+      failed = true;
+      PERSONAL.concat(PLAIN).forEach(ns => { if (cache[ns] === undefined) cache[ns] = fresh(ns); });
+    }
+    readyResolve(); emit();
+  }
+  /** העברת נתונים מגרסה קודמת (localStorage) – פעם אחת */
+  async function migrateLegacy() {
+    let moved = false;
+    try {
+      const lg = localStorage.getItem(LEGACY.log);
+      if (lg && !locked) {
+        const arr = JSON.parse(lg);
+        if (Array.isArray(arr) && !cache.log.length) { cache.log = arr.filter(x => x && Sec.isId(x.id)).map(x => RepairLogSchema.fix(x)).filter(Boolean); dirty.add('log'); }
+        localStorage.removeItem(LEGACY.log); moved = true;
+      }
+      const pr = localStorage.getItem(LEGACY.prefs);
+      if (pr) {
+        const o = JSON.parse(pr);
+        if (o && typeof o === 'object') {
+          const { acad, ...rest } = o;
+          if (!Object.keys(cache.prefs).length) { cache.prefs = sanitizeNs('prefs', rest); dirty.add('prefs'); }
+          if (acad && !cache.progress.acad) { cache.progress = Object.assign({}, cache.progress, { acad }); dirty.add('progress'); }
+        }
+        localStorage.removeItem(LEGACY.prefs); moved = true;
+      }
+    } catch (e) { /* אין localStorage */ }
+    if (moved) await flush();
+  }
+  function sanitizeNs(ns, v) {
+    const d = DEFAULTS[ns];
+    if (Array.isArray(d)) return Array.isArray(v) ? v : fresh(ns);
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : fresh(ns);
+  }
+
+  /* ---------- קריאה/כתיבה ---------- */
+  function get(ns) { if (!(ns in DEFAULTS)) throw new Error('ns ' + ns); if (cache[ns] === undefined) cache[ns] = fresh(ns); return cache[ns]; }
+  function set(ns, v) {
+    if (!(ns in DEFAULTS)) throw new Error('ns ' + ns);
+    if (locked && PERSONAL.includes(ns)) { UI.toast('היומן נעול – הזינו PIN כדי לשמור'); return false; }
+    cache[ns] = v; dirty.add(ns); schedule(); return true;
+  }
+  const touch = ns => set(ns, get(ns));
+  function schedule() { clearTimeout(timer); state('saving'); timer = setTimeout(flush, 250); }
+  async function flush() {
+    clearTimeout(timer); timer = null;
+    if (!dirty.size) { state(failed ? 'error' : 'saved'); return true; }
+    const ds = [...dirty]; dirty = new Set();
+    try {
+      const entries = [];
+      ds.filter(ns => PLAIN.includes(ns)).forEach(ns => entries.push(['ns:' + ns, clone(cache[ns])]));
+      if (ds.some(ns => PERSONAL.includes(ns))) {
+        if (meta.lock) {
+          if (!key) throw new Error('locked');
+          const all = {}; PERSONAL.forEach(ns => { all[ns] = cache[ns]; });
+          entries.push(['sealed', await Vault.sealWith(key.k, key.salt, all, meta.lock.iter)]);
+        } else ds.filter(ns => PERSONAL.includes(ns)).forEach(ns => entries.push(['ns:' + ns, clone(cache[ns])]));
+      }
+      entries.push(['meta', clone(meta)]);
+      await rawSetMany(entries);
+      failed = false; lastSaved = Date.now(); state('saved'); return true;
+    } catch (e) {
+      ds.forEach(ns => dirty.add(ns)); failed = true; state('error'); return false;
+    }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && dirty.size) flush(); });
+  window.addEventListener('pagehide', () => { if (dirty.size) flush(); });
+
+  /* ---------- מחוון ״נשמר״ ---------- */
+  let st = 'idle';
+  function state(s) { st = s; emit(); }
+  function emit() { listeners.forEach(fn => { try { fn(status()); } catch (e) { /* */ } }); }
+  function status() { return { state: st, backend, locked, lockOn: !!meta.lock, lastSaved, lastBackup: meta.lastBackup, failed }; }
+  const onChange = fn => { listeners.add(fn); return () => listeners.delete(fn); };
+
+  /* ---------- נעילת PIN ---------- */
+  const PIN_RE = /^\d{4,12}$/;
+  async function enableLock(pin) {
+    if (!Vault.ok()) throw new Error('no-crypto');
+    if (!PIN_RE.test(pin)) throw new Error('bad-pin');
+    await flush();
+    const salt = Vault.rnd(16), k = await Vault.derive(pin, salt);
+    key = { k, salt };
+    meta.lock = { v: 1, iter: Vault.ITER, salt: Vault.b64(salt), check: await Vault.sealWith(k, salt, 'ev-lab') };
+    const all = {}; PERSONAL.forEach(ns => { all[ns] = cache[ns]; });
+    await rawSetMany([['sealed', await Vault.sealWith(k, salt, all)], ['meta', clone(meta)]].concat(PERSONAL.map(ns => ['ns:' + ns, undefined])));
+    await sealBlobs(true);
+    emit(); return true;
+  }
+  async function unlock(pin) {
+    if (!meta.lock) return true;
+    const salt = Vault.unb64(meta.lock.salt), k = await Vault.derive(pin, salt, meta.lock.iter);
+    await Vault.openWith(k, meta.lock.check);                   // זורק bad-secret אם שגוי
+    const box = await rawGet('sealed');
+    const all = box ? await Vault.openWith(k, box) : {};
+    PERSONAL.forEach(ns => { cache[ns] = sanitizeNs(ns, all[ns]); });
+    key = { k, salt }; locked = false; armIdle(); emit(); return true;
+  }
+  function lockNow() {
+    if (!meta.lock) return;
+    if (dirty.size) flush();
+    key = null; locked = true; PERSONAL.forEach(ns => { cache[ns] = fresh(ns); }); emit();
+  }
+  async function disableLock(pin) {
+    if (!meta.lock) return true;
+    if (locked) await unlock(pin);
+    else { const salt = Vault.unb64(meta.lock.salt); await Vault.openWith(await Vault.derive(pin, salt, meta.lock.iter), meta.lock.check); }
+    await sealBlobs(false);
+    meta.lock = null; key = null;
+    await rawSetMany([['sealed', undefined], ['meta', clone(meta)]].concat(PERSONAL.map(ns => ['ns:' + ns, clone(cache[ns])])));
+    emit(); return true;
+  }
+  // נעילה אוטומטית אחרי 15 דקות בלי פעילות
+  let idleT = null;
+  function armIdle() { clearTimeout(idleT); if (meta.lock && !locked) idleT = setTimeout(lockNow, 15 * 60 * 1000); }
+  ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (meta.lock && !locked) armIdle(); }, { passive: true }));
+
+  /* ---------- קבצים (תמונות) ---------- */
+  async function putBlob(id, blob) {
+    if (!Sec.isId(id)) throw new Error('bad-id');
+    if (locked) throw new Error('locked');
+    let v = blob;
+    if (meta.lock && key) { const buf = await blob.arrayBuffer(); const iv = Vault.rnd(12); v = { iv: Vault.b64(iv), type: blob.type, ct: await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key.k, buf) }; }
+    if (backend === 'idb') return tx(BLOBS, 'readwrite', s => s.put(v, id));
+    if (backend === 'mem' || backend === 'ls') { memBlobs[id] = v; return; }
+  }
+  async function getBlob(id) {
+    let v = backend === 'idb' ? await tx(BLOBS, 'readonly', s => s.get(id)) : memBlobs[id];
+    if (!v) return null;
+    if (v instanceof Blob) return v;
+    if (!key) return null;
+    try { return new Blob([await crypto.subtle.decrypt({ name: 'AES-GCM', iv: Vault.unb64(v.iv) }, key.k, v.ct)], { type: v.type }); } catch (e) { return null; }
+  }
+  async function delBlob(id) { if (backend === 'idb') return tx(BLOBS, 'readwrite', s => s.delete(id)); delete memBlobs[id]; }
+  async function blobIds() { if (backend === 'idb') return tx(BLOBS, 'readonly', s => s.getAllKeys()); return Object.keys(memBlobs); }
+  async function sealBlobs(on) {
+    if (!key) return;
+    for (const id of await blobIds()) {
+      const v = backend === 'idb' ? await tx(BLOBS, 'readonly', s => s.get(id)) : memBlobs[id];
+      if (on && v instanceof Blob) { const iv = Vault.rnd(12); const e = { iv: Vault.b64(iv), type: v.type, ct: await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key.k, await v.arrayBuffer()) }; backend === 'idb' ? await tx(BLOBS, 'readwrite', s => s.put(e, id)) : (memBlobs[id] = e); }
+      if (!on && v && !(v instanceof Blob)) { const b = await getBlob(id); if (b) backend === 'idb' ? await tx(BLOBS, 'readwrite', s => s.put(b, id)) : (memBlobs[id] = b); }
+    }
+  }
+
+  /* ---------- גיבוי ---------- */
+  function snapshot() { const d = {}; PERSONAL.concat(PLAIN).forEach(ns => { d[ns] = clone(get(ns)); }); return d; }
+  async function backup(password) {
+    if (locked) throw new Error('locked');
+    await flush();
+    const data = snapshot();
+    const checksum = 'sha256:' + await Vault.sha256(JSON.stringify(data));
+    const head = { app: 'ev-lab', type: 'backup', schema: SCHEMA, created: new Date().toISOString() };
+    const file = password ? Object.assign(head, { encrypted: await Vault.seal(password, { checksum, data }) }) : Object.assign(head, { checksum, data });
+    return JSON.stringify(file, null, 1);
+  }
+  function markBackedUp() { meta.lastBackup = Date.now(); rawSetMany([['meta', clone(meta)]]).catch(() => {}); emit(); }
+  const needsBackup = () => {
+    const has = PERSONAL.some(ns => { const v = cache[ns]; return Array.isArray(v) ? v.length : v && Object.keys(v).length; });
+    return has && !locked && Date.now() - (meta.lastBackup || meta.created || Date.now()) > 14 * 864e5;
+  };
+
+  /* ---------- שחזור ---------- */
+  const RepairLogSchema = { fix: x => (typeof RepairLog !== 'undefined' ? RepairLog.normalize(x) : x) };
+  const OBJ = { t: 'any' };
+  const LIST = { t: 'arr', max: 20000, of: { t: 'obj', extra: true, p: { id: { t: 'str', re: /^[A-Za-z0-9_-]{1,40}$/ } } } };
+  const DATA_SCHEMA = () => ({ t: 'obj', p: {
+    log: { t: 'arr', max: 20000, opt: true, of: RepairLog.ITEM }, vehicles: Object.assign({ opt: true }, LIST), projects: Object.assign({ opt: true }, LIST),
+    reminders: Object.assign({ opt: true }, LIST), quotes: Object.assign({ opt: true }, LIST), escalations: Object.assign({ opt: true }, LIST),
+    cards: { t: 'obj', opt: true, extra: true, p: {} }, prefs: { t: 'obj', opt: true, extra: true, p: {} }, progress: { t: 'obj', opt: true, extra: true, p: {} }, consent: { t: 'obj', opt: true, extra: true, p: {} }
+  } });
+  /** הגירה: כל גרסה קודמת → סכמה 2 */
+  function migrate(obj) {
+    const notes = [];
+    if (Array.isArray(obj)) { notes.push('קובץ ישן (רשימת רשומות) – הומר ליומן'); return { data: { log: obj }, notes, schema: 0 }; }
+    if (obj && obj.type === 'repair-log') { notes.push(`יומן תיקונים מגרסה ${Sec.num(obj.version) || 1} – הומר לגיבוי מלא`); return { data: { log: obj.items || [] }, notes, schema: 1 }; }
+    if (obj && obj.type === 'backup' && obj.app === 'ev-lab') {
+      const s = Sec.num(obj.schema, 1, 99);
+      if (s > SCHEMA) throw new Sec.ImportError(`הגיבוי נוצר בגרסה חדשה יותר (סכמה ${s}). עדכנו את האפליקציה ונסו שוב.`);
+      return { data: obj.data || {}, notes, schema: s };
+    }
+    throw new Sec.ImportError('זה לא קובץ גיבוי של מעבדת EV.');
+  }
+  /** קורא קובץ גיבוי: מחזיר { data, notes } או זורק ImportError. password – אם הקובץ מוצפן */
+  async function readBackup(text, password) {
+    let obj = Sec.parseJSON(text, 25 * 1024 * 1024);
+    if (obj && obj.encrypted) {
+      if (!password) { const e = new Sec.ImportError('הגיבוי מוצפן – הזינו סיסמה.'); e.needPassword = true; throw e; }
+      let inner; try { inner = await Vault.open(password, obj.encrypted); } catch (e) { throw new Sec.ImportError('סיסמה שגויה, או שהקובץ שונה.'); }
+      Sec.parseJSON(JSON.stringify(inner));                       // אותה בדיקת מפתחות אסורים
+      obj = Object.assign({}, obj, { checksum: inner.checksum, data: inner.data }); delete obj.encrypted;
+    }
+    const mg = migrate(obj);
+    if (obj && obj.type === 'backup') {
+      const sum = 'sha256:' + await Vault.sha256(JSON.stringify(obj.data));
+      if (obj.checksum !== sum) throw new Sec.ImportError('בדיקת השלמות (checksum) נכשלה – הקובץ נפגם או נערך ידנית.');
+    }
+    const r = Sec.validate(mg.data, DATA_SCHEMA(), 'גיבוי');
+    if (!r.ok) { const e = new Sec.ImportError('הגיבוי לא עבר בדיקה:\n' + r.errors.slice(0, 8).join('\n')); e.errors = r.errors; throw e; }
+    const data = r.value;
+    if (data.log) data.log = data.log.map(x => RepairLog.normalize(x));
+    return { data, notes: mg.notes, schema: mg.schema };
+  }
+  const NAMES = { log: 'יומן תיקונים', vehicles: 'כרטיסי כלי', projects: 'פרויקטי בנייה', reminders: 'תזכורות תחזוקה', quotes: 'הצעות מחיר', escalations: 'פניות ״לא מצאתי״', cards: 'כרטיסיות חזרה', prefs: 'העדפות', progress: 'התקדמות באקדמיה', consent: 'הסכמות' };
+  /** תצוגה מקדימה: לכל מרחב – חדש / שונה / זהה / יימחק (בהחלפה) */
+  function preview(data) {
+    const rows = [];
+    for (const ns of PERSONAL.concat(PLAIN)) {
+      if (!(ns in data)) continue;
+      const inc = data[ns], cur = get(ns);
+      if (Array.isArray(inc)) {
+        const byId = new Map(cur.map(x => [x.id, x]));
+        let add = 0, chg = 0, same = 0;
+        inc.forEach(x => { const c = byId.get(x.id); if (!c) add++; else if (JSON.stringify(c) === JSON.stringify(x)) same++; else chg++; });
+        const incIds = new Set(inc.map(x => x.id));
+        rows.push({ ns, name: NAMES[ns], add, chg, same, gone: cur.filter(x => !incIds.has(x.id)).length, total: inc.length });
+      } else {
+        const keys = Object.keys(inc || {});
+        const chg = keys.filter(k => JSON.stringify(cur[k]) !== JSON.stringify(inc[k])).length;
+        rows.push({ ns, name: NAMES[ns], add: keys.filter(k => !(k in cur)).length, chg, same: keys.length - chg, gone: Object.keys(cur).filter(k => !(k in inc)).length, total: keys.length, obj: true });
+      }
+    }
+    return rows;
+  }
+  function apply(data, mode) {
+    if (locked) throw new Error('locked');
+    for (const ns of PERSONAL.concat(PLAIN)) {
+      if (!(ns in data)) continue;
+      const inc = clone(data[ns]);
+      if (mode === 'replace') cache[ns] = inc;
+      else if (Array.isArray(inc)) {
+        const cur = get(ns), idx = new Map(cur.map((x, i) => [x.id, i]));
+        inc.forEach(x => { if (!idx.has(x.id)) cur.push(x); else if ((x.updated || '') > (cur[idx.get(x.id)].updated || '')) cur[idx.get(x.id)] = x; });
+      } else cache[ns] = Object.assign({}, get(ns), inc);
+      dirty.add(ns);
+    }
+    return flush();
+  }
+
+  /* ---------- פרטיות: ייצוא הכול ומחיקה ---------- */
+  async function wipe() {
+    clearTimeout(timer); dirty = new Set(); key = null; locked = false; meta.lock = null; meta.lastBackup = 0; meta.created = Date.now();
+    try { await rawClear(); } catch (e) { /* */ }
+    try {
+      Object.keys(localStorage).filter(k => /^(wiring-lab|ev-lab)/.test(k)).forEach(k => localStorage.removeItem(k));
+      sessionStorage.clear();
+    } catch (e) { /* */ }
+    try { if (window.caches) for (const k of await caches.keys()) if (/^ev-lab-user/.test(k)) await caches.delete(k); } catch (e) { /* */ }
+    PERSONAL.concat(PLAIN).forEach(ns => { cache[ns] = fresh(ns); });
+    emit();
+  }
+  async function estimate() { try { return navigator.storage && navigator.storage.estimate ? await navigator.storage.estimate() : null; } catch (e) { return null; } }
+  async function persistRequest() { try { return navigator.storage && navigator.storage.persist ? await navigator.storage.persist() : false; } catch (e) { return false; } }
+
+  return { init, ready, get, set, touch, flush, status, onChange, enableLock, unlock, lockNow, disableLock, putBlob, getBlob, delBlob, blobIds,
+    backup, markBackedUp, needsBackup, readBackup, preview, apply, wipe, estimate, persistRequest, snapshot, PERSONAL, PLAIN, NAMES, SCHEMA,
+    isLocked: () => locked, lockOn: () => !!meta.lock, backend: () => backend, PIN_RE };
+})();
+
+/* =====================================================================
    p07 · Core Pro – רמות משתמש, מילון מונחים, אמינות נתונים, מצב סדנה
    נשען על: DATA, State, M(), LAYOUT(), vehicleComps(), harness(), UI, Scene
    ===================================================================== */
@@ -185,18 +527,14 @@ const IN_FRAME = (() => { try { return window.self !== window.top; } catch (e) {
 
 /** אחסון העדפות Pro (נפרד מ-Store הקיים), עטוף ב-try/catch */
 const ProStore = {
-  KEY: 'wiring-lab.pro.v1',
-  _d: null,
-  _load() {
-    if (this._d) return this._d;
-    try { this._d = JSON.parse(window.localStorage.getItem(this.KEY)) || {}; } catch (e) { this._d = {}; }
-    if (typeof this._d !== 'object' || !this._d) this._d = {};
-    return this._d;
+  // העדפות ב-Persist('prefs'), התקדמות האקדמיה ב-Persist('progress') – IndexedDB
+  get(k, d) {
+    const o = k === 'acad' ? Persist.get('progress') : Persist.get('prefs');
+    const v = Sec.own(o, k) ? o[k] : undefined; return v === undefined ? d : v;
   },
-  get(k, d) { const o = this._load(); const v = Sec.own(o, k) ? o[k] : undefined; return v === undefined ? d : v; },
   set(k, v) {
-    this._load()[k] = v;
-    try { window.localStorage.setItem(this.KEY, JSON.stringify(this._d)); } catch (e) { /* אחסון לא זמין */ }
+    const ns = k === 'acad' ? 'progress' : 'prefs';
+    Persist.set(ns, Object.assign({}, Persist.get(ns), { [k]: v }));
   }
 };
 
@@ -396,22 +734,17 @@ const ProUI = (() => {
 
 /* ---------- יומן תיקונים (משותף לאבחון ולכלים) ---------- */
 const RepairLog = (() => {
-  const KEY = 'wiring-lab.log.v1';
-  let items = null;
-  function load() {
-    if (items) return items;
-    try { items = JSON.parse(window.localStorage.getItem(KEY)) || []; } catch (e) { items = []; }
-    if (!Array.isArray(items)) items = [];
-    return items;
-  }
-  function save() { try { window.localStorage.setItem(KEY, JSON.stringify(items)); return true; } catch (e) { UI.toast('האחסון המקומי לא זמין – ייצאו JSON כדי לשמור'); return false; } }
+  // נשמר ב-Persist('log') – IndexedDB, מוצפן כשיש PIN
+  let items = [];
+  function load() { items = Persist.get('log'); return items; }
+  function save() { return Persist.set('log', items); }
   function add(rec) {
     load();
-    const r = Object.assign({ id: 'r' + Date.now().toString(36), date: new Date().toISOString().slice(0, 10), model: State.model, modelName: M().name, customer: '', serial: '', symptoms: '', measurements: '', replaced: '', notes: '', status: 'פתוח' }, rec || {});
+    const r = Object.assign({ id: 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), updated: new Date().toISOString(), date: new Date().toISOString().slice(0, 10), model: State.model, modelName: M().name, customer: '', serial: '', symptoms: '', measurements: '', replaced: '', notes: '', status: 'פתוח' }, rec || {});
     items.unshift(r); save();
     return r;
   }
-  function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch); save(); } return r; }
+  function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch, { updated: new Date().toISOString() }); save(); } return r; }
   function remove(id) { load(); items = items.filter(x => x.id !== id); save(); }
   function all() { return load(); }
   const S = (max, o) => Object.assign({ t: 'str', max, opt: true }, o);
@@ -1312,9 +1645,8 @@ const MeterSim = (() => {
    השוואת דגמים ורכיבים חלופיים, בדיקת עקביות מפרט, סימולטור, מצב סדנה.
    ===================================================================== */
 const Tools = (() => {
-  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה']];
-  let sub = ProStore.get('toolsSub', 'calc'), editId = null, delArm = null, printId = null;
-  if (!SUBS.some(s => s[0] === sub)) sub = 'calc';
+  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה'], ['data', 'גיבוי ופרטיות']];
+  let sub = null, editId = null, delArm = null, printId = null;
   const num = id => { const e = $('#' + id); if (!e) return NaN; const v = Sec.num(e.value, e.min !== '' ? Number(e.min) : -Infinity, e.max !== '' ? Number(e.max) : Infinity); return v === null ? NaN : v; };
   const f1 = x => (Math.round(x * 10) / 10).toString();
   const out = (id, h) => { const e = $('#' + id); if (e) e.innerHTML = h; };
@@ -1399,6 +1731,7 @@ const Tools = (() => {
 
   /* ---------- יומן תיקונים ---------- */
   function logHTML() {
+    if (Persist.isLocked()) return DataUI.lockedCard('היומן');
     const items = RepairLog.all(), r = editId ? items.find(x => x.id === editId) : null;
     const v = k => esc(r ? r[k] : (k === 'model' ? State.model : ''));
     const mOpts = Object.keys(DATA.models).map(id => `<option value="${id}" ${(r ? r.model : State.model) === id ? 'selected' : ''}>${esc(DATA.models[id].short)}</option>`).join('');
@@ -1448,6 +1781,7 @@ const Tools = (() => {
       <textarea class="input copybox" id="lgRepBox" hidden rows="6" readonly aria-label="דו״ח להעתקה"></textarea></div>`;
   }
   function bindLog() {
+    if (!$('#logForm')) return;
     $('#logForm').addEventListener('submit', e => {
       e.preventDefault();
       const rec = { customer: $('#lgCust').value.trim(), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
@@ -1524,11 +1858,13 @@ const Tools = (() => {
   }
 
   function render() {
-    const body = sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
+    if (sub === null) { sub = ProStore.get('toolsSub', 'calc'); if (!SUBS.some(s => s[0] === sub)) sub = 'calc'; }
+    const body = sub === 'data' ? DataUI.html() : sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
     if (sub !== 'sim') MeterSim.detach();
     $('#modeView').innerHTML = `<div><p class="eyebrow">${ICON.tech} כלים · <bdi>${esc(M().short)}</bdi></p><h2>ארגז הכלים של הטכנאי</h2></div>${subtabs()}<div class="stack">${body}</div>`;
     if (sub === 'calc') { $$('#modeView input, #modeView select').forEach(i => i.addEventListener('input', updCalc)); updCalc(); }
     if (sub === 'log') bindLog();
+    if (sub === 'data') DataUI.bind();
     if (sub === 'sim') MeterSim.bind(); else { Scene.select(null); Scene.highlightBundle(null); }
     if (printId) { const r = $('#lgReport'); if (r) r.scrollIntoView({ block: 'nearest' }); }
   }
@@ -1556,7 +1892,8 @@ const Tools = (() => {
     try { window.print(); } catch (e) { done(); }
     setTimeout(done, 3000);
   });
-  return { render, restore() {}, onVehicle() { editId = null; } };
+  function go(s) { sub = s; ProStore.set('toolsSub', s); editId = null; printId = null; if (State.mode === 'tools') { render(); $('#panelScroll').scrollTop = 0; } else UI.setMode('tools'); }
+  return { render, go, restore() {}, onVehicle() { editId = null; } };
 })();
 
 /* =====================================================================
@@ -1655,12 +1992,216 @@ const WizardPlus = (() => {
 })();
 
 /* =====================================================================
-   p14 · Boot Pro – מאתחל את שכבת ה-Pro ואז מפעיל את האתחול המקורי
+   p15 · DataUI – גיבוי, שחזור, נעילת PIN, מחוון שמירה, תזכורת גיבוי
+   (לשונית כלים ← ״גיבוי ופרטיות״). כל טקסט של משתמש: esc() או textContent.
    ===================================================================== */
-(function bootPro() {
-  try { Level.init(); } catch (e) { console.error('Level.init', e); }
-  bootBase();
-  try { Glossary.init(); } catch (e) { console.error('Glossary.init', e); }
-  Level.apply();
+const DataUI = (() => {
+  let pending = null;          // { data, notes, rows } – גיבוי שנקרא וממתין לאישור
+  let lastBackupText = '', pwNeeded = false;
+  const fmtTime = t => (t ? new Date(t).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' }) : 'אף פעם');
+  const days = t => (t ? Math.floor((Date.now() - t) / 864e5) : null);
+  const BACKEND = { idb: 'IndexedDB – במכשיר הזה בלבד', ls: 'localStorage (IndexedDB לא זמין) – במכשיר הזה בלבד', mem: 'זיכרון זמני בלבד – ייעלם בסגירת הדף' };
+
+  /* ---------- מחוון ״נשמר״ ---------- */
+  function initIndicator() {
+    const el = $('#saveState'); if (!el) return;
+    const upd = s => {
+      el.dataset.state = s.locked ? 'locked' : s.state;
+      el.textContent = s.locked ? 'נעול' : s.state === 'saving' ? 'שומר…' : s.state === 'error' ? 'לא נשמר' : s.lastSaved ? 'נשמר' : (s.backend === 'mem' ? 'לא נשמר' : 'שמור מקומית');
+      el.title = s.locked ? 'הנתונים האישיים מוצפנים. הזינו PIN בלשונית גיבוי ופרטיות.' : s.state === 'error' || s.backend === 'mem' ? 'האחסון המקומי לא זמין – צרו גיבוי כדי לא לאבד נתונים' : 'נשמר במכשיר ' + (s.lastSaved ? fmtTime(s.lastSaved) : '');
+    };
+    Persist.onChange(upd); upd(Persist.status());
+  }
+
+  /* ---------- הודעות עליונות (נעילה, תזכורת גיבוי) ---------- */
+  function notice(id, text, actions) {
+    const box = $('#notices'); if (!box) return;
+    let n = document.getElementById(id);
+    if (!n) { n = document.createElement('div'); n.id = id; n.className = 'notice'; box.appendChild(n); }
+    n.textContent = '';
+    const t = document.createElement('span'); t.className = 'grow'; t.textContent = text; n.appendChild(t);
+    actions.forEach(([label, fn, cls]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn sm ' + (cls || ''); b.textContent = label; b.addEventListener('click', fn); n.appendChild(b); });
+  }
+  const dropNotice = id => { const n = document.getElementById(id); if (n) n.remove(); };
+  function refreshNotices() {
+    if (Persist.isLocked()) notice('nt-lock', 'היומן והנתונים האישיים נעולים.', [['פתיחה עם PIN', () => Tools.go('data')]]);
+    else dropNotice('nt-lock');
+    const snooze = Number(ProStore.get('backupSnooze', 0));
+    if (Persist.needsBackup() && Date.now() > snooze) {
+      const d = days(Persist.status().lastBackup);
+      notice('nt-backup', d === null ? 'עוד לא גיביתם את הנתונים. הם שמורים רק במכשיר הזה.' : `עברו ${d} ימים מהגיבוי האחרון.`, [['גבה עכשיו', () => Tools.go('data'), 'primary'], ['בעוד 3 ימים', () => { ProStore.set('backupSnooze', Date.now() + 3 * 864e5); dropNotice('nt-backup'); }, 'ghost']]);
+    } else dropNotice('nt-backup');
+  }
+
+  /* ---------- לשונית ---------- */
+  function lockCard() {
+    if (!Vault.ok()) return `<div class="card stack"><h3>נעילת PIN</h3><p class="lead">הדפדפן לא תומך בהצפנה (Web Crypto). פתחו את האפליקציה בכתובת https.</p></div>`;
+    if (Persist.isLocked()) return `<div class="card stack lock-card"><h3>פתחו את הנתונים</h3>
+      <p class="lead">היומן, כרטיסי הכלים והפרויקטים מוצפנים במכשיר. הזינו את ה-PIN.</p>
+      <form class="row" id="unlockForm" autocomplete="off"><label class="sr-only" for="pinIn">PIN</label><input class="input num pin" id="pinIn" type="password" inputmode="numeric" maxlength="12" autocomplete="off" required>
+      <button type="submit" class="btn primary">פתח</button></form><p class="field-err" id="pinErr" role="alert" hidden></p>
+      <p class="foot">שכחתם את ה-PIN? אין דרך לשחזר אותו – אפשר רק לשחזר מגיבוי או למחוק את כל הנתונים (למטה).</p></div>`;
+    if (Persist.lockOn()) return `<div class="card stack"><h3>נעילת PIN פעילה</h3>
+      <p class="lead">הנתונים האישיים מוצפנים (AES-GCM-256, PBKDF2 ${Vault.ITER.toLocaleString('he-IL')} איטרציות). נעילה אוטומטית אחרי 15 דקות בלי פעילות.</p>
+      <div class="row"><button type="button" class="btn" data-action="dt-lock">נעל עכשיו</button></div>
+      <form class="row" id="unlockOff" autocomplete="off"><label class="field grow"><span class="lbl">ביטול הנעילה – הזינו PIN</span><input class="input num pin" id="pinOff" type="password" inputmode="numeric" maxlength="12" required></label><button type="submit" class="btn ghost">בטל נעילה</button></form>
+      <p class="field-err" id="pinErr" role="alert" hidden></p></div>`;
+    return `<div class="card stack"><h3>נעילת PIN ליומן (לא חובה)</h3>
+      <p class="lead">מצפין את היומן, כרטיסי הכלים, הפרויקטים והתמונות במכשיר. מומלץ אם יש במכשיר פרטי לקוחות.</p>
+      <form class="tool-grid" id="lockForm" autocomplete="off">
+        <label class="field"><span class="lbl">PIN (4–12 ספרות)</span><input class="input num pin" id="pinNew" type="password" inputmode="numeric" maxlength="12" required></label>
+        <label class="field"><span class="lbl">שוב, לאימות</span><input class="input num pin" id="pinNew2" type="password" inputmode="numeric" maxlength="12" required></label>
+        <button type="submit" class="btn primary">הפעל נעילה</button>
+      </form><p class="field-err" id="pinErr" role="alert" hidden></p>
+      <p class="foot">ה-PIN לא נשמר בשום מקום. שכחתם אותו – הנתונים המוצפנים אבודים. גבו לפני.</p></div>`;
+  }
+  function html() {
+    const s = Persist.status(), locked = s.locked;
+    return `<p class="lead">הכול נשמר רק במכשיר הזה. אין שרת, אין חשבון ואין שליחה החוצה.</p>
+      <div class="card stack"><h3>מצב האחסון</h3>
+        <dl class="specs"><dt>איפה</dt><dd>${esc(BACKEND[s.backend])}</dd><dt>נשמר לאחרונה</dt><dd class="num">${esc(fmtTime(s.lastSaved))}</dd>
+        <dt>גיבוי אחרון</dt><dd class="num">${esc(fmtTime(s.lastBackup))}${s.lastBackup && days(s.lastBackup) >= 14 ? ' – הגיע הזמן לגבות' : ''}</dd><dt>נפח בשימוש</dt><dd class="num" id="dtUsage">—</dd></dl>
+        ${s.backend !== 'idb' ? `<div class="note warn">${ICON.warn}<span>${s.backend === 'mem' ? 'הדפדפן חוסם אחסון (למשל מצב גלישה פרטית). צרו גיבוי לפני סגירת הדף.' : 'IndexedDB לא זמין – תמונות לא יישמרו אחרי סגירה.'}</span></div>` : ''}
+        <button type="button" class="btn sm ghost" data-action="dt-persist">בקש מהדפדפן לא למחוק את הנתונים</button></div>
+      ${lockCard()}
+      <div class="card stack"><h3>גיבוי</h3>
+        <p class="lead">קובץ JSON אחד עם כל הנתונים, גרסת סכמה ובדיקת שלמות (SHA-256).</p>
+        <form class="tool-grid" id="bkForm" autocomplete="off">
+          <label class="field"><span class="lbl">סיסמה להצפנת הקובץ (לא חובה)</span><input class="input" id="bkPw" type="password" maxlength="128" autocomplete="new-password"></label>
+          <label class="field"><span class="lbl">הסיסמה שוב</span><input class="input" id="bkPw2" type="password" maxlength="128" autocomplete="new-password"></label>
+          <button type="submit" class="btn primary" ${locked ? 'disabled' : ''}>צור גיבוי</button>
+        </form>
+        <p class="field-err" id="bkErr" role="alert" hidden></p>
+        <div class="row" id="bkOut" hidden><button type="button" class="btn sm" data-action="dt-save">שמור קובץ</button><button type="button" class="btn sm" data-action="dt-share" hidden>שתף</button><button type="button" class="btn sm ghost" data-action="dt-copy">העתק</button></div>
+        <textarea class="input copybox" id="bkBox" hidden rows="5" readonly aria-label="גיבוי להעתקה"></textarea></div>
+      <div class="card stack"><h3>שחזור מגיבוי</h3>
+        <div class="field"><label for="rsFile">קובץ גיבוי</label><input class="input" id="rsFile" type="file" accept="application/json,.json"></div>
+        <div class="field"><label for="rsPaste">או הדביקו את התוכן</label><textarea class="input copybox" id="rsPaste" rows="3" maxlength="26214400"></textarea></div>
+        <div class="field" id="rsPwRow" ${pwNeeded ? '' : 'hidden'}><label for="rsPw">סיסמת הגיבוי</label><input class="input" id="rsPw" type="password" maxlength="128" autocomplete="off"></div>
+        <button type="button" class="btn" data-action="dt-read" ${locked ? 'disabled' : ''}>בדוק את הקובץ</button>
+        <pre class="import-err" id="rsErr" hidden role="alert"></pre>
+        <div id="rsPreview"></div></div>
+      ${typeof Privacy !== 'undefined' ? Privacy.html() : ''}`;
+  }
+  function previewHTML(p) {
+    return `<div class="stack preview">
+      ${p.notes.length ? `<div class="note info">${ICON.info}<span>${p.notes.map(esc).join('<br>')}</span></div>` : ''}
+      <table class="volt"><thead><tr><th scope="col">מה</th><th scope="col">חדש</th><th scope="col">שונה</th><th scope="col">זהה</th><th scope="col">יימחק בהחלפה</th></tr></thead>
+      <tbody>${p.rows.map(r => `<tr><th scope="row">${esc(r.name)}</th><td class="num">${r.add}</td><td class="num">${r.chg}</td><td class="num">${r.same}</td><td class="num">${r.gone}</td></tr>`).join('')}</tbody></table>
+      <fieldset class="stack plain"><legend class="lbl">איך לשחזר</legend>
+        <label class="check"><input type="radio" name="rsMode" value="merge" checked><span><b>מיזוג</b> – מוסיף חדשים, מעדכן רשומות שהגיבוי חדש יותר בהן</span></label>
+        <label class="check"><input type="radio" name="rsMode" value="replace"><span><b>החלפה</b> – מוחק את מה שיש במכשיר ושם את הגיבוי במקומו</span></label></fieldset>
+      <label class="check" id="rsAckRow" hidden><input type="checkbox" id="rsAck"><span>הבנתי שנתונים שלא בגיבוי יימחקו מהמכשיר</span></label>
+      <div class="row"><button type="button" class="btn primary" data-action="dt-apply">שחזר</button><button type="button" class="btn ghost" data-action="dt-cancel">ביטול</button></div></div>`;
+  }
+  const err = (id, msg) => { const e = $('#' + id); if (e) { e.hidden = !msg; e.textContent = msg || ''; } };
+  function bind() {
+    Persist.estimate().then(e => { const u = $('#dtUsage'); if (u && e) u.textContent = `${(e.usage / 1048576).toFixed(1)}MB מתוך ${(e.quota / 1048576 / 1024).toFixed(1)}GB`; });
+    const lf = $('#lockForm');
+    if (lf) lf.addEventListener('submit', async e => {
+      e.preventDefault();
+      const a = $('#pinNew').value, b = $('#pinNew2').value;
+      if (!Persist.PIN_RE.test(a)) { err('pinErr', 'PIN של 4 עד 12 ספרות'); return; }
+      if (a !== b) { err('pinErr', 'שני ה-PIN לא זהים'); return; }
+      try { await Persist.enableLock(a); UI.toast('הנעילה פעילה – הנתונים מוצפנים'); rerender(); } catch (x) { err('pinErr', 'לא הצלחנו להפעיל נעילה: ' + x.message); }
+    });
+    const uf = $('#unlockForm');
+    if (uf) uf.addEventListener('submit', async e => {
+      e.preventDefault();
+      try { await Persist.unlock($('#pinIn').value); UI.toast('נפתח'); refreshNotices(); rerender(); }
+      catch (x) { err('pinErr', 'PIN שגוי'); $('#pinIn').value = ''; $('#pinIn').focus(); }
+    });
+    const of = $('#unlockOff');
+    if (of) of.addEventListener('submit', async e => {
+      e.preventDefault();
+      try { await Persist.disableLock($('#pinOff').value); UI.toast('הנעילה בוטלה – הנתונים לא מוצפנים'); rerender(); }
+      catch (x) { err('pinErr', 'PIN שגוי'); }
+    });
+    $('#bkForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const a = $('#bkPw').value, b = $('#bkPw2').value;
+      if (a !== b) { err('bkErr', 'שתי הסיסמאות לא זהות'); return; }
+      if (a && a.length < 8) { err('bkErr', 'סיסמה של 8 תווים לפחות'); return; }
+      err('bkErr', '');
+      try {
+        lastBackupText = await Persist.backup(a || null);
+        $('#bkOut').hidden = false;
+        const sh = $('[data-action="dt-share"]'); if (sh) sh.hidden = !canShare();
+        UI.toast(a ? 'נוצר גיבוי מוצפן' : 'נוצר גיבוי');
+      } catch (x) { err('bkErr', x.message === 'locked' ? 'פתחו את הנעילה קודם' : 'יצירת הגיבוי נכשלה'); }
+    });
+    const rf = $('#rsFile');
+    rf.addEventListener('change', () => {
+      const f = rf.files && rf.files[0]; if (!f) return;
+      if (f.size > 25 * 1048576) { err('rsErr', 'הקובץ גדול מ-25MB'); rf.value = ''; return; }
+      const rd = new FileReader(); rd.onload = () => { $('#rsPaste').value = String(rd.result || ''); readNow(); }; rd.readAsText(f);
+    });
+    $$('input[name="rsMode"]').forEach(r => r.addEventListener('change', () => { const x = $('#rsAckRow'); if (x) x.hidden = r.value !== 'replace' || !r.checked; }));
+    if (typeof Privacy !== 'undefined') Privacy.bind();
+  }
+  const fileName = () => `ev-lab-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  const canShare = () => { try { return !IN_FRAME && !!(navigator.canShare && navigator.canShare({ files: [new File(['{}'], 'x.json', { type: 'application/json' })] })); } catch (e) { return false; } };
+  async function readNow() {
+    err('rsErr', ''); $('#rsPreview').innerHTML = '';
+    try {
+      const r = await Persist.readBackup($('#rsPaste').value, ($('#rsPw') || {}).value || '');
+      pending = { data: r.data, notes: r.notes, rows: Persist.preview(r.data) };
+      $('#rsPreview').innerHTML = previewHTML(pending);
+      $$('input[name="rsMode"]').forEach(x => x.addEventListener('change', () => { $('#rsAckRow').hidden = $('input[name="rsMode"]:checked').value !== 'replace'; }));
+    } catch (x) {
+      if (x.needPassword) { pwNeeded = true; $('#rsPwRow').hidden = false; $('#rsPw').focus(); }
+      err('rsErr', x instanceof Sec.ImportError ? x.message : 'קריאת הקובץ נכשלה');
+    }
+  }
+  function rerender() { if (State.mode === 'tools') UI.Modes().tools.render(); refreshNotices(); }
+  UI.on('dt-read', readNow);
+  UI.on('dt-cancel', () => { pending = null; $('#rsPreview').innerHTML = ''; });
+  UI.on('dt-apply', async () => {
+    if (!pending) return;
+    const mode = ($('input[name="rsMode"]:checked') || {}).value || 'merge';
+    if (mode === 'replace' && !$('#rsAck').checked) { UI.toast('סמנו שהבנתם שנתונים יימחקו'); $('#rsAck').focus(); return; }
+    const ok = await Persist.apply(pending.data, mode);
+    pending = null; pwNeeded = false;
+    UI.toast(ok ? (mode === 'replace' ? 'שוחזר (הוחלף)' : 'שוחזר (מוזג)') : 'השחזור לא נשמר – האחסון לא זמין');
+    Level.apply(); rerender();
+  });
+  UI.on('dt-save', () => { offerFile(fileName(), lastBackupText, $('#bkBox')); Persist.markBackedUp(); refreshNotices(); });
+  UI.on('dt-copy', () => { copyText(lastBackupText, $('#bkBox')); Persist.markBackedUp(); refreshNotices(); });
+  UI.on('dt-share', async () => {
+    try { await navigator.share({ files: [new File([lastBackupText], fileName(), { type: 'application/json' })], title: 'גיבוי מעבדת EV' }); Persist.markBackedUp(); refreshNotices(); }
+    catch (e) { if (e && e.name !== 'AbortError') UI.toast('השיתוף נכשל – שמרו כקובץ'); }
+  });
+  UI.on('dt-lock', () => { Persist.lockNow(); UI.toast('ננעל'); rerender(); });
+  UI.on('dt-persist', async () => { UI.toast(await Persist.persistRequest() ? 'הדפדפן לא ימחק את הנתונים אוטומטית' : 'הדפדפן לא אישר – גבו באופן קבוע'); });
+
+  /** כרטיס לתצוגות שתלויות בנתונים נעולים */
+  const lockedCard = what => `<div class="card stack"><h3>${esc(what)} נעול</h3><p class="lead">הנתונים מוצפנים במכשיר. פתחו עם PIN כדי לצפות ולשמור.</p><button type="button" class="btn primary" data-action="tl-sub" data-sub="data">פתיחה עם PIN</button></div>`;
+  function init() {
+    initIndicator(); refreshNotices();
+    let last = '';
+    Persist.onChange(s => { const k = s.locked + ':' + s.lastBackup; if (k !== last) { last = k; refreshNotices(); } });
+  }
+  return { html, bind, init, lockedCard, refreshNotices, notice, dropNotice };
 })();
+
+/* =====================================================================
+   p14 · Boot Pro – טוען את האחסון המקומי, מאתחל את שכבת ה-Pro ואז את האתחול המקורי
+   ===================================================================== */
+const Boot = (() => {
+  let done; const ready = new Promise(r => { done = r; });
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error(name, e); } };
+  function go() {
+    safe('Level.init', () => Level.init());
+    bootBase();
+    safe('Glossary.init', () => Glossary.init());
+    Level.apply();
+    safe('DataUI.init', () => DataUI.init());
+    (window.BootHooks || []).forEach(fn => safe('hook', fn));
+    done();
+  }
+  Persist.init().then(go, go);
+  return { ready };
+})();
+/** לבדיקות אוטומטיות: מחכה לסיום האתחול */
+window.__testReady = () => Boot.ready;
 

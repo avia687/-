@@ -4,9 +4,8 @@
    השוואת דגמים ורכיבים חלופיים, בדיקת עקביות מפרט, סימולטור, מצב סדנה.
    ===================================================================== */
 const Tools = (() => {
-  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה']];
-  let sub = ProStore.get('toolsSub', 'calc'), editId = null, delArm = null, printId = null;
-  if (!SUBS.some(s => s[0] === sub)) sub = 'calc';
+  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה'], ['data', 'גיבוי ופרטיות']];
+  let sub = null, editId = null, delArm = null, printId = null;
   const num = id => { const e = $('#' + id); if (!e) return NaN; const v = Sec.num(e.value, e.min !== '' ? Number(e.min) : -Infinity, e.max !== '' ? Number(e.max) : Infinity); return v === null ? NaN : v; };
   const f1 = x => (Math.round(x * 10) / 10).toString();
   const out = (id, h) => { const e = $('#' + id); if (e) e.innerHTML = h; };
@@ -91,6 +90,7 @@ const Tools = (() => {
 
   /* ---------- יומן תיקונים ---------- */
   function logHTML() {
+    if (Persist.isLocked()) return DataUI.lockedCard('היומן');
     const items = RepairLog.all(), r = editId ? items.find(x => x.id === editId) : null;
     const v = k => esc(r ? r[k] : (k === 'model' ? State.model : ''));
     const mOpts = Object.keys(DATA.models).map(id => `<option value="${id}" ${(r ? r.model : State.model) === id ? 'selected' : ''}>${esc(DATA.models[id].short)}</option>`).join('');
@@ -140,6 +140,7 @@ const Tools = (() => {
       <textarea class="input copybox" id="lgRepBox" hidden rows="6" readonly aria-label="דו״ח להעתקה"></textarea></div>`;
   }
   function bindLog() {
+    if (!$('#logForm')) return;
     $('#logForm').addEventListener('submit', e => {
       e.preventDefault();
       const rec = { customer: $('#lgCust').value.trim(), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
@@ -216,11 +217,13 @@ const Tools = (() => {
   }
 
   function render() {
-    const body = sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
+    if (sub === null) { sub = ProStore.get('toolsSub', 'calc'); if (!SUBS.some(s => s[0] === sub)) sub = 'calc'; }
+    const body = sub === 'data' ? DataUI.html() : sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
     if (sub !== 'sim') MeterSim.detach();
     $('#modeView').innerHTML = `<div><p class="eyebrow">${ICON.tech} כלים · <bdi>${esc(M().short)}</bdi></p><h2>ארגז הכלים של הטכנאי</h2></div>${subtabs()}<div class="stack">${body}</div>`;
     if (sub === 'calc') { $$('#modeView input, #modeView select').forEach(i => i.addEventListener('input', updCalc)); updCalc(); }
     if (sub === 'log') bindLog();
+    if (sub === 'data') DataUI.bind();
     if (sub === 'sim') MeterSim.bind(); else { Scene.select(null); Scene.highlightBundle(null); }
     if (printId) { const r = $('#lgReport'); if (r) r.scrollIntoView({ block: 'nearest' }); }
   }
@@ -248,5 +251,6 @@ const Tools = (() => {
     try { window.print(); } catch (e) { done(); }
     setTimeout(done, 3000);
   });
-  return { render, restore() {}, onVehicle() { editId = null; } };
+  function go(s) { sub = s; ProStore.set('toolsSub', s); editId = null; printId = null; if (State.mode === 'tools') { render(); $('#panelScroll').scrollTop = 0; } else UI.setMode('tools'); }
+  return { render, go, restore() {}, onVehicle() { editId = null; } };
 })();

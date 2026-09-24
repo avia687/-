@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>מעבדת EV</title>
-<link rel="stylesheet" href="app.css" integrity="sha384-DzfxEXIHCtNcniOO5BTJY/bC4+ZbIDqAzXAriganCu1QB5zPRWVTPRgm55sZyp6p">
+<link rel="stylesheet" href="app.css" integrity="sha384-TX0jGbZS4LXIaB6ZAw1VQ12LYUCLhOn2Xs8/i7OPgxtzQRYtYztHkfft5fOsNtAt">
 </head>
 <body>
 <meta name="theme-color" content="#0b0f14">
@@ -13505,6 +13505,7 @@
       </div>
       <button type="button" class="toggle" id="quickBtn" aria-pressed="false" hidden title="מצב מהיר: בלי הסברים">מהיר</button>
       <button type="button" class="toggle" id="workshopBtn" aria-pressed="false" title="מצב סדנה: טקסט וכפתורים גדולים">סדנה</button>
+      <span class="save-state" id="saveState" role="status" aria-live="polite"></span>
     </div>
     <nav class="modes" role="tablist" aria-label="מצב עבודה" id="modeTabs">
       <button type="button" role="tab" id="tab-learn" data-mode="learn" aria-controls="modeView" aria-selected="true">לימוד</button>
@@ -13514,6 +13515,7 @@
     </nav>
   </header>
 
+  <div class="notices" id="notices"></div>
   <main class="workspace">
     <aside class="panel sheet-peek" id="panel" aria-label="פאנל מידע">
       <div class="sheet-grip" id="sheetGrip" role="button" tabindex="0" aria-label="הרחבה או כיווץ של פאנל המידע" aria-expanded="false"><span></span></div>
@@ -13591,7 +13593,7 @@
 <script src="vendor/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="></script>
 <script src="app.js" integrity="sha384-yhuA2JXaKraHbVtvvrGcrkebsHr1Y8vE0fLtx/czlo85NfhQ2pUdfdIvgPmmJxZn"></script>
 
-<script src="pro.js" integrity="sha384-HnDQCLHaDNk82xcN7wODb63Pl5COZwkH1/QCsiyyK2ibQRTU6/5tMKxVcwkY/tR1"></script>
+<script src="pro.js" integrity="sha384-I1WnerTrVWyc84/UEgy7UbBIwPnLBBOs55w742+I49XMYx5OOZ4U3zHMkKJZlg0s"></script>
 
 </body>
 </html>

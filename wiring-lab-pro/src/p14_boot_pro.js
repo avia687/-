@@ -1,9 +1,20 @@
 /* =====================================================================
-   p14 · Boot Pro – מאתחל את שכבת ה-Pro ואז מפעיל את האתחול המקורי
+   p14 · Boot Pro – טוען את האחסון המקומי, מאתחל את שכבת ה-Pro ואז את האתחול המקורי
    ===================================================================== */
-(function bootPro() {
-  try { Level.init(); } catch (e) { console.error('Level.init', e); }
-  bootBase();
-  try { Glossary.init(); } catch (e) { console.error('Glossary.init', e); }
-  Level.apply();
+const Boot = (() => {
+  let done; const ready = new Promise(r => { done = r; });
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error(name, e); } };
+  function go() {
+    safe('Level.init', () => Level.init());
+    bootBase();
+    safe('Glossary.init', () => Glossary.init());
+    Level.apply();
+    safe('DataUI.init', () => DataUI.init());
+    (window.BootHooks || []).forEach(fn => safe('hook', fn));
+    done();
+  }
+  Persist.init().then(go, go);
+  return { ready };
 })();
+/** לבדיקות אוטומטיות: מחכה לסיום האתחול */
+window.__testReady = () => Boot.ready;
