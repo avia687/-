@@ -28,4 +28,8 @@ function watch(page, errors, tag = '') {
   page.on('pageerror', e => errors.push(`${tag}[pageerror] ${e.message} ${(e.stack || '').split('\n')[1] || ''}`));
 }
 function assert(cond, msg) { if (!cond) throw new Error('ASSERT: ' + msg); console.log('  ✓ ' + msg); }
-module.exports = { serve, launch, watch, assert, DIST };
+/** אחרי טעינה: מאשר תנאים (כמו משתמש שכבר אישר) ומאשר מראש פעולות מסוכנות לסשן – לבדיקות רגרסיה */
+async function prep(page) {
+  await page.evaluate(async () => { await window.__testReady(); if (typeof Consent !== 'undefined') { if (!Consent.hasTerms()) Consent.record('terms'); Legal.close(); Consent.preapprove(['battery', 'hv', 'buildPack', 'speed']); } });
+}
+module.exports = { serve, launch, watch, assert, prep, DIST };

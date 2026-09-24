@@ -167,6 +167,8 @@ patch('    <nav class="modes" role="tablist" aria-label="מצב עבודה" id="
     <nav class="modes" role="tablist" aria-label="מצב עבודה" id="modeTabs">`, 'prefs');
 patch('aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>',
   'aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>\n      <button type="button" role="tab" id="tab-tools" data-mode="tools" aria-controls="modeView" aria-selected="false" tabindex="-1">כלים</button>', 'tools tab');
+patch('    <button class="safety-btn" id="hazardOpen" type="button" aria-haspopup="dialog">', '    <nav class="legal-links" aria-label="מסמכים"><a href="terms.html" data-legal="terms">תנאי שימוש</a><a href="privacy.html" data-legal="privacy">פרטיות</a></nav>\n    <button class="safety-btn" id="hazardOpen" type="button" aria-haspopup="dialog">', 'legal links');
+patch('  <div class="toast" id="toast" role="status" aria-live="polite"></div>\n</div>', '  <div class="toast" id="toast" role="status" aria-live="polite"></div>\n</div>\n<template id="tpl-terms">' + read('legal/terms.html') + '</template>\n<template id="tpl-privacy">' + read('legal/privacy.html') + '</template>', 'legal templates');
 patch('  <main class="workspace">', '  <div class="notices" id="notices"></div>\n  <main class="workspace">', 'notices');
 patch('  <div class="toast" id="toast" role="status" aria-live="polite"></div>',
   '  <div class="gtip" id="gtip" role="tooltip" hidden></div>\n  <div class="toast" id="toast" role="status" aria-live="polite"></div>', 'gtip');
@@ -197,7 +199,7 @@ patch("    if (sub === 'volts') { ['socNom', 'socMeas'].forEach(id => $('#' + id
 patch("  function highlight(focus = true) {\n    if (sub === 'tour' && step >= 0) {",
   "  function highlight(focus = true) {\n    if (sub === 'academy') { Academy.highlight(focus); return; }\n    if (sub === 'tour' && step >= 0) {", 'learn highlight');
 patch("<dl class=\"specs\">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])}</dd>`).join('')}</dl></div>",
-  "<dl class=\"specs\">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}</div>", 'spec conf');
+  "<dl class=\"specs\">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}${Legal.modelNote(m)}</div>", 'spec conf');
 // Wizard: תנאים מקדימים, אימות מדידה, תרחישים חדשים
 patch("      <div class=\"card stack\" style=\"border-color:rgba(255,77,77,.35)\">\n        <h3>בדיקת בטיחות לפני עבודה</h3>",
   "      ${WizardPlus.setupExtra(scenario)}\n      <div class=\"card stack\" style=\"border-color:rgba(255,77,77,.35)\">\n        <h3>בדיקת בטיחות לפני עבודה</h3>", 'wiz setup');
@@ -221,7 +223,7 @@ patch("onVehicle() { reset(); }, abort() { if (symId)", "onVehicle() { reset(); 
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
   ['p06_sec.js', 1], ['p06b_storage.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
-  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p14_boot_pro.js', 1]
+  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p14_boot_pro.js', 1]
 ];
 let js = MODS.filter(([, s]) => s <= STAGE).map(([f]) => read(f)).join('\n');
 if (STAGE < 4) js = read('stubs.js') + '\n' + js;
@@ -231,6 +233,10 @@ const THREE_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.mi
 const THREE_LOCAL = path.join(ROOT, 'vendor', 'three.min.js');
 const THREE_SRI = 'sha512-' + crypto.createHash('sha512').update(fs.readFileSync(THREE_LOCAL)).digest('base64');
 patch(`<script src="${THREE_SRC}"></script>`, `<script src="${THREE_SRC}" integrity="${THREE_SRI}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`, 'three sri');
+
+// פרטיות: בלי גופנים מ-CDN (גם בגרסת ה-Artifact)
+html = html.replace(/<link rel="preconnect"[^>]*>\n?|<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
+if (/fonts\.g(oogleapis|static)/.test(html)) throw new Error('google fonts left');
 
 /* ---------- 5. CSP: בלי style="" ----------
    סגנון סטטי → data-sx + כלל CSS; רוחב דינמי → data-sw; צבע דינמי → data-sc (מוחלים ב-Sec.applyStyles) */
@@ -262,7 +268,6 @@ fs.writeFileSync(path.join(DIST, 'index.html'),
   fs.mkdirSync(path.join(WEB, 'vendor'), { recursive: true });
   let w = html;
   const css = [];
-  w = w.replace(/<link rel="preconnect"[^>]*>\n?|<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
   w = w.replace(/<style>\n?([\s\S]*?)<\/style>\n?/g, (_, c) => { css.push(c); return ''; });
   const scripts = [];
   w = w.replace(/<script>\n?([\s\S]*?)<\/script>\n?/g, (_, c) => { scripts.push(c); return `@@SCRIPT${scripts.length - 1}@@`; });
@@ -292,6 +297,23 @@ ${w}
 </body>
 </html>
 `);
+  for (const doc of ['terms', 'privacy']) {
+    fs.writeFileSync(path.join(WEB, doc + '.html'), `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="${CSP}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${doc === 'terms' ? 'תנאי שימוש' : 'מדיניות פרטיות'} – מעבדת EV</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="legal-page">
+<p><a href="./">חזרה למעבדה</a></p>
+${read('legal/' + doc + '.html')}
+</body>
+</html>
+`);
+  }
   // כותרות לשרת (Netlify/Cloudflare Pages) – frame-ancestors לא נתמך ב-meta
   fs.writeFileSync(path.join(WEB, '_headers'), `/*
   Content-Security-Policy: ${CSP}; frame-ancestors 'none'

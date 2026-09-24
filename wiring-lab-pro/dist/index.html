@@ -13466,9 +13466,6 @@
  }
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap">
 <style>
 /* ===================== DESIGN TOKENS ===================== */
 :root{
@@ -13998,6 +13995,25 @@ body.workshop .navrow .btn{min-height:64px;font-size:19px}
 fieldset.plain{border:0;padding:0;margin:0}
 .input.pin{max-width:180px;letter-spacing:.3em}
 
+/* ---------- משפטי / הסכמה / פרטיות ---------- */
+.legal-links{display:flex;gap:10px;font-size:12.5px}
+.legal-links a{color:inherit;text-decoration:underline;text-underline-offset:2px;padding:4px 2px}
+.legal-card{max-width:680px;max-height:min(88vh,860px);display:flex;flex-direction:column}
+.legal-body{overflow:auto;flex:1 1 auto;min-height:0}
+.legal-foot{padding-top:12px;border-top:1px solid var(--line);margin-top:10px}
+.legal h1{font-size:22px;margin:4px 0 2px}.legal h2{font-size:17px;margin:18px 0 6px}
+.legal p,.legal li{line-height:1.6}.legal ul{padding-inline-start:20px}
+.legal table{border-collapse:collapse;width:100%;font-size:14px}.legal th,.legal td{border:1px solid var(--line);padding:6px 8px;text-align:start;vertical-align:top}
+.legal-meta{color:var(--muted);font-size:13px}
+.draft-flag{border:1px solid var(--warn);color:var(--warn);padding:6px 10px;border-radius:8px}
+.lawyer{border-inline-start:3px solid var(--warn);padding-inline-start:10px;color:var(--muted)}
+.verify-law{display:inline-block;font-size:12px;font-weight:600;color:var(--warn);border:1px solid currentColor;border-radius:6px;padding:0 6px;margin-inline-start:4px}
+.consent-list{padding-inline-start:20px;margin:0}.consent-list li{margin-bottom:6px;line-height:1.55}
+.legal-inline{max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.danger-zone{border:1px solid rgba(255,77,77,.35);border-radius:10px;padding:12px;margin-top:6px}
+.danger-zone h4{margin:0;color:var(--danger)}
+body.legal-page{max-width:760px;margin:0 auto;padding:16px;overflow:auto;height:auto}
+
 </style>
 <style>
 /* generated from inline styles */
@@ -14044,6 +14060,7 @@ fieldset.plain{border:0;padding:0;margin:0}
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 5.5 7.6 12.5H4.4L12 7.5ZM11 11v4.5h2V11h-2Zm0 6v2h2v-2h-2Z"/></svg>
     <span class="grow" id="disclaimerText">כלי עזר ללימוד בלבד. לא מחליף בדיקה מקצועית.</span>
     <button class="hazard-chip" id="hazardChip" type="button" hidden>⛔ סומן מצב סיכון</button>
+    <nav class="legal-links" aria-label="מסמכים"><a href="terms.html" data-legal="terms">תנאי שימוש</a><a href="privacy.html" data-legal="privacy">פרטיות</a></nav>
     <button class="safety-btn" id="hazardOpen" type="button" aria-haspopup="dialog"><span class="hide-sm">דיווח על </span>סכנה</button>
   </div>
 
@@ -14158,6 +14175,109 @@ fieldset.plain{border:0;padding:0;margin:0}
   <div class="gtip" id="gtip" role="tooltip" hidden></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
+<template id="tpl-terms"><article class="legal" lang="he" dir="rtl">
+<p class="draft-flag"><b>טיוטה – טרם נבדקה על ידי עורך דין.</b> אין להסתמך על נוסח זה כמסמך משפטי סופי.</p>
+<h1>תנאי שימוש – מעבדת EV</h1>
+<p class="legal-meta">גרסה <span data-legal-version>2026-09-24-draft1</span> · עודכן 24.9.2026</p>
+
+<h2>1. מה זה המוצר</h2>
+<p>מעבדת EV היא כלי לימוד ועזר לאבחון ולתחזוקה של מערכות חשמל באופניים ובקורקינטים חשמליים. המידע כללי, חלקו משוער (מסומן ״טיפוסי״ או ״לא ידוע״) ועלול להיות שגוי או לא עדכני לדגם שלכם.</p>
+<p>הכלי לא מחליף טכנאי מוסמך, הוראות יצרן או בדיקה מקצועית. החלטה לבצע עבודה על כלי – באחריותכם.</p>
+
+<h2>2. בטיחות</h2>
+<ul>
+<li>סוללות ליתיום עלולות להתלקח. אין לפתוח מארז סוללה, לתקן תאים או לעקוף BMS.</li>
+<li>מתח מעל 60V (DC) מסוכן במגע. עבודה על מערכות כאלה – רק עם ציוד מבודד והכשרה מתאימה.</li>
+<li>בכל סימן לחום, עשן, ריח או נפיחות: מפסיקים, מרחיקים את הכלי מאנשים ומחומר דליק, ובמקרה חירום מתקשרים לכבאות והצלה 102.</li>
+</ul>
+
+<h2>3. חוק ורגולציה</h2>
+<p>אופניים חשמליים וקורקינטים חשמליים בישראל כפופים לחקיקה ולתקנות תעבורה, לדרישות תקינה ולחובות ביטוח. <b>יש לאמת מול החוק העדכני</b> – ההוראות משתנות, והמעבדה לא מתעדכנת אוטומטית.</p>
+<ul>
+<li>שינוי מגבלת מהירות או הספק, החלפת מנוע או בקר בחזק יותר, או שינוי הגדרות (למשל קוטר גלגל) כדי לעקוף מגבלה – עלולים להיות אסורים בדרך ציבורית, לשנות את סיווג הכלי ולבטל כיסוי ביטוחי. המעבדה לא מלמדת לעקוף מגבלות.</li>
+<li>מדריכי ״בנה בעצמך״ נועדו <b>לשימוש בשטח פרטי ולמטרות לימוד</b>. כלי שנבנה או שונה עלול לא לעמוד בדרישות לרכיבה בדרך ציבורית.</li>
+</ul>
+
+<h2>4. שימושים אסורים</h2>
+<ul>
+<li>עקיפת מגבלות מהירות, הספק או מנגנוני בטיחות.</li>
+<li>פתיחה, תיקון או הרכבה של סוללות בלי הכשרה, ציוד ופיקוח מתאימים.</li>
+<li>שימוש במידע כדי לפגוע באחרים או ברכוש.</li>
+</ul>
+
+<h2>5. מחירים ונתוני רכיבים</h2>
+<p>טווחי מחירים הם הערכה לקטגוריה, עם תאריך עדכון ורמת אמינות. הם לא הצעת מחיר, לא המלצה לספק ולא מחייבים. אמתו מול הספק לפני רכישה.</p>
+
+<h2>6. אחריות</h2>
+<p class="lawyer">[לנוסח עורך דין: הגבלת אחריות, שיפוי, והיקף האחריות המותר לפי הדין הישראלי, כולל דיני הגנת הצרכן.]</p>
+
+<h2>7. פרטיות</h2>
+<p>כל הנתונים נשמרים במכשיר שלכם בלבד. פרטים במדיניות הפרטיות.</p>
+
+<h2>8. הסכמה</h2>
+<p>לפני השימוש הראשון, ולפני פעולות מסוכנות, תתבקשו לאשר את התנאים. האישור (גרסה ותאריך) נשמר במכשיר בלבד ומופיע בייצוא הנתונים.</p>
+
+<h2>9. דין וסמכות שיפוט</h2>
+<p class="lawyer">[לנוסח עורך דין: דין ישראלי, מקום שיפוט, פרטי המפעיל ודרכי יצירת קשר.]</p>
+</article>
+</template>
+<template id="tpl-privacy"><article class="legal" lang="he" dir="rtl">
+<p class="draft-flag"><b>טיוטה – טרם נבדקה על ידי עורך דין.</b></p>
+<h1>מדיניות פרטיות – מעבדת EV</h1>
+<p class="legal-meta">גרסה <span data-legal-version>2026-09-24-draft1</span> · עודכן 24.9.2026</p>
+
+<h2>בקצרה</h2>
+<ul>
+<li>אין שרת, אין חשבון, אין עוגיות ואין כלי אנליטיקה.</li>
+<li>כל מה שאתם מזינים נשמר רק בדפדפן במכשיר הזה (IndexedDB).</li>
+<li>אתם יכולים לייצא הכול בלחיצה, ולמחוק הכול בלחיצה (עם אישור כפול).</li>
+</ul>
+
+<h2>מה נשמר במכשיר</h2>
+<table>
+<thead><tr><th scope="col">מידע</th><th scope="col">למה</th><th scope="col">מוצפן עם PIN</th></tr></thead>
+<tbody>
+<tr><td>יומן תיקונים: שם לקוח וטלפון (לא חובה), מספר סידורי, תקלות, מדידות, הערות</td><td>ניהול תיקונים</td><td>כן</td></tr>
+<tr><td>כרטיסי כלי, תזכורות תחזוקה, הצעות מחיר, פרויקטי בנייה</td><td>היסטוריה ומעקב</td><td>כן</td></tr>
+<tr><td>תמונות שצירפתם לתיקון (דחוסות)</td><td>תיעוד</td><td>כן</td></tr>
+<tr><td>העדפות תצוגה, התקדמות באקדמיה, כרטיסיות חזרה</td><td>המשך מאיפה שעצרתם</td><td>לא</td></tr>
+<tr><td>אישור תנאי השימוש (גרסה ותאריך)</td><td>תיעוד הסכמה</td><td>לא</td></tr>
+</tbody>
+</table>
+<p>פרטי לקוח הם לא חובה. אפשר לסמן ״לקוח אנונימי״ ולשמור רק את נתוני הכלי.</p>
+
+<h2>מה יוצא מהמכשיר</h2>
+<ul>
+<li><b>גרסת האפליקציה המותקנת (PWA):</b> לא יוצאת אף בקשה לשרת חיצוני. הגופנים, הקוד ומודל התלת-ממד נטענים מאותו אתר ונשמרים לעבודה בלי רשת.</li>
+<li><b>תצוגה מקדימה מוטמעת (Artifact):</b> ספריית התלת-ממד Three.js נטענת מ-cdnjs (עם בדיקת שלמות SRI). לא נשלח מידע אישי.</li>
+<li><b>פקודות קוליות (לא חובה, כבוי כברירת מחדל):</b> בחלק מהדפדפנים (למשל Chrome) זיהוי הדיבור מתבצע בשרתי ספק הדפדפן, כלומר הקול נשלח אליו. ההקראה משתמשת רק בקולות שמותקנים במכשיר כשיש כאלה.</li>
+<li><b>גיבוי ושיתוף:</b> קובץ גיבוי יוצא רק כשאתם שומרים או משתפים אותו. מומלץ להצפין בסיסמה.</li>
+</ul>
+
+<h2>תמונות</h2>
+<p>תמונות נדחסות ומקודדות מחדש במכשיר. הקידוד מחדש מסיר נתוני EXIF, כולל מיקום GPS.</p>
+
+<h2>אבטחה</h2>
+<ul>
+<li>נעילת PIN (לא חובה): הנתונים האישיים מוצפנים ב-AES-GCM עם מפתח שנגזר מה-PIN (PBKDF2, 250,000 איטרציות). ה-PIN לא נשמר. שכחתם אותו – אין דרך לשחזר את הנתונים המוצפנים.</li>
+<li>מי שיש לו גישה פיזית למכשיר לא נעול יכול לראות את הנתונים. נעלו את המכשיר ואת היומן.</li>
+<li>קובץ גיבוי לא מוצפן מכיל את כל הנתונים בטקסט גלוי.</li>
+</ul>
+
+<h2>הזכויות שלכם</h2>
+<ul>
+<li>עיון: ״ייצוא כל הנתונים שלי״ בלשונית כלים ← גיבוי ופרטיות.</li>
+<li>תיקון: עריכת כל רשומה ביומן.</li>
+<li>מחיקה: ״מחק את כל הנתונים שלי״ – מוחק את המסד, ההעדפות והמטמון של האפליקציה במכשיר.</li>
+</ul>
+
+<h2>אם אתם שומרים פרטי לקוחות</h2>
+<p>כשטכנאי או עסק שומרים פרטי לקוחות, ייתכן שחלות עליהם חובות לפי חוק הגנת הפרטיות, התשמ״א-1981, והתקנות לפיו (כולל אבטחת מידע). החוק עודכן בשנים האחרונות. <b>יש לאמת מול החוק העדכני ועם יועץ משפטי.</b></p>
+
+<h2>יצירת קשר</h2>
+<p class="lawyer">[לנוסח עורך דין: שם המפעיל, כתובת ליצירת קשר בנושאי פרטיות.]</p>
+</article>
+</template>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
@@ -15978,7 +16098,7 @@ const Learn = (() => {
           <div class="kv"><span>מנועים</span><b>${m.motor.pos === 'dual' ? '2' : '1'}</b></div>
         </div>
       </div>
-      <div class="card stack"><h3>מפרט מלא</h3><dl class="specs">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}</div>
+      <div class="card stack"><h3>מפרט מלא</h3><dl class="specs">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}${Legal.modelNote(m)}</div>
       <div class="card stack"><h3>מערכת החשמל בדגם הזה</h3><p>${T(m.electric)}</p>
         <div class="row" data-sx="s8">
           <span>מלאה <b class="num" data-sx="s9">${b.full.toFixed(1)}V</b></span>
@@ -18086,11 +18206,13 @@ const Tools = (() => {
     return `<p class="lead">יומן לכל כלי שמגיע לתיקון. נשמר רק בדפדפן הזה – ייצאו JSON לגיבוי או להעברה למכשיר אחר.</p>
       <form class="card stack" id="logForm" autocomplete="off"><h3>${r ? 'עריכת רשומה' : 'רשומה חדשה'}</h3>
         <div class="tool-grid">
-          <div class="field"><label for="lgCust">לקוח</label><input class="input" id="lgCust" maxlength="120" value="${v('customer')}"></div>
+          <div class="field"><label for="lgCust">לקוח (לא חובה)</label><input class="input" id="lgCust" maxlength="120" autocomplete="off" value="${v('customer')}" ${r && r.anon ? 'disabled' : ''}></div>
+          <div class="field"><label for="lgPhone">טלפון (לא חובה)</label><input class="input" id="lgPhone" type="tel" inputmode="tel" maxlength="30" autocomplete="off" value="${v('phone')}" ${r && r.anon ? 'disabled' : ''}></div>
           <div class="field"><label for="lgModel">דגם</label><select class="input" id="lgModel">${mOpts}</select></div>
           <div class="field"><label for="lgSerial">מספר סידורי</label><input class="input" id="lgSerial" maxlength="60" value="${v('serial')}"></div>
           <div class="field"><label for="lgStatus">סטטוס</label><select class="input" id="lgStatus">${['פתוח', 'בטיפול', 'ממתין לחלק', 'הסתיים'].map(s => `<option ${((r && r.status) || 'פתוח') === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
         </div>
+        <label class="check" for="lgAnon"><input type="checkbox" id="lgAnon" ${r && r.anon ? 'checked' : ''}><span>לקוח אנונימי – בלי שם וטלפון</span></label>
         <div class="field"><label for="lgSym">תלונה / סימפטומים</label><textarea class="input" id="lgSym" rows="2" maxlength="2000">${v('symptoms')}</textarea></div>
         <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
         <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
@@ -18106,7 +18228,7 @@ const Tools = (() => {
           <pre class="import-err" id="lgErr" hidden role="alert"></pre>
           <button type="button" class="btn primary" data-action="lg-doimport">ייבוא</button></div>
         ${items.length ? items.map(x => `<div class="card log-item">
-          <div class="spread"><b>${esc(x.customer || 'ללא שם')} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
+          <div class="spread"><b>${esc(x.anon ? 'לקוח אנונימי' : (x.customer || 'ללא שם'))} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
           ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
           <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחצו שוב למחיקה' : 'מחיקה'}</button></div>
@@ -18116,13 +18238,13 @@ const Tools = (() => {
   }
   function reportText(x) {
     const mm = DATA.models[x.model] || {};
-    return `דו״ח תיקון – מעבדת החיווט\nתאריך: ${x.date}\nלקוח: ${x.customer}\nכלי: ${mm.name || x.modelName}${x.serial ? ' · מס״ד ' + x.serial : ''}\nתלונה: ${x.symptoms}\nמדידות: ${x.measurements}\nהוחלף: ${x.replaced}\nהערות: ${x.notes}\nסטטוס: ${x.status}\n\n${DATA.meta.disclaimer}`;
+    return `דו״ח תיקון – מעבדת החיווט\nתאריך: ${x.date}\nלקוח: ${x.anon ? 'לקוח אנונימי' : x.customer}${x.phone ? ' · ' + x.phone : ''}\nכלי: ${mm.name || x.modelName}${x.serial ? ' · מס״ד ' + x.serial : ''}\nתלונה: ${x.symptoms}\nמדידות: ${x.measurements}\nהוחלף: ${x.replaced}\nהערות: ${x.notes}\nסטטוס: ${x.status}\n\n${DATA.meta.disclaimer}`;
   }
   function reportHTML(x) {
     if (!x) return '';
     const mm = DATA.models[x.model] || {};
     return `<div class="card stack print-area" id="lgReport"><h3>דו״ח תיקון ללקוח</h3>
-      <dl class="specs"><dt>תאריך</dt><dd class="num">${esc(x.date)}</dd><dt>לקוח</dt><dd>${esc(x.customer)}</dd><dt>כלי</dt><dd><bdi>${esc(mm.name || x.modelName)}</bdi>${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</dd>
+      <dl class="specs"><dt>תאריך</dt><dd class="num">${esc(x.date)}</dd><dt>לקוח</dt><dd>${esc(x.anon ? 'לקוח אנונימי' : x.customer)}${x.phone ? ' · <bdi>' + esc(x.phone) + '</bdi>' : ''}</dd><dt>כלי</dt><dd><bdi>${esc(mm.name || x.modelName)}</bdi>${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</dd>
       <dt>תלונה</dt><dd>${esc(x.symptoms)}</dd><dt>מדידות</dt><dd>${esc(x.measurements)}</dd><dt>הוחלף</dt><dd>${esc(x.replaced)}</dd><dt>הערות</dt><dd>${esc(x.notes)}</dd><dt>סטטוס</dt><dd>${esc(x.status)}</dd></dl>
       <p class="foot">${esc(DATA.meta.disclaimer)}</p>
       <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn sm primary" data-action="lg-print">הדפסה</button>'}<button type="button" class="btn sm" data-action="lg-copyrep" data-id="${esc(x.id)}">העתקת הדו״ח</button><button type="button" class="btn sm ghost" data-action="lg-closerep">סגירה</button></div>
@@ -18130,9 +18252,13 @@ const Tools = (() => {
   }
   function bindLog() {
     if (!$('#logForm')) return;
+    const an = $('#lgAnon');
+    an.addEventListener('change', () => { ['#lgCust', '#lgPhone'].forEach(s => { const e = $(s); e.disabled = an.checked; if (an.checked) e.value = ''; }); });
     $('#logForm').addEventListener('submit', e => {
       e.preventDefault();
-      const rec = { customer: $('#lgCust').value.trim(), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
+      const anon = $('#lgAnon').checked, phone = anon ? '' : Sec.str($('#lgPhone').value.trim(), 30);
+      if (phone && !/^[0-9+()\- ]{6,30}$/.test(phone)) { Sec.fieldMsg($('#lgPhone'), 'ספרות, רווח, + ( ) - בלבד'); $('#lgPhone').focus(); return; }
+      const rec = { anon, phone, customer: anon ? '' : Sec.str($('#lgCust').value.trim(), 120), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
       if (editId) { RepairLog.update(editId, rec); UI.toast('הרשומה עודכנה'); } else { RepairLog.add(rec); UI.toast('נוסף ליומן'); }
       editId = null; render();
     });
@@ -18531,6 +18657,235 @@ const DataUI = (() => {
   }
   return { html, bind, init, lockedCard, refreshNotices, notice, dropNotice };
 })();
+
+/* =====================================================================
+   p16 · Legal + Consent + Privacy
+   · Consent: הסכמה פעילה (תיבת סימון) לפני שימוש ראשון ולפני פעולות מסוכנות.
+     נשמרים גרסת התנאים והתאריך בלבד, במכשיר (Persist 'consent').
+   · Legal: חלון תנאי שימוש / פרטיות (מתבניות <template> בקובץ), הערות רגולציה.
+   · Privacy: ייצוא כל הנתונים האישיים, ״מחק את כל הנתונים שלי״ עם אישור כפול.
+   כל הטקסטים המשפטיים הם טיוטה לבדיקת עורך דין.
+   ===================================================================== */
+const Legal = (() => {
+  const VERSION = '2026-09-24-draft1';
+  const VERIFY = '<span class="verify-law">לאמת מול החוק העדכני</span>';
+  let lastFocus = null;
+
+  /* ---------- חלון (תנאים / פרטיות / הסכמה) ---------- */
+  function dialog() {
+    let d = $('#legalModal');
+    if (d) return d;
+    d = document.createElement('div');
+    d.className = 'modal'; d.id = 'legalModal'; d.hidden = true;
+    d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'legalTitle');
+    d.innerHTML = '<div class="modal-card legal-card"><div class="spread"><h2 id="legalTitle" tabindex="-1"></h2><button type="button" class="close-x" data-legal-close aria-label="סגירה"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="legal-body" id="legalBody"></div><div class="legal-foot" id="legalFoot"></div></div>';
+    $('#app').appendChild(d);
+    d.addEventListener('click', e => { if (e.target.closest('[data-legal-close]') && !d.dataset.blocking) close(); });
+    d.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !d.dataset.blocking) close();
+      if (e.key === 'Tab') trap(d, e);
+    });
+    return d;
+  }
+  function trap(c, e) {
+    const it = $$('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])', c).filter(x => x.offsetParent !== null);
+    if (!it.length) return;
+    const f = it[0], l = it[it.length - 1];
+    if (e.shiftKey && document.activeElement === f) { e.preventDefault(); l.focus(); }
+    else if (!e.shiftKey && document.activeElement === l) { e.preventDefault(); f.focus(); }
+  }
+  function open(title, bodyNode, footNode, blocking) {
+    const d = dialog();
+    lastFocus = document.activeElement;
+    $('#legalTitle').textContent = title;
+    const b = $('#legalBody'); b.textContent = ''; if (bodyNode) b.appendChild(bodyNode); b.scrollTop = 0;
+    const f = $('#legalFoot'); f.textContent = ''; if (footNode) f.appendChild(footNode);
+    if (blocking) d.dataset.blocking = '1'; else delete d.dataset.blocking;
+    $('[data-legal-close]', d).hidden = !!blocking;
+    d.hidden = false;
+    $('#legalTitle').focus();
+  }
+  function close() {
+    const d = $('#legalModal'); if (!d) return;
+    d.hidden = true; delete d.dataset.blocking;
+    if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus();
+  }
+  const doc = which => { const t = document.getElementById('tpl-' + which); return t ? t.content.cloneNode(true) : document.createTextNode('המסמך לא נמצא.'); };
+  function show(which) { open(which === 'terms' ? 'תנאי שימוש' : 'מדיניות פרטיות', doc(which), null, false); }
+
+  /* ---------- הערת רגולציה לדגם ---------- */
+  const num = s => { const m = String(s || '').match(/(\d{2,5})\s*W/); return m ? Number(m[1]) : null; };
+  const kmh = s => { const m = String(s || '').match(/(\d{2,3})\s*קמ״ש/g); return m ? Math.max(...m.map(x => parseInt(x, 10))) : null; };
+  function modelNote(m) {
+    const w = num(m.motor && m.motor.nominal), v = kmh(m.speed);
+    const over = (v && v > 25) || (m.cat === 'ebike' && w && w > 250);
+    return `<div class="note ${over ? 'warn' : 'info'} law-note">${over ? ICON.warn : ICON.info}<span><b>רגולציה בישראל</b> ${VERIFY}<br>
+      ${m.cat === 'ebike'
+        ? 'אופניים עם מנוע עזר: סיוע עד 25 קמ״ש ומנוע בהספק נומינלי עד 250W, עם אישור תקן. גיל מינימום וחובת קסדה לפי התקנות.'
+        : 'קורקינט חשמלי: מהירות מרבית 25 קמ״ש. גיל מינימום, קסדה ומקום רכיבה לפי התקנות.'}
+      ${over ? `<br>המפרט שפורסם לדגם (${esc([w ? w + 'W' : '', v ? v + ' קמ״ש' : ''].filter(Boolean).join(' · '))}) חורג מהמגבלות. ייתכן שזו גרסה שלא מיועדת לדרך ציבורית – בדקו את התווית והאישור של הכלי שלכם.` : ''}
+      שינוי שעוקף מגבלה עלול לשנות את סיווג הכלי ולבטל ביטוח.</span></div>`;
+  }
+  const privateUse = () => `<div class="note warn private-use">${ICON.warn}<span><b>לשימוש בשטח פרטי ולמטרות לימוד.</b> כלי שנבנה או שונה עלול לא לעמוד בדרישות לרכיבה בדרך ציבורית ${VERIFY}.</span></div>`;
+
+  /* ---------- קישורים בתחתית ---------- */
+  function init() {
+    document.addEventListener('click', e => {
+      const a = e.target.closest && e.target.closest('[data-legal]');
+      if (a) { e.preventDefault(); show(a.dataset.legal); }
+    });
+  }
+  return { VERSION, VERIFY, open, close, show, doc, modelNote, privateUse, init, trap };
+})();
+
+const Consent = (() => {
+  const ACTIONS = {
+    battery: { t: 'עבודה על סוללה', d: 'מחליפים מארז שלם בלבד. לא פותחים מארז, לא מתקנים תאים ולא עוקפים BMS. סוללת ליתיום פגועה עלולה להתלקח גם אחרי שעות.' },
+    hv: { t: 'עבודה על מתח מעל 60V', d: 'מתח DC מעל 60V מסוכן במגע. עובדים עם ציוד מבודד, מודדים לפני מגע, ולא עובדים לבד. אם אין לכם הכשרה – פנו לטכנאי.' },
+    buildPack: { t: 'בניית סוללה', d: 'למתקדמים בלבד: ריתוך נקודתי (לא הלחמה), נתיך לכל ענף, BMS מתאים, איזון תאים וטעינה ראשונה בפיקוח על משטח לא דליק. טעות אחת מספיקה לשריפה.' },
+    speed: { t: 'הגדרות מהירות והספק', d: 'שינוי מגבלת מהירות או הספק, או קוטר גלגל לא נכון כדי לעקוף מגבלה, עלול להיות אסור בדרך ציבורית ולבטל ביטוח. מגדירים רק את הערכים האמיתיים של הכלי.' }
+  };
+  const session = new Set();
+  const data = () => Persist.get('consent');
+  const hasTerms = () => { const t = data().terms; return !!(t && t.v === Legal.VERSION); };
+  function record(key) {
+    const c = Object.assign({}, data());
+    const now = new Date().toISOString();
+    if (key === 'terms') c.terms = { v: Legal.VERSION, at: now };
+    else { c.actions = Object.assign({}, c.actions); const prev = c.actions[key]; c.actions[key] = { v: Legal.VERSION, at: now, n: (prev && prev.n || 0) + 1 }; }
+    Persist.set('consent', c);
+  }
+  /** חלון הסכמה – מחזיר Promise<boolean> */
+  function ask(title, bodyNode, label, blocking) {
+    return new Promise(res => {
+      const foot = document.createElement('div'); foot.className = 'stack';
+      const lab = document.createElement('label'); lab.className = 'check consent-check';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'consentChk';
+      const sp = document.createElement('span'); sp.textContent = label;
+      lab.append(cb, sp);
+      const row = document.createElement('div'); row.className = 'row';
+      const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'btn primary'; ok.textContent = 'המשך'; ok.disabled = true;
+      row.appendChild(ok);
+      if (!blocking) { const no = document.createElement('button'); no.type = 'button'; no.className = 'btn ghost'; no.textContent = 'ביטול'; no.addEventListener('click', () => { Legal.close(); res(false); }); row.appendChild(no); }
+      foot.append(lab, row);
+      cb.addEventListener('change', () => { ok.disabled = !cb.checked; });
+      ok.addEventListener('click', () => { if (!cb.checked) return; Legal.close(); res(true); });
+      Legal.open(title, bodyNode, foot, blocking);
+      const d = $('#legalModal');
+      const onClose = new MutationObserver(() => { if (d.hidden) { onClose.disconnect(); res(false); } });
+      onClose.observe(d, { attributes: true, attributeFilter: ['hidden'] });
+    });
+  }
+  /** לפני שימוש ראשון (או אחרי עדכון גרסת התנאים) */
+  async function gateTerms() {
+    if (hasTerms()) return true;
+    const body = document.createElement('div'); body.className = 'stack';
+    body.innerHTML = `<p class="lead">לפני שמתחילים – שלושה דברים:</p>
+      <ol class="consent-list"><li><b>זה כלי לימוד ועזר</b>, לא תחליף לטכנאי מוסמך. חלק מהנתונים משוערים ומסומנים כך.</li>
+      <li><b>סוללות ומתח גבוה מסוכנים.</b> לא פותחים סוללות ולא עוקפים מגבלות מהירות או הספק.</li>
+      <li><b>הנתונים נשארים אצלכם.</b> אין שרת ואין מעקב – הכול נשמר במכשיר.</li></ol>
+      <p class="foot">קראו את <a href="terms.html" data-legal-inline="terms">תנאי השימוש</a> ואת <a href="privacy.html" data-legal-inline="privacy">מדיניות הפרטיות</a> (טיוטה, גרסה ${esc(Legal.VERSION)}).</p>
+      <div class="legal-inline" id="legalInline" hidden></div>`;
+    body.addEventListener('click', e => {
+      const a = e.target.closest('[data-legal-inline]'); if (!a) return;
+      e.preventDefault(); e.stopPropagation();
+      const box = $('#legalInline', body); box.textContent = ''; box.appendChild(Legal.doc(a.dataset.legalInline)); box.hidden = false; box.scrollIntoView({ block: 'start' });
+    });
+    const ok = await ask('ברוכים הבאים למעבדת EV', body, 'קראתי ואני מסכים/ה לתנאי השימוש ולמדיניות הפרטיות', true);
+    if (ok) record('terms');
+    return ok;
+  }
+  /** לפני פעולה מסוכנת. מחזיר true אם אושר (או אושר כבר בסשן הזה) */
+  async function confirm(keys) {
+    keys = [].concat(keys).filter(k => ACTIONS[k] && !session.has(k));
+    if (!keys.length) return true;
+    const body = document.createElement('div'); body.className = 'stack';
+    body.innerHTML = keys.map(k => `<div class="note danger">${ICON.warn}<span><b>${esc(ACTIONS[k].t)}.</b> ${esc(ACTIONS[k].d)}</span></div>`).join('') +
+      `<p class="foot">${Legal.VERIFY} · האישור נשמר במכשיר עם תאריך וגרסת התנאים.</p>`;
+    const ok = await ask('לפני שממשיכים', body, 'הבנתי את הסיכון ואני אחראי/ת לעבודה', false);
+    if (ok) keys.forEach(k => { session.add(k); record(k); });
+    return ok;
+  }
+  /** יירוט לחיצות על פעולות מסוכנות (לפני שהמטפל המקורי רץ) */
+  function needsFor(el) {
+    const a = el.dataset.action, k = [];
+    if (a === 'wz-start') {
+      const sc = ($('input[name="wzS"]:checked') || {}).value;
+      if (sc === 'battery') k.push('battery');
+      if (sc === 'display' || sc === 'controller') k.push('speed');
+      if (Number(State.voltage) >= DATA.pro.hvThreshold) k.push('hv');
+    }
+    if ((a === 'dp-open' || a === 'tp-meas' || a === 'tp-go') && M().voltage >= DATA.pro.hvThreshold) k.push('hv');
+    if (el.dataset.consent) el.dataset.consent.split(',').forEach(x => k.push(x));
+    return k.filter(x => !session.has(x));
+  }
+  function init() {
+    window.addEventListener('click', e => {
+      const el = e.target.closest && e.target.closest('[data-action], [data-consent]');
+      if (!el || el.disabled) return;
+      const k = needsFor(el);
+      if (!k.length) return;
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      confirm(k).then(ok => { if (ok && document.contains(el)) el.click(); });
+    }, true);
+  }
+  /** אישור מראש לסשן הנוכחי בלבד (למשל טכנאי מוסמך שכבר אישר) – לא נשמר */
+  const preapprove = keys => [].concat(keys).forEach(k => { if (ACTIONS[k]) session.add(k); });
+  return { init, gateTerms, confirm, hasTerms, ACTIONS, record, data, preapprove };
+})();
+
+const Privacy = (() => {
+  let wipeStep = 0;
+  function html() {
+    return `<div class="card stack" id="privacyCard"><h3>הנתונים שלך</h3>
+      <p class="lead">אין שרת ואין מעקב. אפשר לראות, לייצא ולמחוק הכול. <a href="privacy.html" data-legal="privacy">מדיניות הפרטיות</a> · <a href="terms.html" data-legal="terms">תנאי שימוש</a></p>
+      <div class="row"><button type="button" class="btn" data-action="pv-export">ייצוא כל הנתונים שלי</button></div>
+      <textarea class="input copybox" id="pvBox" hidden rows="5" readonly aria-label="כל הנתונים להעתקה"></textarea>
+      <div class="danger-zone stack"><h4>מחק את כל הנתונים שלי</h4>
+        <p class="foot">מוחק את היומן, כרטיסי הכלים, התמונות, הפרויקטים, ההעדפות, ההסכמות והמטמון של האפליקציה במכשיר הזה. אי אפשר לבטל.</p>
+        <div id="pvWipe">${wipeHTML()}</div></div></div>`;
+  }
+  function wipeHTML() {
+    if (wipeStep === 0) return '<button type="button" class="btn danger" data-action="pv-wipe1">מחק את כל הנתונים שלי</button>';
+    if (wipeStep === 1) return `<div class="stack"><label class="check"><input type="checkbox" id="pvAck1"><span>הבנתי שהכול יימחק ואין דרך לשחזר בלי קובץ גיבוי</span></label>
+      <div class="row"><button type="button" class="btn danger" data-action="pv-wipe2" disabled id="pvGo1">המשך</button><button type="button" class="btn ghost" data-action="pv-cancel">ביטול</button></div></div>`;
+    return `<div class="stack"><label class="field"><span class="lbl">לאישור סופי הקלידו: מחק</span><input class="input" id="pvWord" maxlength="10" autocomplete="off"></label>
+      <div class="row"><button type="button" class="btn danger" data-action="pv-wipe3" disabled id="pvGo2">מחק עכשיו</button><button type="button" class="btn ghost" data-action="pv-cancel">ביטול</button></div></div>`;
+  }
+  function renderWipe() {
+    const w = $('#pvWipe'); if (!w) return;
+    w.innerHTML = wipeHTML();
+    const a = $('#pvAck1'); if (a) a.addEventListener('change', () => { $('#pvGo1').disabled = !a.checked; });
+    const t = $('#pvWord'); if (t) { t.addEventListener('input', () => { $('#pvGo2').disabled = t.value.trim() !== 'מחק'; }); t.focus(); }
+  }
+  function bind() { wipeStep = 0; renderWipe(); }
+  async function exportAll() {
+    if (Persist.isLocked()) { UI.toast('פתחו את הנעילה קודם'); Tools.go('data'); return; }
+    await Persist.flush();
+    const photos = {};
+    for (const id of await Persist.blobIds()) {
+      const b = await Persist.getBlob(id);
+      if (b) photos[id] = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.onerror = () => r(null); fr.readAsDataURL(b); });
+    }
+    let ui = null; try { ui = JSON.parse(localStorage.getItem('wiring-lab.v1')); } catch (e) { /* */ }
+    const out = { app: 'ev-lab', type: 'personal-data-export', created: new Date().toISOString(), note: 'כל המידע שהאפליקציה שומרת עליך במכשיר הזה.', storage: Persist.backend(), data: Persist.snapshot(), photos, uiState: ui };
+    offerFile(`ev-lab-my-data-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(out, null, 1), $('#pvBox'));
+  }
+  async function wipe() {
+    await Persist.wipe();
+    try { if (navigator.serviceWorker && navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ type: 'wipe' }); } catch (e) { /* */ }
+    UI.toast('כל הנתונים נמחקו');
+    setTimeout(() => location.reload(), 400);
+  }
+  UI.on('pv-export', exportAll);
+  UI.on('pv-wipe1', () => { wipeStep = 1; renderWipe(); });
+  UI.on('pv-wipe2', () => { if ($('#pvAck1') && $('#pvAck1').checked) { wipeStep = 2; renderWipe(); } });
+  UI.on('pv-wipe3', () => { if ($('#pvWord') && $('#pvWord').value.trim() === 'מחק') wipe(); });
+  UI.on('pv-cancel', () => { wipeStep = 0; renderWipe(); });
+  return { html, bind, exportAll, wipe };
+})();
+
+(window.BootHooks = window.BootHooks || []).push(() => { Legal.init(); Consent.init(); Consent.gateTerms(); });
 
 /* =====================================================================
    p14 · Boot Pro – טוען את האחסון המקומי, מאתחל את שכבת ה-Pro ואז את האתחול המקורי

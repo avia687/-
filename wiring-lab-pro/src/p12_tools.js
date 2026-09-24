@@ -97,11 +97,13 @@ const Tools = (() => {
     return `<p class="lead">יומן לכל כלי שמגיע לתיקון. נשמר רק בדפדפן הזה – ייצאו JSON לגיבוי או להעברה למכשיר אחר.</p>
       <form class="card stack" id="logForm" autocomplete="off"><h3>${r ? 'עריכת רשומה' : 'רשומה חדשה'}</h3>
         <div class="tool-grid">
-          <div class="field"><label for="lgCust">לקוח</label><input class="input" id="lgCust" maxlength="120" value="${v('customer')}"></div>
+          <div class="field"><label for="lgCust">לקוח (לא חובה)</label><input class="input" id="lgCust" maxlength="120" autocomplete="off" value="${v('customer')}" ${r && r.anon ? 'disabled' : ''}></div>
+          <div class="field"><label for="lgPhone">טלפון (לא חובה)</label><input class="input" id="lgPhone" type="tel" inputmode="tel" maxlength="30" autocomplete="off" value="${v('phone')}" ${r && r.anon ? 'disabled' : ''}></div>
           <div class="field"><label for="lgModel">דגם</label><select class="input" id="lgModel">${mOpts}</select></div>
           <div class="field"><label for="lgSerial">מספר סידורי</label><input class="input" id="lgSerial" maxlength="60" value="${v('serial')}"></div>
           <div class="field"><label for="lgStatus">סטטוס</label><select class="input" id="lgStatus">${['פתוח', 'בטיפול', 'ממתין לחלק', 'הסתיים'].map(s => `<option ${((r && r.status) || 'פתוח') === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
         </div>
+        <label class="check" for="lgAnon"><input type="checkbox" id="lgAnon" ${r && r.anon ? 'checked' : ''}><span>לקוח אנונימי – בלי שם וטלפון</span></label>
         <div class="field"><label for="lgSym">תלונה / סימפטומים</label><textarea class="input" id="lgSym" rows="2" maxlength="2000">${v('symptoms')}</textarea></div>
         <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
         <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
@@ -117,7 +119,7 @@ const Tools = (() => {
           <pre class="import-err" id="lgErr" hidden role="alert"></pre>
           <button type="button" class="btn primary" data-action="lg-doimport">ייבוא</button></div>
         ${items.length ? items.map(x => `<div class="card log-item">
-          <div class="spread"><b>${esc(x.customer || 'ללא שם')} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
+          <div class="spread"><b>${esc(x.anon ? 'לקוח אנונימי' : (x.customer || 'ללא שם'))} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
           ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
           <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחצו שוב למחיקה' : 'מחיקה'}</button></div>
@@ -127,13 +129,13 @@ const Tools = (() => {
   }
   function reportText(x) {
     const mm = DATA.models[x.model] || {};
-    return `דו״ח תיקון – מעבדת החיווט\nתאריך: ${x.date}\nלקוח: ${x.customer}\nכלי: ${mm.name || x.modelName}${x.serial ? ' · מס״ד ' + x.serial : ''}\nתלונה: ${x.symptoms}\nמדידות: ${x.measurements}\nהוחלף: ${x.replaced}\nהערות: ${x.notes}\nסטטוס: ${x.status}\n\n${DATA.meta.disclaimer}`;
+    return `דו״ח תיקון – מעבדת החיווט\nתאריך: ${x.date}\nלקוח: ${x.anon ? 'לקוח אנונימי' : x.customer}${x.phone ? ' · ' + x.phone : ''}\nכלי: ${mm.name || x.modelName}${x.serial ? ' · מס״ד ' + x.serial : ''}\nתלונה: ${x.symptoms}\nמדידות: ${x.measurements}\nהוחלף: ${x.replaced}\nהערות: ${x.notes}\nסטטוס: ${x.status}\n\n${DATA.meta.disclaimer}`;
   }
   function reportHTML(x) {
     if (!x) return '';
     const mm = DATA.models[x.model] || {};
     return `<div class="card stack print-area" id="lgReport"><h3>דו״ח תיקון ללקוח</h3>
-      <dl class="specs"><dt>תאריך</dt><dd class="num">${esc(x.date)}</dd><dt>לקוח</dt><dd>${esc(x.customer)}</dd><dt>כלי</dt><dd><bdi>${esc(mm.name || x.modelName)}</bdi>${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</dd>
+      <dl class="specs"><dt>תאריך</dt><dd class="num">${esc(x.date)}</dd><dt>לקוח</dt><dd>${esc(x.anon ? 'לקוח אנונימי' : x.customer)}${x.phone ? ' · <bdi>' + esc(x.phone) + '</bdi>' : ''}</dd><dt>כלי</dt><dd><bdi>${esc(mm.name || x.modelName)}</bdi>${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</dd>
       <dt>תלונה</dt><dd>${esc(x.symptoms)}</dd><dt>מדידות</dt><dd>${esc(x.measurements)}</dd><dt>הוחלף</dt><dd>${esc(x.replaced)}</dd><dt>הערות</dt><dd>${esc(x.notes)}</dd><dt>סטטוס</dt><dd>${esc(x.status)}</dd></dl>
       <p class="foot">${esc(DATA.meta.disclaimer)}</p>
       <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn sm primary" data-action="lg-print">הדפסה</button>'}<button type="button" class="btn sm" data-action="lg-copyrep" data-id="${esc(x.id)}">העתקת הדו״ח</button><button type="button" class="btn sm ghost" data-action="lg-closerep">סגירה</button></div>
@@ -141,9 +143,13 @@ const Tools = (() => {
   }
   function bindLog() {
     if (!$('#logForm')) return;
+    const an = $('#lgAnon');
+    an.addEventListener('change', () => { ['#lgCust', '#lgPhone'].forEach(s => { const e = $(s); e.disabled = an.checked; if (an.checked) e.value = ''; }); });
     $('#logForm').addEventListener('submit', e => {
       e.preventDefault();
-      const rec = { customer: $('#lgCust').value.trim(), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
+      const anon = $('#lgAnon').checked, phone = anon ? '' : Sec.str($('#lgPhone').value.trim(), 30);
+      if (phone && !/^[0-9+()\- ]{6,30}$/.test(phone)) { Sec.fieldMsg($('#lgPhone'), 'ספרות, רווח, + ( ) - בלבד'); $('#lgPhone').focus(); return; }
+      const rec = { anon, phone, customer: anon ? '' : Sec.str($('#lgCust').value.trim(), 120), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
       if (editId) { RepairLog.update(editId, rec); UI.toast('הרשומה עודכנה'); } else { RepairLog.add(rec); UI.toast('נוסף ליומן'); }
       editId = null; render();
     });

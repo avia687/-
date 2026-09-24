@@ -1,5 +1,5 @@
 // שלב C – אבטחה. PW=$(npm root -g)/playwright node tests/stageC.cjs
-const { serve, launch, watch, assert } = require('./lib.cjs');
+const { serve, launch, watch, assert, prep } = require('./lib.cjs');
 (async () => {
   const browser = await launch(); const errors = [];
   const { srv, url } = await serve();
@@ -8,7 +8,7 @@ const { serve, launch, watch, assert } = require('./lib.cjs');
   const csp = [];
   p.on('console', m => { if (/Content Security Policy/.test(m.text())) csp.push(m.text()); });
   await p.goto(url + 'index.html'); await p.waitForTimeout(1200);
-  await p.evaluate(() => window.__testReady && window.__testReady());
+  await prep(p);
 
   // 1. CSP חוסם סקריפט מוזרק
   const inj = await p.evaluate(() => new Promise(r => { const s = document.createElement('script'); s.textContent = 'window.__inj=1'; document.body.appendChild(s); const d = document.createElement('div'); d.innerHTML = '<img src="x" onerror="window.__inj2=1">'; document.body.appendChild(d); setTimeout(() => r([window.__inj, window.__inj2, !!document.querySelector('meta[http-equiv="Content-Security-Policy"]')]), 400); }));

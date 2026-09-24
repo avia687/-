@@ -525,6 +525,25 @@ body.workshop .navrow .btn{min-height:64px;font-size:19px}
 fieldset.plain{border:0;padding:0;margin:0}
 .input.pin{max-width:180px;letter-spacing:.3em}
 
+/* ---------- משפטי / הסכמה / פרטיות ---------- */
+.legal-links{display:flex;gap:10px;font-size:12.5px}
+.legal-links a{color:inherit;text-decoration:underline;text-underline-offset:2px;padding:4px 2px}
+.legal-card{max-width:680px;max-height:min(88vh,860px);display:flex;flex-direction:column}
+.legal-body{overflow:auto;flex:1 1 auto;min-height:0}
+.legal-foot{padding-top:12px;border-top:1px solid var(--line);margin-top:10px}
+.legal h1{font-size:22px;margin:4px 0 2px}.legal h2{font-size:17px;margin:18px 0 6px}
+.legal p,.legal li{line-height:1.6}.legal ul{padding-inline-start:20px}
+.legal table{border-collapse:collapse;width:100%;font-size:14px}.legal th,.legal td{border:1px solid var(--line);padding:6px 8px;text-align:start;vertical-align:top}
+.legal-meta{color:var(--muted);font-size:13px}
+.draft-flag{border:1px solid var(--warn);color:var(--warn);padding:6px 10px;border-radius:8px}
+.lawyer{border-inline-start:3px solid var(--warn);padding-inline-start:10px;color:var(--muted)}
+.verify-law{display:inline-block;font-size:12px;font-weight:600;color:var(--warn);border:1px solid currentColor;border-radius:6px;padding:0 6px;margin-inline-start:4px}
+.consent-list{padding-inline-start:20px;margin:0}.consent-list li{margin-bottom:6px;line-height:1.55}
+.legal-inline{max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.danger-zone{border:1px solid rgba(255,77,77,.35);border-radius:10px;padding:12px;margin-top:6px}
+.danger-zone h4{margin:0;color:var(--danger)}
+body.legal-page{max-width:760px;margin:0 auto;padding:16px;overflow:auto;height:auto}
+
 
 /* generated from inline styles */
 [data-sx="s0"]{font-size:14px !important}

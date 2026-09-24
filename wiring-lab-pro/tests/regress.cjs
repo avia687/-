@@ -1,7 +1,7 @@
 // בדיקת רגרסיה מלאה: 12 דגמים × לימוד/אקדמיה/אשף/אבחון/כלים, בלי WebGL, מובייל.
 // שימוש: PW=$(npm root -g)/playwright node tests/regress.cjs [web|artifact]
 const fs = require('fs'), path = require('path');
-const { serve, launch, watch, assert, DIST } = require('./lib.cjs');
+const { serve, launch, watch, assert, prep, DIST } = require('./lib.cjs');
 const THREE = fs.readFileSync(path.join(__dirname, '..', 'vendor', 'three.min.js'));
 const target = process.argv[2] || 'web';
 (async () => {
@@ -16,7 +16,7 @@ const target = process.argv[2] || 'web';
     await p.route('**/fonts.googleapis.com/**', r => r.fulfill({ body: '', contentType: 'text/css' }));
     await p.goto(target === 'web' ? url + 'index.html' : 'file://' + path.join(DIST, 'index.html'));
     await p.waitForTimeout(1500);
-    await p.evaluate(() => window.__testReady && window.__testReady());
+    await prep(p);
     return p;
   };
   const suite = async (p) => p.evaluate(() => {

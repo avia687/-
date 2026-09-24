@@ -1815,7 +1815,7 @@ const Learn = (() => {
           <div class="kv"><span>מנועים</span><b>${m.motor.pos === 'dual' ? '2' : '1'}</b></div>
         </div>
       </div>
-      <div class="card stack"><h3>מפרט מלא</h3><dl class="specs">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}</div>
+      <div class="card stack"><h3>מפרט מלא</h3><dl class="specs">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}${Legal.modelNote(m)}</div>
       <div class="card stack"><h3>מערכת החשמל בדגם הזה</h3><p>${T(m.electric)}</p>
         <div class="row" data-sx="s8">
           <span>מלאה <b class="num" data-sx="s9">${b.full.toFixed(1)}V</b></span>

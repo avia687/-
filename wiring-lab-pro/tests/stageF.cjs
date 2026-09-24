@@ -1,5 +1,5 @@
 // שלב F – אחסון, גיבוי, שחזור, נעילה. PW=$(npm root -g)/playwright node tests/stageF.cjs
-const { serve, launch, watch, assert } = require('./lib.cjs');
+const { serve, launch, watch, assert, prep } = require('./lib.cjs');
 const IDB_DUMP = () => new Promise(res => { const r = indexedDB.open('ev-lab'); r.onsuccess = () => { const d = r.result; const t = d.transaction('kv'); const s = t.objectStore('kv'); const out = {}; const c = s.openCursor(); c.onsuccess = () => { const cur = c.result; if (cur) { out[cur.key] = cur.value; cur.continue(); } else { d.close(); res(out); } }; }; });
 (async () => {
   const browser = await launch(); const errors = [];
@@ -14,7 +14,7 @@ const IDB_DUMP = () => new Promise(res => { const r = indexedDB.open('ev-lab'); 
     }
   });
   const p = await ctx.newPage(); watch(p, errors);
-  const load = async () => { await p.goto(url + 'index.html'); await p.evaluate(() => window.__testReady()); await p.waitForTimeout(300); };
+  const load = async () => { await p.goto(url + 'index.html'); await prep(p); await p.waitForTimeout(300); };
   await load();
   const q = (s) => p.evaluate(s2 => { const e = document.querySelector(s2); if (!e) throw new Error('missing ' + s2); e.click(); }, s);
 
@@ -121,9 +121,9 @@ const IDB_DUMP = () => new Promise(res => { const r = indexedDB.open('ev-lab'); 
   const ctx2 = await browser.newContext({ serviceWorkers: 'block' });
   await ctx2.addInitScript(() => { Object.defineProperty(window, 'indexedDB', { value: undefined }); });
   const p2 = await ctx2.newPage(); watch(p2, errors, '(noidb) ');
-  await p2.goto(url + 'index.html'); await p2.evaluate(() => window.__testReady());
+  await p2.goto(url + 'index.html'); await prep(p2);
   await p2.evaluate(async () => { RepairLog.add({ customer: 'בלי IDB' }); await Persist.flush(); });
-  await p2.reload(); await p2.evaluate(() => window.__testReady());
+  await p2.reload(); await prep(p2);
   const fb = await p2.evaluate(() => [Persist.backend(), RepairLog.all().map(x => x.customer)]);
   assert(fb[0] === 'ls' && fb[1].includes('בלי IDB'), 'בלי IndexedDB: נפילה ל-localStorage והנתונים נשמרים');
 
