@@ -301,7 +301,8 @@ const SceneStub = {
   init() {}, start() {}, build() {}, setView() {}, setExplodeInstant() {}, setFlow() {}, setCircuit() {}, select() {},
   highlightBundle() {}, focus() {}, resetCamera() {}, home() {}, setBottomInset() {}, hasComp: () => true, resize() {}
 };
-const Scene = (typeof THREE === 'undefined') ? SceneStub : (() => {
+const Scene = Object.assign({}, SceneStub, { wake() {}, loaded: false });
+function makeScene() { return (() => {
   const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
   const col = hex => new THREE.Color(hex).convertSRGBToLinear();
   const ACCENT = col('#00e5ff');
@@ -1234,7 +1235,9 @@ const Scene = (typeof THREE === 'undefined') ? SceneStub : (() => {
     camera.updateProjectionMatrix();
     applyViewOffset();
   }
+  let running = false;
   function frame(now) {
+    if (!Perf.shouldRender()) { running = false; return; }
     requestAnimationFrame(frame);
     if (sizeDirty) resize();
     const t = now / 1000;
@@ -1325,7 +1328,7 @@ const Scene = (typeof THREE === 'undefined') ? SceneStub : (() => {
   function start() {
     const h = homeView();
     camera.position.copy(h.pos); controls.target.copy(h.target); camera.lookAt(h.target);
-    requestAnimationFrame(frame);
+    running = true; requestAnimationFrame(frame);
   }
 
   /* ---------- API ---------- */
@@ -1348,9 +1351,11 @@ const Scene = (typeof THREE === 'undefined') ? SceneStub : (() => {
     home() { const h = homeView(); camera.position.copy(h.pos); controls.target.copy(h.target); tween = null; },
     setBottomInset(px) { viewOffTarget = Math.round((px || 0) * 0.45); },
     hasComp: id => !!comps[id],
-    resize() { sizeDirty = true; }
+    resize() { sizeDirty = true; },
+    wake() { if (!running) { running = true; requestAnimationFrame(frame); } },
+    loaded: true
   };
-})();
+})(); }
 
 /* ===================== UI ===================== */
 const UI = (() => {
@@ -1603,6 +1608,7 @@ const UI = (() => {
   }
   function setModel(id) {
     if (!DATA.models[id] || id === State.model) return;
+    if (!ModelData.ready(id)) { toast('טוען את נתוני הדגם…'); ModelData.ensure(id).then(() => setModel(id), () => toast('נתוני הדגם לא נטענו – בדקו חיבור')); return; }
     setModelState(id);
     lastByCat[State.vehicle] = id;
     State.voltage = M().voltage;
@@ -2158,25 +2164,6 @@ function bootBase() {
   Store.apply(Store.load());
   Safety.init();
   UI.init();
-  const loader = $('#loader');
-  if (typeof THREE === 'undefined') {
-    $('#loaderText').textContent = 'המודל התלת-ממדי לא נטען (אין חיבור ל-cdnjs). הלימוד, האשף והאבחון זמינים בפאנל.';
-    const sp = $('.spin', loader); if (sp) sp.hidden = true;
-    UI.setMode(State.mode, true);
-    return;
-  }
-  try {
-    Scene.init($('#scene'), { onPick: UI.onPick, onHover: UI.onHover });
-    Scene.build(State.vehicle);
-    if (State.view === 'explode') Scene.setExplodeInstant(true);
-    Scene.setCircuit();
-    Scene.start();
-    UI.syncToolbar();
-    UI.setMode(State.mode, true);
-    requestAnimationFrame(() => requestAnimationFrame(() => loader.classList.add('done')));
-  } catch (err) {
-    $('#loaderText').textContent = 'הדפדפן לא הצליח להפעיל תלת-ממד (WebGL). הלימוד, האשף והאבחון זמינים בפאנל.';
-    const sp = $('.spin', loader); if (sp) sp.hidden = true;
-    UI.setMode(State.mode, true);
-  }
+  UI.setMode(State.mode, true);
+  Perf.boot3D();
 }

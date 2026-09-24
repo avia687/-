@@ -13,7 +13,7 @@ const Boot = (() => {
     (window.BootHooks || []).forEach(fn => safe('hook', fn));
     done();
   }
-  Persist.init().then(go, go);
+  Persist.init().then(() => ModelData.ensure(ModelData.initialId()).catch(() => UI.toast('נתוני הדגם לא נטענו – בדקו חיבור'))).then(go, go);
   return { ready };
 })();
 /** לבדיקות אוטומטיות: מחכה לסיום האתחול */

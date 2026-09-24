@@ -1,0 +1,40 @@
+{
+ "name": "מעבדת EV – חשמל לאופניים וקורקינטים",
+ "short_name": "מעבדת EV",
+ "lang": "he",
+ "dir": "rtl",
+ "description": "לימוד, התקנה ואבחון של מערכות חשמל באופניים ובקורקינטים חשמליים. עובד בלי רשת.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#16181b",
+ "theme_color": "#16181b",
+ "categories": [
+  "education",
+  "utilities"
+ ],
+ "icons": [
+  {
+   "src": "icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  },
+  {
+   "src": "icons/icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
+ ]
+}

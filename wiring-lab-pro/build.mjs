@@ -220,10 +220,24 @@ patch("  function codesHTML() {\n    return `\n      <div class=\"field\"><label
 patch("<span class=\"brand-tag\">${esc((DATA.errorCodes.brands.find(b => b.id === c.b) || { name: c.b }).name)}</span>", "<span class=\"brand-tag\">${esc((DATA.errorCodes.brands.find(b => b.id === c.b) || { name: c.b }).name)} ${DiagPro.codeConf(c)}</span>", 'code conf');
 patch("onVehicle() { reset(); }, abort() { if (symId)", "onVehicle() { reset(); DiagPro.reset(); }, abort() { if (symId)", 'diag onVehicle');
 
+// Three.js בטעינה עצלה: Scene הוא אובייקט שמתמלא אחרי הטעינה; לולאת ציור רק כשצריך
+patch("const Scene = (typeof THREE === 'undefined') ? SceneStub : (() => {", "const Scene = Object.assign({}, SceneStub, { wake() {}, loaded: false });\nfunction makeScene() { return (() => {", 'scene lazy open');
+patch("    hasComp: id => !!comps[id],\n    resize() { sizeDirty = true; }\n  };\n})();", "    hasComp: id => !!comps[id],\n    resize() { sizeDirty = true; },\n    wake() { if (!running) { running = true; requestAnimationFrame(frame); } },\n    loaded: true\n  };\n})(); }", 'scene lazy close');
+patch("  function frame(now) {\n    requestAnimationFrame(frame);", "  let running = false;\n  function frame(now) {\n    if (!Perf.shouldRender()) { running = false; return; }\n    requestAnimationFrame(frame);", 'frame gate');
+patch("    camera.position.copy(h.pos); controls.target.copy(h.target); camera.lookAt(h.target);\n    requestAnimationFrame(frame);\n  }", "    camera.position.copy(h.pos); controls.target.copy(h.target); camera.lookAt(h.target);\n    running = true; requestAnimationFrame(frame);\n  }", 'start running');
+{
+  const a0 = html.indexOf("  const loader = $('#loader');\n  if (typeof THREE === 'undefined') {");
+  const a1 = html.indexOf('}\n</script>', a0);
+  if (a0 < 0 || a1 < 0) throw new Error('boot 3d block not found');
+  html = html.slice(0, a0) + "  UI.setMode(State.mode, true);\n  Perf.boot3D();\n" + html.slice(a1);
+}
+patch("  function setModel(id) {\n    if (!DATA.models[id] || id === State.model) return;", "  function setModel(id) {\n    if (!DATA.models[id] || id === State.model) return;\n    if (!ModelData.ready(id)) { toast('טוען את נתוני הדגם…'); ModelData.ensure(id).then(() => setModel(id), () => toast('נתוני הדגם לא נטענו – בדקו חיבור')); return; }", 'setModel lazy');
+patch('<div class="stage-tools">', '<div class="stage-tools">\n        <button type="button" class="icon-btn" id="saverBtn" aria-pressed="false" aria-label="חיסכון סוללה – כיבוי התלת-ממד" title="חיסכון סוללה – כיבוי התלת-ממד"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="16" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 10v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>', 'saver btn');
+
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
   ['p06_sec.js', 1], ['p06b_storage.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
-  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p14_boot_pro.js', 1]
+  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p17_perf.js', 1], ['p14_boot_pro.js', 1]
 ];
 let js = MODS.filter(([, s]) => s <= STAGE).map(([f]) => read(f)).join('\n');
 if (STAGE < 4) js = read('stubs.js') + '\n' + js;
@@ -232,7 +246,8 @@ html = html.replace(/\n?$/, '') + `\n<script>\n'use strict';\n${js}\n</script>\n
 const THREE_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 const THREE_LOCAL = path.join(ROOT, 'vendor', 'three.min.js');
 const THREE_SRI = 'sha512-' + crypto.createHash('sha512').update(fs.readFileSync(THREE_LOCAL)).digest('base64');
-patch(`<script src="${THREE_SRC}"></script>`, `<script src="${THREE_SRC}" integrity="${THREE_SRI}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`, 'three sri');
+const threeCfg = src => `<script type="application/json" id="three-src">${JSON.stringify({ src, sri: THREE_SRI })}</script>`;
+patch(`<script src="${THREE_SRC}"></script>`, threeCfg(THREE_SRC), 'three lazy cfg');
 
 // פרטיות: בלי גופנים מ-CDN (גם בגרסת ה-Artifact)
 html = html.replace(/<link rel="preconnect"[^>]*>\n?|<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
@@ -273,11 +288,36 @@ fs.writeFileSync(path.join(DIST, 'index.html'),
   w = w.replace(/<script>\n?([\s\S]*?)<\/script>\n?/g, (_, c) => { scripts.push(c); return `@@SCRIPT${scripts.length - 1}@@`; });
   if (scripts.length !== 2) throw new Error('expected 2 inline scripts, got ' + scripts.length);
   const sri = t => 'sha384-' + crypto.createHash('sha384').update(t).digest('base64');
+  // נתוני דגמים: שדות כבדים שנקראים רק לדגם הנוכחי → data/m-<id>.json
+  const LAZY = ['testPoints', 'expectedValues', 'hallSequence', 'commonFailures', 'failureWeights', 'errorCodes', 'torque', 'sources', 'maintenance', 'faults', 'strengths', 'overview', 'compNotes', 'electric'];
+  fs.mkdirSync(path.join(WEB, 'data'), { recursive: true });
+  {
+    const j0 = w.indexOf(OPEN), j1 = w.indexOf('</script>', j0);
+    const D = JSON.parse(w.slice(j0 + OPEN.length, j1));
+    for (const id of Object.keys(D.models)) {
+      const m = D.models[id], part = {};
+      LAZY.forEach(k => { if (k in m) { part[k] = m[k]; delete m[k]; } });
+      m._lazy = true;
+      fs.writeFileSync(path.join(WEB, 'data', `m-${id}.json`), JSON.stringify(part));
+    }
+    D.lazyFields = LAZY;
+    w = w.slice(0, j0 + OPEN.length) + '\n' + JSON.stringify(D).replace(/<\/script/gi, '<\\/script') + '\n' + w.slice(j1);
+  }
+  // אייקונים ו-manifest
+  fs.mkdirSync(path.join(WEB, 'icons'), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, 'src', 'icons'))) fs.copyFileSync(path.join(ROOT, 'src', 'icons', f), path.join(WEB, 'icons', f));
+  fs.writeFileSync(path.join(WEB, 'manifest.webmanifest'), JSON.stringify({
+    name: 'מעבדת EV – חשמל לאופניים וקורקינטים', short_name: 'מעבדת EV', lang: 'he', dir: 'rtl',
+    description: 'לימוד, התקנה ואבחון של מערכות חשמל באופניים ובקורקינטים חשמליים. עובד בלי רשת.',
+    start_url: './', scope: './', display: 'standalone', orientation: 'any', background_color: '#16181b', theme_color: '#16181b', categories: ['education', 'utilities'],
+    icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' }, { src: 'icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }, { src: 'icons/icon.svg', sizes: 'any', type: 'image/svg+xml' }]
+  }, null, 1));
   fs.writeFileSync(path.join(WEB, 'app.css'), css.join('\n'));
   fs.writeFileSync(path.join(WEB, 'app.js'), scripts[0]);
   fs.writeFileSync(path.join(WEB, 'pro.js'), scripts[1]);
   fs.copyFileSync(THREE_LOCAL, path.join(WEB, 'vendor', 'three.min.js'));
-  w = w.replace(`<script src="${THREE_SRC}" integrity="${THREE_SRI}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`, `<script src="vendor/three.min.js" integrity="${THREE_SRI}"></script>`);
+  w = w.replace(threeCfg(THREE_SRC), threeCfg('vendor/three.min.js'));
+  if (!w.includes('"src":"vendor/three.min.js"')) throw new Error('three cfg not replaced');
   w = w.replace('@@SCRIPT0@@', `<script src="app.js" integrity="${sri(scripts[0])}"></script>\n`).replace('@@SCRIPT1@@', `<script src="pro.js" integrity="${sri(scripts[1])}"></script>\n`);
   if (/<script(?![^>]*(type="application\/json"|src=))/.test(w)) throw new Error('inline script left in web build');
   if (/\son[a-z]+=["']/i.test(w.replace(/<script type="application\/json"[\s\S]*?<\/script>/g, ''))) throw new Error('inline handler in web build');
@@ -290,6 +330,11 @@ fs.writeFileSync(path.join(DIST, 'index.html'),
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>מעבדת EV</title>
+<meta name="theme-color" content="#16181b">
+<meta name="description" content="לימוד, התקנה ואבחון של מערכות חשמל באופניים ובקורקינטים חשמליים. עובד בלי רשת, הנתונים נשמרים רק במכשיר.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-180.png">
 <link rel="stylesheet" href="app.css" integrity="${sri(css.join('\n'))}">
 </head>
 <body>
@@ -313,6 +358,36 @@ ${read('legal/' + doc + '.html')}
 </body>
 </html>
 `);
+  }
+  // Service Worker: precache של כל הקבצים, גרסה לפי hash של התוכן
+  {
+    const files = [];
+    const walk = d => fs.readdirSync(path.join(WEB, d)).forEach(f => { const r = d ? d + '/' + f : f; if (fs.statSync(path.join(WEB, r)).isDirectory()) walk(r); else if (!['_headers', 'sw.js'].includes(r)) files.push(r); });
+    walk('');
+    const h = crypto.createHash('sha256'); files.sort().forEach(f => h.update(f).update(fs.readFileSync(path.join(WEB, f))));
+    const ver = h.digest('hex').slice(0, 12);
+    fs.writeFileSync(path.join(WEB, 'sw.js'), `/* מעבדת EV – Service Worker. עבודה מלאה בלי רשת. גרסה ${ver} */
+'use strict';
+const CACHE = 'ev-lab-app-${ver}';
+const ASSETS = ${JSON.stringify(['./'].concat(files.sort()))};
+self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); });
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ev-lab-app-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (req.mode === 'navigate') {
+    e.respondWith(caches.match(url.pathname.endsWith('.html') ? req : './', { ignoreSearch: true }).then(r => r || fetch(req)).catch(() => caches.match('./')));
+    return;
+  }
+  e.respondWith(caches.match(req, { ignoreSearch: true }).then(r => r || fetch(req)));
+});
+self.addEventListener('message', e => { if (e.data && e.data.type === 'skipWaiting') self.skipWaiting(); });
+`);
+    console.log(`web: ${files.length} files precached, sw ${ver}`);
   }
   // כותרות לשרת (Netlify/Cloudflare Pages) – frame-ancestors לא נתמך ב-meta
   fs.writeFileSync(path.join(WEB, '_headers'), `/*

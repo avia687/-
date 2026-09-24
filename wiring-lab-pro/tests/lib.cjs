@@ -14,6 +14,9 @@ function serve(dir = path.join(DIST, 'web'), port = 0, opts = {}) {
         const hdr = fs.existsSync(path.join(dir, '_headers')) ? fs.readFileSync(path.join(dir, '_headers'), 'utf8') : '';
         const m = hdr.match(/Content-Security-Policy: (.*)/); if (m) h['Content-Security-Policy'] = m[1].trim();
       }
+      if (opts.gzip && /gzip/.test(req.headers['accept-encoding'] || '') && /\.(html|js|css|json|svg|webmanifest)$/.test(f)) {
+        h['Content-Encoding'] = 'gzip'; rsp.writeHead(200, h); rsp.end(require('zlib').gzipSync(fs.readFileSync(f), { level: 9 })); return;
+      }
       rsp.writeHead(200, h); fs.createReadStream(f).pipe(rsp);
     });
     srv.listen(port, '127.0.0.1', () => res({ srv, url: `http://127.0.0.1:${srv.address().port}/` }));
@@ -30,6 +33,6 @@ function watch(page, errors, tag = '') {
 function assert(cond, msg) { if (!cond) throw new Error('ASSERT: ' + msg); console.log('  ✓ ' + msg); }
 /** אחרי טעינה: מאשר תנאים (כמו משתמש שכבר אישר) ומאשר מראש פעולות מסוכנות לסשן – לבדיקות רגרסיה */
 async function prep(page) {
-  await page.evaluate(async () => { await window.__testReady(); if (typeof Consent !== 'undefined') { if (!Consent.hasTerms()) Consent.record('terms'); Legal.close(); Consent.preapprove(['battery', 'hv', 'buildPack', 'speed']); } });
+  await page.evaluate(async () => { await window.__testReady(); if (typeof ModelData !== 'undefined') await ModelData.all(); if (typeof Consent !== 'undefined') { if (!Consent.hasTerms()) Consent.record('terms'); Legal.close(); Consent.preapprove(['battery', 'hv', 'buildPack', 'speed']); } });
 }
 module.exports = { serve, launch, watch, assert, prep, DIST };

@@ -69,7 +69,7 @@ const DataUI = (() => {
         <dl class="specs"><dt>איפה</dt><dd>${esc(BACKEND[s.backend])}</dd><dt>נשמר לאחרונה</dt><dd class="num">${esc(fmtTime(s.lastSaved))}</dd>
         <dt>גיבוי אחרון</dt><dd class="num">${esc(fmtTime(s.lastBackup))}${s.lastBackup && days(s.lastBackup) >= 14 ? ' – הגיע הזמן לגבות' : ''}</dd><dt>נפח בשימוש</dt><dd class="num" id="dtUsage">—</dd></dl>
         ${s.backend !== 'idb' ? `<div class="note warn">${ICON.warn}<span>${s.backend === 'mem' ? 'הדפדפן חוסם אחסון (למשל מצב גלישה פרטית). צרו גיבוי לפני סגירת הדף.' : 'IndexedDB לא זמין – תמונות לא יישמרו אחרי סגירה.'}</span></div>` : ''}
-        <button type="button" class="btn sm ghost" data-action="dt-persist">בקש מהדפדפן לא למחוק את הנתונים</button></div>
+        <div class="row"><button type="button" class="btn sm ghost" data-action="dt-persist">בקש מהדפדפן לא למחוק את הנתונים</button>${typeof Perf !== 'undefined' ? Perf.installHTML() : ''}</div></div>
       ${lockCard()}
       <div class="card stack"><h3>גיבוי</h3>
         <p class="lead">קובץ JSON אחד עם כל הנתונים, גרסת סכמה ובדיקת שלמות (SHA-256).</p>
