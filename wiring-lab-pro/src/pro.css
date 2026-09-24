@@ -154,6 +154,7 @@ details.meas .mbody{padding:0 12px 12px;display:grid;gap:10px}
   .btn.sm,.chip,.seg button,.subtabs button,.dots button,.close-x,.linkbtn,.toggle,.modes button,.comp-grid button,.opt span,.check,.sym{min-height:44px}
   .linkbtn{display:inline-flex;align-items:center}
   .dots button{min-width:44px}
+  .sym-chips .chip,.symchip,.input,select.input,.btn{min-height:44px}
   .close-x{width:44px}
 }
 
@@ -183,3 +184,9 @@ body.workshop .navrow .btn{min-height:64px;font-size:19px}
   body.printing .print-area .row{display:none!important}
   body.printing .print-area *{color:#000!important;background:#fff!important;border-color:#999!important;box-shadow:none!important}
 }
+
+/* ---------- אבטחה / ולידציה ---------- */
+.live.live-ok{color:var(--ok);background:var(--ok-soft);border-color:rgba(61,220,132,.4)}
+.field-err{color:var(--danger);font-size:13px}
+.input[aria-invalid="true"]{border-color:var(--danger)}
+.import-err{white-space:pre-wrap;color:var(--danger);background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.35);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;margin:0}

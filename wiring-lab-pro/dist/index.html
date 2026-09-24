@@ -13949,6 +13949,7 @@ details.meas .mbody{padding:0 12px 12px;display:grid;gap:10px}
   .btn.sm,.chip,.seg button,.subtabs button,.dots button,.close-x,.linkbtn,.toggle,.modes button,.comp-grid button,.opt span,.check,.sym{min-height:44px}
   .linkbtn{display:inline-flex;align-items:center}
   .dots button{min-width:44px}
+  .sym-chips .chip,.symchip,.input,select.input,.btn{min-height:44px}
   .close-x{width:44px}
 }
 
@@ -13979,6 +13980,52 @@ body.workshop .navrow .btn{min-height:64px;font-size:19px}
   body.printing .print-area *{color:#000!important;background:#fff!important;border-color:#999!important;box-shadow:none!important}
 }
 
+/* ---------- אבטחה / ולידציה ---------- */
+.live.live-ok{color:var(--ok);background:var(--ok-soft);border-color:rgba(61,220,132,.4)}
+.field-err{color:var(--danger);font-size:13px}
+.input[aria-invalid="true"]{border-color:var(--danger)}
+.import-err{white-space:pre-wrap;color:var(--danger);background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.35);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;margin:0}
+
+</style>
+<style>
+/* generated from inline styles */
+[data-sx="s0"]{font-size:14px !important}
+[data-sx="s1"]{font-size:13px !important;color:var(--muted) !important;font-weight:600 !important}
+[data-sx="s2"]{margin-top:6px !important}
+[data-sx="s3"]{color:var(--text) !important}
+[data-sx="s4"]{--c:#00e5ff !important}
+[data-sx="s5"]{padding:10px !important;border:1px dashed var(--line2) !important}
+[data-sx="s6"]{grid-template-columns:1fr 1fr !important}
+[data-sx="s7"]{font-size:20px !important}
+[data-sx="s8"]{gap:16px !important}
+[data-sx="s9"]{color:var(--ok) !important}
+[data-sx="s10"]{color:var(--warn) !important}
+[data-sx="s11"]{color:var(--muted) !important}
+[data-sx="s12"]{white-space:normal !important;min-width:120px !important}
+[data-sx="s13"]{white-space:normal !important;min-width:140px !important}
+[data-sx="s14"]{font-weight:500 !important;color:var(--muted) !important}
+[data-sx="s15"]{border:0 !important;padding:0 !important;margin:0 !important}
+[data-sx="s16"]{border-color:rgba(255,77,77,.35) !important}
+[data-sx="s17"]{font-size:13px !important;color:var(--muted) !important}
+[data-sx="s18"]{gap:6px !important}
+[data-sx="s19"]{--c:var(--ok) !important}
+[data-sx="s20"]{--c:var(--warn) !important}
+[data-sx="s21"]{padding:10px 12px !important}
+[data-sx="s22"]{font-size:19px !important}
+[data-sx="s23"]{margin:0 !important;padding-inline-start:18px !important}
+[data-sx="s24"]{font-size:14px !important;font-weight:600 !important}
+[data-sx="s25"]{grid-column:2 !important}
+[data-sx="s26"]{}
+[data-sx="s27"]{font-size:13px !important}
+[data-sx="s28"]{border-color:rgba(61,220,132,.4) !important}
+[data-sx="s29"]{font-size:13.5px !important}
+[data-sx="s30"]{--c:#ff9f1a !important}
+[data-sx="s31"]{margin:0 !important}
+[data-sx="s32"]{justify-content:center !important}
+[data-sx="s33"]{border-color:var(--line) !important}
+[data-sx="s34"]{accent-color:var(--accent) !important}
+[data-sx="s35"]{--c:var(--danger) !important}
+[data-sx="s36"]{accent-color:var(--ok) !important}
 </style>
 <div id="app">
   <div class="safety" role="note" aria-label="הודעת בטיחות">
@@ -14098,7 +14145,7 @@ body.workshop .navrow .btn{min-height:64px;font-size:19px}
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -14195,7 +14242,7 @@ const Store = {
   },
   apply(saved) {
     if (!saved || typeof saved !== 'object') return;
-    if (DATA.models[saved.model]) setModelState(saved.model);
+    if (Object.prototype.hasOwnProperty.call(DATA.models, saved.model)) setModelState(saved.model);
     else setModelState(saved.vehicle === 'scooter' ? 'oxo' : DATA.defaultModel);
     if (['learn', 'wizard', 'diag', 'tools'].includes(saved.mode)) State.mode = saved.mode;
     if (['normal', 'xray', 'explode'].includes(saved.view)) State.view = saved.view;
@@ -15468,7 +15515,7 @@ const UI = (() => {
   }
   function hideHint() { if (hintHidden) return; hintHidden = true; const h = $('#stageHint'); if (h) h.style.opacity = '0'; }
   function colorHex(c) { const d = DATA.colors[c]; return d ? (d.ui || d.hex) : '#888'; }
-  function swatch(c) { return `<span class="sw" style="--c:${colorHex(c)}" aria-hidden="true"></span>`; }
+  function swatch(c) { return `<span class="sw" data-sc="${colorHex(c)}" aria-hidden="true"></span>`; }
 
   /* ---------- Bottom Sheet (מובייל) ---------- */
   function sheetVisible(s) {
@@ -15538,7 +15585,7 @@ const UI = (() => {
   function bundleTip(id) {
     const b = bundleById(id); if (!b) return '';
     const circ = circuitById(b.circuit);
-    return `<h4><span class="sw" style="--c:${circ.color}"></span>${esc(b.label)}</h4>
+    return `<h4><span class="sw" data-sc="${circ.color}"></span>${esc(b.label)}</h4>
       <div class="conn">${esc(connName(b.connector))} · ${esc(b.connector.pins)} פינים${b.connector.alt ? ' · או ' + esc(b.connector.alt) : ''}</div>
       <ul>${b.wires.map(w => `<li>${swatch(w.c)}<b>${esc(DATA.colors[w.c].name)}</b> ${esc(w.n)} · <span class="num">${T(w.v)}</span></li>`).join('')}</ul>`;
   }
@@ -15603,7 +15650,7 @@ const UI = (() => {
     if (!rows.length && !note) return '';
     return `<div class="card stack model-card"><div class="spread"><h3>בדגם הזה</h3><span class="brand-chip"><bdi>${esc(m.short)}</bdi></span></div>
       ${rows.length ? `<dl class="specs">${rows.map(r => `<dt>${esc(r[0])}</dt><dd>${T(r[1])}</dd>`).join('')}</dl>` : ''}
-      ${note ? `<p class="lead" style="font-size:14px">${T(note)}</p>` : ''}</div>`;
+      ${note ? `<p class="lead" data-sx="s0">${T(note)}</p>` : ''}</div>`;
   }
   function compHTML(id) {
     const c = DATA.components[id], veh = State.vehicle;
@@ -15620,7 +15667,7 @@ const UI = (() => {
         <button type="button" class="close-x" data-action="close-comp" aria-label="סגירת פרטי הרכיב">${ICON.close}</button>
       </div>
       <p class="lead">${T(c.role)}</p>
-      ${variants ? `<div class="variant"><span class="lbl" style="font-size:13px;color:var(--muted);font-weight:600">סוג במודל:</span><div class="seg" role="radiogroup" aria-label="סוג ${esc(compName(id))}">${variants.map(v => `<button type="button" role="radio" aria-checked="${State.variants[vKey] === v.id}" data-action="variant" data-key="${vKey}" data-val="${v.id}">${esc(v.label)}</button>`).join('')}</div></div>` : ''}
+      ${variants ? `<div class="variant"><span class="lbl" data-sx="s1">סוג במודל:</span><div class="seg" role="radiogroup" aria-label="סוג ${esc(compName(id))}">${variants.map(v => `<button type="button" role="radio" aria-checked="${State.variants[vKey] === v.id}" data-action="variant" data-key="${vKey}" data-val="${v.id}">${esc(v.label)}</button>`).join('')}</div></div>` : ''}
       ${c.safety ? `<div class="note danger">${ICON.warn}<span>${esc(c.safety)}</span></div>` : ''}
       <div class="card stack"><h3>מיקום התקנה</h3><p>${T(byVehicle(c.location, veh))}</p></div>
       ${modelCompHTML(id)}
@@ -15628,10 +15675,10 @@ const UI = (() => {
       <div class="card stack"><h3>מפרט אופייני</h3><dl class="specs">${byVehicle(c.specs, veh).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])}</dd>`).join('')}</dl></div>
       ${bs.length || (c.connectors || []).length ? `<div class="card stack"><h3>מחברים וצבעי חוטים</h3>
         ${bs.map(b => `<div><div class="bundle-h"><span>${esc(b.label)}</span><span class="conn-tag">${esc(connName(b.connector))} · ${esc(b.connector.pins)}P</span></div>
-          ${compact ? `<div class="row" aria-label="צבעי חוטים">${b.wires.map(w => `<span title="${esc(DATA.colors[w.c].name + ' – ' + w.n)}">${swatch(w.c)}</span>`).join('')}<button type="button" class="linkbtn" data-action="show-circuit" data-circuit="${b.circuit}">הצג במודל</button></div>` : wireList(b) + `<div class="row" style="margin-top:6px"><button type="button" class="btn sm ghost" data-action="show-circuit" data-circuit="${b.circuit}">הצג מעגל ${esc(circuitById(b.circuit).name)}</button></div>`}
+          ${compact ? `<div class="row" aria-label="צבעי חוטים">${b.wires.map(w => `<span title="${esc(DATA.colors[w.c].name + ' – ' + w.n)}">${swatch(w.c)}</span>`).join('')}<button type="button" class="linkbtn" data-action="show-circuit" data-circuit="${b.circuit}">הצג במודל</button></div>` : wireList(b) + `<div class="row" data-sx="s2"><button type="button" class="btn sm ghost" data-action="show-circuit" data-circuit="${b.circuit}">הצג מעגל ${esc(circuitById(b.circuit).name)}</button></div>`}
         </div>`).join('')}
         ${(c.connectors || []).length ? `<p class="foot">סוגי שקעים נפוצים: ${c.connectors.map(x => esc(connName(x))).join(' · ')}</p>` : ''}
-        <details class="concept"><summary>מה ההבדל בין המחברים?</summary><div class="body">${[...connTypes].map(t => DATA.connectors[t] ? `<p><b style="color:var(--text)">${esc(DATA.connectors[t].name)}</b> (${esc(DATA.connectors[t].pins)} פינים): ${esc(DATA.connectors[t].desc)}</p>` : '').join('')}</div></details>
+        <details class="concept"><summary>מה ההבדל בין המחברים?</summary><div class="body">${[...connTypes].map(t => DATA.connectors[t] ? `<p><b data-sx="s3">${esc(DATA.connectors[t].name)}</b> (${esc(DATA.connectors[t].pins)} פינים): ${esc(DATA.connectors[t].desc)}</p>` : '').join('')}</div></details>
       </div>` : ''}
       <div class="note info">${ICON.info}<span>${esc(DATA.meta.wiringNote)}</span></div>
       <div class="card stack"><h3>תקלות נפוצות</h3><ul class="bul">${c.faults.map(f => `<li>${T(f)}</li>`).join('')}</ul></div>
@@ -15669,8 +15716,8 @@ const UI = (() => {
     const cs = DATA.circuits.filter(c => harness().some(b => b.circuit === c.id));
     if (State.circuit !== 'all' && !cs.some(c => c.id === State.circuit)) State.circuit = 'all';
     $('#circuitBar').innerHTML =
-      `<button type="button" class="chip" data-circuit="all" style="--c:#00e5ff" aria-pressed="${State.circuit === 'all'}"><i></i>כל המעגלים</button>` +
-      cs.map(c => `<button type="button" class="chip" data-circuit="${c.id}" style="--c:${c.color}" aria-pressed="${State.circuit === c.id}" title="${esc(c.hint)}"><i></i>${esc(c.name)}</button>`).join('');
+      `<button type="button" class="chip" data-circuit="all" data-sx="s4" aria-pressed="${State.circuit === 'all'}"><i></i>כל המעגלים</button>` +
+      cs.map(c => `<button type="button" class="chip" data-circuit="${c.id}" data-sc="${c.color}" aria-pressed="${State.circuit === c.id}" title="${esc(c.hint)}"><i></i>${esc(c.name)}</button>`).join('');
   }
   function setCircuit(id) {
     State.circuit = id;
@@ -15680,7 +15727,7 @@ const UI = (() => {
   }
   function renderLegend() {
     const kinds = ['hv', 'phase', 'v5', 'sig', 'lv', 'gnd'];
-    $('#flowLegend').innerHTML = '<b>זרימת זרם</b>' + kinds.map(k => `<span><i style="--c:${DATA.flowKinds[k].color}"></i>${esc(DATA.flowKinds[k].name)}</span>`).join('');
+    $('#flowLegend').innerHTML = '<b>זרימת זרם</b>' + kinds.map(k => `<span><i data-sc="${DATA.flowKinds[k].color}"></i>${esc(DATA.flowKinds[k].name)}</span>`).join('');
   }
   function syncToolbar() {
     $$('#catSeg button').forEach(b => b.setAttribute('aria-checked', String(b.dataset.cat === State.vehicle)));
@@ -15833,7 +15880,7 @@ const Learn = (() => {
     }
     const s = S[step], b = s.bundle ? bundleById(s.bundle) : null, last = step === S.length - 1;
     return `<div class="stack">
-      <div class="progress" role="progressbar" aria-label="התקדמות בסיור" aria-valuemin="1" aria-valuemax="${S.length}" aria-valuenow="${step + 1}"><i style="width:${((step + 1) / S.length) * 100}%"></i></div>
+      <div class="progress" role="progressbar" aria-label="התקדמות בסיור" aria-valuemin="1" aria-valuemax="${S.length}" aria-valuenow="${step + 1}"><i data-sw="${((step + 1) / S.length) * 100}"></i></div>
       <div class="dots" role="group" aria-label="קפיצה לצעד">${S.map((x, i) => `<button type="button" data-action="tour-go" data-i="${i}" aria-label="צעד ${i + 1}: ${esc(x.title)}" ${i === step ? 'aria-current="step"' : ''} class="${i < step ? 'done' : ''}">${i + 1}</button>`).join('')}</div>
     </div>
     <div class="card stack" aria-live="polite">
@@ -15853,8 +15900,8 @@ const Learn = (() => {
       ${c.calc ? calcHTML() : ''}${c.id === 'law' ? `<div class="note warn">${ICON.warn}<span>${esc(DATA.meta.batteryNote)}</span></div>` : ''}</div></details>`).join('');
   }
   function calcHTML() {
-    return `<div class="card flat stack" style="padding:10px;border:1px dashed var(--line2)">
-      <b style="color:var(--text)">מחשבון אנרגיה וטווח</b>
+    return `<div class="card flat stack" data-sx="s5">
+      <b data-sx="s3">מחשבון אנרגיה וטווח</b>
       <div class="calc">
         <div class="field"><label for="calcV">מתח (V)</label><select class="input" id="calcV">${DATA.wizard.voltages.map(v => `<option value="${v}" ${v === State.voltage ? 'selected' : ''}>${v}V</option>`).join('')}</select></div>
         <div class="field"><label for="calcAh">קיבולת (Ah)</label><input class="input num" id="calcAh" type="number" inputmode="decimal" min="1" max="60" step="0.5" value="14"></div>
@@ -15876,7 +15923,7 @@ const Learn = (() => {
       <div class="card stack">
         <h3>כמה נשאר בסוללה?</h3>
         <p class="lead">מדדו מתח אחרי לפחות שעה מנוחה (לא בזמן נסיעה או טעינה).</p>
-        <div class="calc" style="grid-template-columns:1fr 1fr">
+        <div class="calc" data-sx="s6">
           <div class="field"><label for="socNom">סוללה</label><select class="input" id="socNom">${DATA.batteryTable.map(b => `<option value="${b.nominal}" ${b.nominal === State.voltage ? 'selected' : ''}>${b.nominal}V (${b.s}S)</option>`).join('')}</select></div>
           <div class="field"><label for="socMeas">מתח שנמדד (V)</label><input class="input num" id="socMeas" type="number" inputmode="decimal" step="0.1" value="${battRow(State.voltage).nominal + 2}"></div>
         </div>
@@ -15908,7 +15955,7 @@ const Learn = (() => {
     const m = M(), b = battRow(m.voltage);
     const li = arr => `<ul class="bul">${arr.map(x => `<li>${T(x)}</li>`).join('')}</ul>`;
     return `<div class="card stack">
-        <div class="model-head"><div><p class="eyebrow">${esc(DATA.categories[m.cat].name)} · ${esc(LAYOUT().name)}</p><h3 style="font-size:20px"><bdi>${esc(m.name)}</bdi></h3></div><span class="brand-chip"><bdi>${esc(m.brand)}</bdi></span></div>
+        <div class="model-head"><div><p class="eyebrow">${esc(DATA.categories[m.cat].name)} · ${esc(LAYOUT().name)}</p><h3 data-sx="s7"><bdi>${esc(m.name)}</bdi></h3></div><span class="brand-chip"><bdi>${esc(m.brand)}</bdi></span></div>
         <p class="lead">${T(m.overview)}</p>
         <div class="kv-grid">
           <div class="kv"><span>מתח</span><b>${m.voltage}V</b></div>
@@ -15919,11 +15966,11 @@ const Learn = (() => {
       </div>
       <div class="card stack"><h3>מפרט מלא</h3><dl class="specs">${specRows(m).map(s => `<dt>${esc(s[0])}</dt><dd>${T(s[1])} ${Conf.badgeFor(m, s[0])}</dd>`).join('')}</dl>${Conf.modelExtraHTML(m)}</div>
       <div class="card stack"><h3>מערכת החשמל בדגם הזה</h3><p>${T(m.electric)}</p>
-        <div class="row" style="gap:16px">
-          <span>מלאה <b class="num" style="color:var(--ok)">${b.full.toFixed(1)}V</b></span>
-          <span>ריקה ≈ <b class="num" style="color:var(--warn)">${b.empty.toFixed(1)}V</b></span>
-          <span>תאים <b class="num" style="color:var(--text)">${b.s}S</b></span>
-          <span>מטען <b class="num" style="color:var(--text)">${b.full.toFixed(1)}V</b></span>
+        <div class="row" data-sx="s8">
+          <span>מלאה <b class="num" data-sx="s9">${b.full.toFixed(1)}V</b></span>
+          <span>ריקה ≈ <b class="num" data-sx="s10">${b.empty.toFixed(1)}V</b></span>
+          <span>תאים <b class="num" data-sx="s3">${b.s}S</b></span>
+          <span>מטען <b class="num" data-sx="s3">${b.full.toFixed(1)}V</b></span>
         </div>
         <p class="foot">רכיבים במודל: ${vehicleComps().map(id => esc(compName(id))).join(' · ')}</p>
       </div>
@@ -15941,8 +15988,8 @@ const Learn = (() => {
       <div class="tbl-wrap"><table class="volt cmp"><caption class="sr-only">השוואת דגמים</caption>
       <thead><tr><th scope="col">דגם</th><th scope="col">סוללה</th><th scope="col">Wh</th><th scope="col">מנוע</th><th scope="col">משקל</th><th scope="col">בלמים</th></tr></thead>
       <tbody>${ids.map(id => { const m = DATA.models[id]; return `<tr ${id === State.model ? 'aria-current="true"' : ''}>
-        <td><button type="button" class="linkbtn" data-action="select-model" data-model="${id}"><bdi>${esc(m.short)}</bdi></button><br><small style="color:var(--muted)">${esc(DATA.categories[m.cat].short)}</small></td>
-        <td class="nom">${m.voltage}V ${m.ah}Ah</td><td>${m.wh}</td><td style="white-space:normal;min-width:120px">${T(m.motor.nominal)}${m.motor.pos === 'dual' ? ' ×2 מנועים' : ''}</td><td>${T(m.weight)}</td><td style="white-space:normal;min-width:140px">${T(m.brakes)}</td></tr>`; }).join('')}</tbody></table></div>
+        <td><button type="button" class="linkbtn" data-action="select-model" data-model="${id}"><bdi>${esc(m.short)}</bdi></button><br><small data-sx="s11">${esc(DATA.categories[m.cat].short)}</small></td>
+        <td class="nom">${m.voltage}V ${m.ah}Ah</td><td>${m.wh}</td><td data-sx="s12">${T(m.motor.nominal)}${m.motor.pos === 'dual' ? ' ×2 מנועים' : ''}</td><td>${T(m.weight)}</td><td data-sx="s13">${T(m.brakes)}</td></tr>`; }).join('')}</tbody></table></div>
       <p class="foot">״לא פורסם״ – נתון שלא מצאנו במקורות. ${esc(DATA.meta.brandNote)}</p>`;
   }
   function compsHTML() {
@@ -15990,7 +16037,7 @@ const Wizard = (() => {
 
   function opt(name, value, label, checked, sub) {
     const id = `${name}-${value}`;
-    return `<label class="opt" for="${id}"><input type="radio" name="${name}" id="${id}" value="${value}" ${checked ? 'checked' : ''}><span>${label}${sub ? `<br><small style="font-weight:500;color:var(--muted)">${sub}</small>` : ''}</span></label>`;
+    return `<label class="opt" for="${id}"><input type="radio" name="${name}" id="${id}" value="${value}" ${checked ? 'checked' : ''}><span>${label}${sub ? `<br><small data-sx="s14">${sub}</small>` : ''}</span></label>`;
   }
   function setupHTML() {
     const av = available();
@@ -15999,19 +16046,19 @@ const Wizard = (() => {
     return `
       <div><p class="eyebrow">${ICON.bolt} אשף התקנה</p><h2>מה עושים היום?</h2><p class="lead">בחרו כלי, מתח, סוג בקר ורכיב. האשף ידריך אתכם שלב אחר שלב ויסמן במודל את הרכיב והמחבר.</p></div>
       <div class="field"><label for="wzModel">הדגם</label><select class="input" id="wzModel">${UI.modelOptions()}</select></div>
-      <fieldset class="field" style="border:0;padding:0;margin:0"><legend class="lbl">מתח הסוללה</legend>
+      <fieldset class="field" data-sx="s15"><legend class="lbl">מתח הסוללה</legend>
         <div class="opt-grid">${DATA.wizard.voltages.map(v => opt('wzV', v, `${v}V`, v === State.voltage, `מלאה ${battRow(v).full.toFixed(1)}V`)).join('')}</div></fieldset>
       ${hv ? `<div class="note warn">${ICON.warn}<span>מתח של ${State.voltage}V הוא מסוכן יותר במגע. עבדו רק כשהסוללה מנותקת, בכפפות ובלי תכשיטי מתכת.</span></div>` : ''}
-      <fieldset class="field" style="border:0;padding:0;margin:0"><legend class="lbl">סוג הבקר</legend>
+      <fieldset class="field" data-sx="s15"><legend class="lbl">סוג הבקר</legend>
         <div class="opt-grid">${DATA.wizard.controllerTypes.map(c => opt('wzC', c.id, esc(c.name), c.id === State.ctrl)).join('')}</div>
         <p class="foot">${T(ctrlType().note)}</p></fieldset>
-      <fieldset class="field" style="border:0;padding:0;margin:0"><legend class="lbl">רכיב להתקנה או להחלפה</legend>
+      <fieldset class="field" data-sx="s15"><legend class="lbl">רכיב להתקנה או להחלפה</legend>
         <div class="opt-grid">${av.map(k => opt('wzS', k, esc(DATA.wizard.scenarios[k].name), k === scenario)).join('')}</div>
         <p class="foot">${T(DATA.wizard.scenarios[scenario].desc)} · ${steps().length} שלבים</p></fieldset>
       ${WizardPlus.setupExtra(scenario)}
-      <div class="card stack" style="border-color:rgba(255,77,77,.35)">
+      <div class="card stack" data-sx="s16">
         <h3>בדיקת בטיחות לפני עבודה</h3>
-        <p class="lead" style="font-size:14px">סמנו אם אחד מאלה נכון עכשיו. סימון עוצר את העבודה.</p>
+        <p class="lead" data-sx="s0">סמנו אם אחד מאלה נכון עכשיו. סימון עוצר את העבודה.</p>
         <div class="checks" id="wzChecks">${Safety.checksHTML('wz')}</div>
       </div>
       <button type="button" class="btn primary block" data-action="wz-start">התחלת האשף ${ICON.next}</button>
@@ -16024,19 +16071,19 @@ const Wizard = (() => {
     return `
       <div class="spread"><p class="eyebrow">${esc(sc.name)} · <bdi>${esc(M().short)}</bdi> · ${State.voltage}V</p><button type="button" class="linkbtn" data-action="wz-exit">יציאה מהאשף</button></div>
       <div class="stack">
-        <div class="spread"><span style="font-size:13px;color:var(--muted)" class="num">שלב ${idx + 1} מתוך ${S.length}</span><span style="font-size:13px;color:var(--muted)" class="num">${Math.round(((idx + 1) / S.length) * 100)}%</span></div>
-        <div class="progress" role="progressbar" aria-label="התקדמות באשף" aria-valuemin="1" aria-valuemax="${S.length}" aria-valuenow="${idx + 1}"><i style="width:${((idx + 1) / S.length) * 100}%"></i></div>
+        <div class="spread"><span data-sx="s17" class="num">שלב ${idx + 1} מתוך ${S.length}</span><span data-sx="s17" class="num">${Math.round(((idx + 1) / S.length) * 100)}%</span></div>
+        <div class="progress" role="progressbar" aria-label="התקדמות באשף" aria-valuemin="1" aria-valuemax="${S.length}" aria-valuenow="${idx + 1}"><i data-sw="${((idx + 1) / S.length) * 100}"></i></div>
       </div>
-      <div class="step-head"><div class="step-num" aria-hidden="true">${idx + 1}</div><div class="stack" style="gap:6px"><h2 id="wzTitle" tabindex="-1">${T(s.title)}</h2>${s.live ? Safety.liveBadge() : ''}</div></div>
+      <div class="step-head"><div class="step-num" aria-hidden="true">${idx + 1}</div><div class="stack" data-sx="s18"><h2 id="wzTitle" tabindex="-1">${T(s.title)}</h2>${s.live ? Safety.liveBadge() : ''}</div></div>
       ${s.live ? `<div class="note warn">${ICON.warn}<span>שלב עם מתח: ידיים יבשות, בלי תכשיטי מתכת, חוד אחד בכל פעם, ואל תקצרו בין פינים.</span></div>` : ''}
       ${vnote ? `<div class="note info">${ICON.info}<span>${T(vnote)}</span></div>` : ''}
       <div class="sec"><h4>כלים נדרשים</h4><div class="tools">${s.tools.map(t => `<span>${esc(t)}</span>`).join('')}</div></div>
       <div class="sec"><h4>פעולה</h4><p>${T(s.action)}</p></div>
-      <div class="sec" style="--c:var(--ok)"><h4>איך יודעים שזה נכון</h4><p class="verify">${T(s.verify)}</p></div>
-      <div class="sec" style="--c:var(--warn)"><h4>טעות נפוצה</h4><p class="mistake">${T(s.mistake)}</p></div>
+      <div class="sec" data-sx="s19"><h4>איך יודעים שזה נכון</h4><p class="verify">${T(s.verify)}</p></div>
+      <div class="sec" data-sx="s20"><h4>טעות נפוצה</h4><p class="mistake">${T(s.mistake)}</p></div>
       ${s.legal ? `<div class="note warn">${ICON.warn}<span>${T(DATA.meta.legalNote)}</span></div>` : ''}
-      <div class="card flat stack" style="padding:10px 12px">
-        <span style="font-size:13px;color:var(--muted)">מודגש במודל:</span>
+      <div class="card flat stack" data-sx="s21">
+        <span data-sx="s17">מודגש במודל:</span>
         <div class="row"><button type="button" class="linkbtn" data-action="select-comp" data-comp="${s.comp}">${esc(compName(s.comp))}</button>
         ${b ? `<span class="conn-tag">${esc(b.label)} · ${esc(connName(b.connector))} ${esc(b.connector.pins)}P</span>` : s.bundle === 'all' ? '<span class="conn-tag">כל המחברים</span>' : ''}</div>
       </div>
@@ -16110,7 +16157,7 @@ const Diagnostics = (() => {
   }
   function listHTML() {
     return `
-      <div class="card stack" style="border-color:rgba(255,77,77,.35)">
+      <div class="card stack" data-sx="s16">
         <h3>לפני הכול: יש סימן סכנה?</h3>
         <div class="checks" id="dgChecks">${Safety.checksHTML('dg')}</div>
       </div>
@@ -16133,12 +16180,12 @@ const Diagnostics = (() => {
     const s = sym(), n = s.nodes[nodeId];
     const compOK = vehicleComps().includes(n.comp);
     return `
-      <div class="spread"><p class="eyebrow">${esc(s.glyph)} ${esc(s.name)}</p><span class="num" style="font-size:13px;color:var(--muted)">שאלה ${trail.length + 1}</span></div>
+      <div class="spread"><p class="eyebrow">${esc(s.glyph)} ${esc(s.name)}</p><span class="num" data-sx="s17">שאלה ${trail.length + 1}</span></div>
       <div class="card stack" aria-live="polite">
         <div class="row">${n.live ? Safety.liveBadge() : ''}</div>
-        <h2 id="dgQ" tabindex="-1" style="font-size:19px">${T(n.q)}</h2>
+        <h2 id="dgQ" tabindex="-1" data-sx="s22">${T(n.q)}</h2>
         <div class="sec"><h4>מה בודקים ואיפה</h4><p>${T(n.where)}${compOK ? ` · <button type="button" class="linkbtn" data-action="select-comp" data-comp="${n.comp}">${esc(compName(n.comp))}</button>` : ''}</p></div>
-        ${n.meter ? meterHTML(n) : (n.expect && n.expect !== '—' ? `<div class="sec" style="--c:var(--ok)"><h4>מה אמורים לראות</h4><p class="verify">${T(n.expect)}</p></div>` : '')}
+        ${n.meter ? meterHTML(n) : (n.expect && n.expect !== '—' ? `<div class="sec" data-sx="s19"><h4>מה אמורים לראות</h4><p class="verify">${T(n.expect)}</p></div>` : '')}
         ${n.hazardYes ? `<div class="note danger">${ICON.warn}<span>תשובה ״כן״ כאן עוצרת את העבודה מטעמי בטיחות.</span></div>` : ''}
       </div>
       <div class="answer">
@@ -16150,8 +16197,8 @@ const Diagnostics = (() => {
   }
   function trailHTML() {
     if (!trail.length) return '';
-    return `<div class="card flat stack" style="padding:10px 12px"><h4 style="font-size:13px;color:var(--muted)">המסלול עד כאן</h4>
-      <ol class="trail" style="margin:0;padding-inline-start:18px">${trail.map(t => `<li><span>${T(t.q)} ← <b>${esc(t.a)}</b></span></li>`).join('')}</ol></div>`;
+    return `<div class="card flat stack" data-sx="s21"><h4 data-sx="s17">המסלול עד כאן</h4>
+      <ol class="trail" data-sx="s23">${trail.map(t => `<li><span>${T(t.q)} ← <b>${esc(t.a)}</b></span></li>`).join('')}</ol></div>`;
   }
   function leafHTML() {
     const s = sym(), L = s.leaves[leafId];
@@ -16163,13 +16210,13 @@ const Diagnostics = (() => {
       <div><p class="eyebrow">${ICON.ok} סיכום האבחון · ${esc(s.name)}</p><h2 id="dgQ" tabindex="-1">${esc(L.title)}</h2></div>
       <div class="note ${tech ? 'warn' : 'ok'}">${tech ? ICON.warn : ICON.ok}<span><b>המסקנה והפעולה:</b> ${T(L.text)}</span></div>
       <div class="card stack"><h3>סיבות אפשריות לפי סבירות</h3>
-        ${causes.map(c => `<div class="cause"><div class="spread"><b style="font-size:14px;font-weight:600">${T(c.t)}</b><span>${c.p}%</span></div><div class="bar" role="img" aria-label="${c.p} אחוז"><i style="width:${c.p}%"></i></div></div>`).join('')}
+        ${causes.map(c => `<div class="cause"><div class="spread"><b data-sx="s24">${T(c.t)}</b><span>${c.p}%</span></div><div class="bar" role="img" aria-label="${c.p} אחוז"><i data-sw="${c.p}"></i></div></div>`).join('')}
       </div>
       <div class="card stack">
         <div class="spread"><h3>רמת קושי לתיקון</h3><div class="diff d${L.diff}" aria-hidden="true">${[1, 2, 3].map(i => `<i class="${i <= L.diff ? 'on' : ''}"></i>`).join('')}</div></div>
         <p>${T(diffLbl)}</p>
-        <div class="spread"><h3>לפנות לטכנאי?</h3><span class="live" style="${tech ? '' : 'color:var(--ok);background:var(--ok-soft);border-color:rgba(61,220,132,.4)'}">${tech ? ICON.tech + ' כן, מומלץ' : ICON.ok + ' לא חובה'}</span></div>
-        <p class="lead" style="font-size:14px">${tech ? 'התיקון דורש ציוד, ניסיון או פתיחת רכיב. טכנאי יחסוך זמן ויגן עליכם.' : 'אפשר לטפל לבד בזהירות, עם הסוללה מנותקת בזמן העבודה.'}</p>
+        <div class="spread"><h3>לפנות לטכנאי?</h3><span class="live${tech ? '' : ' live-ok'}">${tech ? ICON.tech + ' כן, מומלץ' : ICON.ok + ' לא חובה'}</span></div>
+        <p class="lead" data-sx="s0">${tech ? 'התיקון דורש ציוד, ניסיון או פתיחת רכיב. טכנאי יחסוך זמן ויגן עליכם.' : 'אפשר לטפל לבד בזהירות, עם הסוללה מנותקת בזמן העבודה.'}</p>
       </div>
       ${L.codes ? `<button type="button" class="btn block" data-action="dg-sub" data-sub="codes">פתיחת מאגר קודי השגיאה</button>` : ''}
       ${jump ? `<button type="button" class="btn block" data-action="dg-start" data-sym="${jump.id}">המשך לעץ: ${esc(jump.name)} ${ICON.next}</button>` : ''}
@@ -16182,8 +16229,8 @@ const Diagnostics = (() => {
       <div class="field"><label for="codeSearch">חיפוש לפי קוד או תיאור</label>
         <input class="input" id="codeSearch" type="search" placeholder="למשל 24, Hall, בלם" value="${esc(query)}" autocomplete="off"></div>
       <div class="row" role="group" aria-label="סינון לפי יצרן">
-        <button type="button" class="chip" style="--c:#00e5ff" data-action="dg-brand" data-b="all" aria-pressed="${brand === 'all'}"><i></i>הכול</button>
-        ${DATA.errorCodes.brands.map(b => `<button type="button" class="chip" style="--c:#00e5ff" data-action="dg-brand" data-b="${b.id}" aria-pressed="${brand === b.id}"><i></i>${esc(b.name)}</button>`).join('')}
+        <button type="button" class="chip" data-sx="s4" data-action="dg-brand" data-b="all" aria-pressed="${brand === 'all'}"><i></i>הכול</button>
+        ${DATA.errorCodes.brands.map(b => `<button type="button" class="chip" data-sx="s4" data-action="dg-brand" data-b="${b.id}" aria-pressed="${brand === b.id}"><i></i>${esc(b.name)}</button>`).join('')}
       </div>
       <div class="note warn">${ICON.warn}<span>${esc(DATA.errorCodes.note)}</span></div>
       <div class="stack" id="codeList" aria-live="polite"></div>`;
@@ -16197,8 +16244,8 @@ const Diagnostics = (() => {
         <span class="code">${esc(c.c)}</span>
         <span class="brand-tag">${esc((DATA.errorCodes.brands.find(b => b.id === c.b) || { name: c.b }).name)} ${DiagPro.codeConf(c)}</span>
         <b>${T(c.t)}</b>
-        <p>${T(c.d)} <span style="color:var(--text)">${T(c.fix)}</span></p>
-        ${vehicleComps().includes(c.comp) ? `<button type="button" class="linkbtn" data-action="select-comp" data-comp="${c.comp}" style="grid-column:2">הצג: ${esc(compName(c.comp))}</button>` : ''}
+        <p>${T(c.d)} <span data-sx="s3">${T(c.fix)}</span></p>
+        ${vehicleComps().includes(c.comp) ? `<button type="button" class="linkbtn" data-action="select-comp" data-comp="${c.comp}" data-sx="s25">הצג: ${esc(compName(c.comp))}</button>` : ''}
       </div>`).join('') : `<p class="lead">לא נמצא קוד. נסו חיפוש אחר, או בדקו במדריך של הצג.</p>`;
   }
   function highlight(focus = true) {
@@ -16287,6 +16334,184 @@ function bootBase() {
 <script>
 'use strict';
 /* =====================================================================
+   p06 · Sec – אבטחה: ולידציה, JSON בטוח, סכמות, הצפנה (Web Crypto)
+   · כל טקסט של משתמש מוצג דרך esc() (בסיס) או textContent – אין מקום אחר.
+   · JSON מבחוץ: מגבלת גודל, דחיית __proto__/constructor/prototype, סכמה מלאה.
+   · Vault: AES-GCM 256 עם מפתח מ-PBKDF2-SHA256 (250,000 איטרציות, salt אקראי).
+     ה-PIN לא נשמר בשום מקום – רק salt, iv וטקסט מוצפן.
+   · StyleFix: במקום data-sx="s26" (חסום ב-CSP) – data-sw (רוחב %) ו-data-sc (צבע),
+     שמוחלים דרך CSSOM אחרי בדיקת ערך.
+   ===================================================================== */
+const Sec = (() => {
+  const BAD_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+  const own = (o, k) => o != null && Object.prototype.hasOwnProperty.call(o, k);
+  const CTRL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F‪-‮⁦-⁩]/g;
+  /** מחרוזת נקייה: בלי תווי בקרה וכיווניות מוסתרים, באורך מוגבל */
+  const str = (v, max = 2000) => String(v == null ? '' : v).replace(CTRL, '').slice(0, max);
+  const ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+  const isId = s => typeof s === 'string' && ID_RE.test(s);
+  /** מספר בטווח, או null */
+  function num(v, min = -Infinity, max = Infinity) {
+    const n = typeof v === 'number' ? v : parseFloat(String(v == null ? '' : v).replace(',', '.'));
+    return isFinite(n) && n >= min && n <= max ? n : null;
+  }
+  const bytes = s => (window.TextEncoder ? new TextEncoder().encode(s).length : s.length * 3);
+
+  class ImportError extends Error {}
+  /** JSON מבחוץ: גודל, תחביר ומפתחות אסורים. זורק ImportError עם הודעה בעברית */
+  function parseJSON(text, maxBytes = 5 * 1024 * 1024) {
+    if (typeof text !== 'string' || !text.trim()) throw new ImportError('הקובץ ריק.');
+    const n = bytes(text);
+    if (n > maxBytes) throw new ImportError(`הקובץ גדול מדי (${(n / 1048576).toFixed(1)}MB, מותר עד ${(maxBytes / 1048576).toFixed(0)}MB).`);
+    let depth = 0;
+    try {
+      return JSON.parse(text, function (k, v) {
+        if (BAD_KEYS.has(k)) throw new ImportError(`מפתח אסור בקובץ: "${k}". הקובץ נדחה.`);
+        if (v && typeof v === 'object' && ++depth > 200000) throw new ImportError('הקובץ מכיל יותר מדי אובייקטים.');
+        return v;
+      });
+    } catch (e) {
+      if (e instanceof ImportError) throw e;
+      throw new ImportError('זה לא JSON תקין: ' + str(e.message, 120));
+    }
+  }
+
+  /* ---------- סכמה מינימלית ----------
+     { t:'obj', p:{ key: schema }, req:[...], extra:false }
+     { t:'arr', of: schema, max }  { t:'str', max, re, en:[...] }  { t:'num', min, max, int }  { t:'bool' }
+     opt:true – שדה לא חובה. הערכים שעוברים מוחזרים כעותק נקי (בלי שדות לא מוכרים). */
+  function check(v, s, path = 'קובץ', errs = []) {
+    const at = path;
+    if (v === undefined || v === null) { if (!s.opt) errs.push(`${at}: חסר`); return undefined; }
+    switch (s.t) {
+      case 'obj': {
+        if (typeof v !== 'object' || Array.isArray(v)) { errs.push(`${at}: צריך להיות אובייקט`); return undefined; }
+        const out = {};
+        for (const k of Object.keys(v)) {
+          if (BAD_KEYS.has(k)) { errs.push(`${at}: מפתח אסור "${k}"`); continue; }
+          if (!own(s.p, k)) { if (s.extra === false) errs.push(`${at}: שדה לא מוכר "${str(k, 40)}"`); continue; }
+        }
+        for (const k of Object.keys(s.p)) {
+          const r = check(v[k], s.p[k], `${at}.${k}`, errs);
+          if (r !== undefined) out[k] = r;
+        }
+        return out;
+      }
+      case 'arr': {
+        if (!Array.isArray(v)) { errs.push(`${at}: צריך להיות רשימה`); return undefined; }
+        if (s.max != null && v.length > s.max) { errs.push(`${at}: יותר מ-${s.max} פריטים`); return undefined; }
+        return v.map((x, i) => check(x, s.of, `${at}[${i}]`, errs));
+      }
+      case 'str': {
+        if (typeof v !== 'string') { errs.push(`${at}: צריך להיות טקסט`); return undefined; }
+        if (s.max != null && v.length > s.max) { errs.push(`${at}: ארוך מ-${s.max} תווים`); return undefined; }
+        if (s.re && !s.re.test(v)) { errs.push(`${at}: פורמט לא תקין`); return undefined; }
+        if (s.en && !s.en.includes(v)) { errs.push(`${at}: ערך לא מוכר "${str(v, 30)}"`); return undefined; }
+        return str(v, s.max || 2000);
+      }
+      case 'num': {
+        if (typeof v !== 'number' || !isFinite(v)) { errs.push(`${at}: צריך להיות מספר`); return undefined; }
+        if ((s.min != null && v < s.min) || (s.max != null && v > s.max) || (s.int && !Number.isInteger(v))) { errs.push(`${at}: מחוץ לטווח`); return undefined; }
+        return v;
+      }
+      case 'bool':
+        if (typeof v !== 'boolean') { errs.push(`${at}: צריך להיות true/false`); return undefined; }
+        return v;
+      case 'any': return v;
+      default: errs.push(`${at}: סכמה לא מוכרת`); return undefined;
+    }
+  }
+  /** בדיקה מלאה: מחזיר { ok, value, errors } */
+  function validate(v, schema, label) {
+    const errors = [];
+    const value = check(v, schema, label || 'קובץ', errors);
+    return { ok: !errors.length, value, errors };
+  }
+
+  /* ---------- ולידציה של שדות בטופס ---------- */
+  function fieldMsg(inp, msg) {
+    inp.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    let m = inp.parentElement && inp.parentElement.querySelector('.field-err');
+    if (!m && msg && inp.parentElement) { m = document.createElement('span'); m.className = 'field-err'; m.id = (inp.id || 'f') + '-err'; inp.parentElement.appendChild(m); inp.setAttribute('aria-describedby', m.id); }
+    if (m) { m.textContent = msg || ''; m.hidden = !msg; }
+  }
+  function checkField(inp) {
+    if (!inp || inp.tagName !== 'INPUT') return true;
+    if (inp.type === 'number' || inp.classList.contains('num')) {
+      const raw = inp.value.trim();
+      if (!raw) { fieldMsg(inp, ''); return true; }
+      const lo = inp.min !== '' ? Number(inp.min) : -Infinity, hi = inp.max !== '' ? Number(inp.max) : Infinity;
+      const x = parseFloat(raw.replace(',', '.'));
+      if (!isFinite(x) || !/^-?\d*[.,]?\d*$/.test(raw)) { fieldMsg(inp, 'מספר בלבד'); return false; }
+      if (x < lo || x > hi) { fieldMsg(inp, `טווח מותר: ${isFinite(lo) ? lo : ''}–${isFinite(hi) ? hi : ''}`); return false; }
+      fieldMsg(inp, ''); return true;
+    }
+    if (inp.maxLength > 0 && inp.value.length > inp.maxLength) { fieldMsg(inp, `עד ${inp.maxLength} תווים`); return false; }
+    return true;
+  }
+  document.addEventListener('input', e => { if (e.target && e.target.matches && e.target.matches('input.num, input[type="number"]')) checkField(e.target); }, true);
+
+  /* ---------- StyleFix ---------- */
+  const COLOR_RE = /^(#[0-9a-fA-F]{3,8}|var\(--[a-z0-9-]+\))$/;
+  function applyStyles(root) {
+    if (!root || !root.querySelectorAll) return;
+    const one = el => {
+      if (el.hasAttribute('data-sw')) { const n = num(el.getAttribute('data-sw'), -1e9, 1e9); el.style.width = (n === null ? 0 : Math.max(0, Math.min(100, n))) + '%'; }
+      if (el.hasAttribute('data-sc')) { const c = el.getAttribute('data-sc'); if (COLOR_RE.test(c)) el.style.setProperty('--c', c); }
+    };
+    if (root.nodeType === 1 && (root.hasAttribute('data-sw') || root.hasAttribute('data-sc'))) one(root);
+    root.querySelectorAll('[data-sw],[data-sc]').forEach(one);
+  }
+  if (window.MutationObserver) {
+    new MutationObserver(list => {
+      for (const r of list) {
+        if (r.type === 'attributes') applyStyles(r.target);
+        else r.addedNodes.forEach(n => { if (n.nodeType === 1) applyStyles(n); });
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-sw', 'data-sc'] });
+  }
+  applyStyles(document.body);
+
+  return { own, str, isId, num, parseJSON, ImportError, validate, check, checkField, fieldMsg, applyStyles, BAD_KEYS };
+})();
+
+/* ---------- Vault: הצפנה מקומית ---------- */
+const Vault = (() => {
+  const ITER = 250000;
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  const ok = () => !!(window.crypto && crypto.subtle && window.isSecureContext !== false);
+  const b64 = buf => { const a = new Uint8Array(buf); let s = ''; for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode.apply(null, a.subarray(i, i + 0x8000)); return btoa(s); };
+  const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  const rnd = n => crypto.getRandomValues(new Uint8Array(n));
+  async function derive(secret, salt, iter = ITER) {
+    const base = await crypto.subtle.importKey('raw', enc.encode(String(secret).normalize('NFC')), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: iter }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  /** הצפנה עם מפתח קיים */
+  async function sealWith(key, salt, value, iter = ITER) {
+    const iv = rnd(12);
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(value)));
+    return { enc: 'AES-GCM-256', kdf: 'PBKDF2-SHA256', iter, salt: b64(salt), iv: b64(iv), ct: b64(ct) };
+  }
+  /** הצפנה עם סיסמה (salt חדש) */
+  async function seal(secret, value) { const salt = rnd(16); return sealWith(await derive(secret, salt), salt, value); }
+  const isSealed = o => !!(o && typeof o === 'object' && o.enc === 'AES-GCM-256' && typeof o.ct === 'string' && typeof o.iv === 'string' && typeof o.salt === 'string');
+  /** פענוח. זורק Error('bad-secret') כשהסיסמה שגויה או שהנתונים שונו */
+  async function openWith(key, box) {
+    try { return JSON.parse(dec.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(box.iv) }, key, unb64(box.ct)))); }
+    catch (e) { throw new Error('bad-secret'); }
+  }
+  async function open(secret, box) {
+    if (!isSealed(box)) throw new Error('not-sealed');
+    const iter = Number(box.iter);
+    if (!(iter >= 100000 && iter <= 5000000)) throw new Error('bad-params');
+    return openWith(await derive(secret, unb64(box.salt), iter), box);
+  }
+  async function sha256(text) { const h = await crypto.subtle.digest('SHA-256', enc.encode(text)); return Array.from(new Uint8Array(h), b => b.toString(16).padStart(2, '0')).join(''); }
+  return { ok, ITER, derive, seal, sealWith, open, openWith, isSealed, sha256, rnd, b64, unb64 };
+})();
+
+/* =====================================================================
    p07 · Core Pro – רמות משתמש, מילון מונחים, אמינות נתונים, מצב סדנה
    נשען על: DATA, State, M(), LAYOUT(), vehicleComps(), harness(), UI, Scene
    ===================================================================== */
@@ -16302,7 +16527,7 @@ const ProStore = {
     if (typeof this._d !== 'object' || !this._d) this._d = {};
     return this._d;
   },
-  get(k, d) { const v = this._load()[k]; return v === undefined ? d : v; },
+  get(k, d) { const o = this._load(); const v = Sec.own(o, k) ? o[k] : undefined; return v === undefined ? d : v; },
   set(k, v) {
     this._load()[k] = v;
     try { window.localStorage.setItem(this.KEY, JSON.stringify(this._d)); } catch (e) { /* אחסון לא זמין */ }
@@ -16498,7 +16723,7 @@ const ProUI = (() => {
     const cf = (M().commonFailures || []).filter(f => { const c = DATA.pro.causes.find(x => x.id === f.cause); return c && c.comps.includes(id); });
     return `${an ? `<div class="note info beg-only">💡<span><b>במילים פשוטות:</b> ${esc(an)}</span></div>` : ''}
       ${tps.length ? `<div class="card stack"><div class="spread"><h3>נקודות בדיקה ברכיב</h3><button type="button" class="btn sm ghost" data-action="tp-all">כל הנקודות</button></div>${tpRows(tps)}</div>` : ''}
-      ${cf.length ? `<div class="card stack"><h3>תקלות נפוצות בדגם הזה</h3><ul class="clean">${cf.map(f => `<li class="cf-row"><span>${esc(f.t)}</span><span class="cf-w" aria-label="משקל ${Math.round(f.w * 100)}%"><i style="width:${Math.round(f.w * 100)}%"></i></span></li>`).join('')}</ul><p class="foot">המשקל משפיע על ההסתברות ההתחלתית במנוע האבחון.</p></div>` : ''}`;
+      ${cf.length ? `<div class="card stack"><h3>תקלות נפוצות בדגם הזה</h3><ul class="clean">${cf.map(f => `<li class="cf-row"><span>${esc(f.t)}</span><span class="cf-w" aria-label="משקל ${Math.round(f.w * 100)}%"><i data-sw="${Math.round(f.w * 100)}"></i></span></li>`).join('')}</ul><p class="foot">המשקל משפיע על ההסתברות ההתחלתית במנוע האבחון.</p></div>` : ''}`;
   }
   return { compExtra, tpRows };
 })();
@@ -16523,18 +16748,41 @@ const RepairLog = (() => {
   function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch); save(); } return r; }
   function remove(id) { load(); items = items.filter(x => x.id !== id); save(); }
   function all() { return load(); }
+  const S = (max, o) => Object.assign({ t: 'str', max, opt: true }, o);
+  /** סכמת רשומה – כל ייבוא עובר דרכה */
+  const ITEM = { t: 'obj', p: {
+    id: { t: 'str', re: /^[A-Za-z0-9_-]{1,40}$/ }, date: S(10, { re: /^(\d{4}-\d{2}-\d{2})?$/ }), model: S(40, { re: /^[A-Za-z0-9_-]*$/ }), modelName: S(120),
+    customer: S(120), phone: S(30, { re: /^[0-9+()\- ]*$/ }), anon: { t: 'bool', opt: true }, serial: S(60), symptoms: S(2000), measurements: S(4000),
+    replaced: S(1000), notes: S(4000), status: S(30), vehicleId: S(40, { re: /^[A-Za-z0-9_-]*$/ }), km: { t: 'num', min: 0, max: 1e6, opt: true },
+    price: { t: 'num', min: 0, max: 1e7, opt: true }, photos: { t: 'arr', max: 20, opt: true, of: { t: 'str', re: /^[A-Za-z0-9_-]{1,40}$/ } },
+    updated: S(30)
+  } };
+  const FILE = { t: 'obj', p: { app: S(40), type: S(40), version: { t: 'num', min: 1, max: 99, opt: true }, exported: S(40), items: { t: 'arr', max: 20000, of: ITEM } } };
+  const MAX_BYTES = 5 * 1024 * 1024;
+  /** ייבוא: גודל → JSON בטוח → סכמה. מחזיר { ok, items, errors } */
+  function parseImport(text) {
+    let obj;
+    try { obj = Sec.parseJSON(text, MAX_BYTES); } catch (e) { return { ok: false, errors: [e.message] }; }
+    if (Array.isArray(obj)) obj = { items: obj };
+    const r = Sec.validate(obj, FILE, 'קובץ');
+    if (!r.ok) return { ok: false, errors: r.errors };
+    return { ok: true, items: r.value.items, errors: [] };
+  }
+  function normalize(x) {
+    return {
+      id: x.id, date: x.date || '', model: Sec.own(DATA.models, x.model) ? x.model : '', modelName: x.modelName || '',
+      customer: x.customer || '', phone: x.phone || '', anon: !!x.anon, serial: x.serial || '', symptoms: x.symptoms || '', measurements: x.measurements || '',
+      replaced: x.replaced || '', notes: x.notes || '', status: x.status || 'פתוח', vehicleId: x.vehicleId || '', km: x.km, price: x.price, photos: x.photos || [], updated: x.updated || ''
+    };
+  }
   function replaceAll(list, merge) {
     load();
-    const clean = list.filter(x => x && typeof x === 'object' && typeof x.id === 'string').map(x => ({
-      id: String(x.id).slice(0, 40), date: String(x.date || '').slice(0, 10), model: String(x.model || ''), modelName: String(x.modelName || ''),
-      customer: String(x.customer || ''), serial: String(x.serial || ''), symptoms: String(x.symptoms || ''), measurements: String(x.measurements || ''),
-      replaced: String(x.replaced || ''), notes: String(x.notes || ''), status: String(x.status || 'פתוח')
-    }));
+    const clean = list.filter(x => x && Sec.isId(x.id)).map(normalize);
     if (merge) { const ids = new Set(items.map(x => x.id)); clean.forEach(x => { if (!ids.has(x.id)) items.push(x); }); }
     else items = clean;
     save(); return clean.length;
   }
-  return { add, update, remove, all, replaceAll };
+  return { add, update, remove, all, replaceAll, parseImport, normalize, ITEM, MAX_BYTES };
 })();
 
 /** העתקה ללוח עם נפילה לבחירת טקסט */
@@ -16726,7 +16974,7 @@ const DiagPro = (() => {
       <button type="button" class="prob ${i === 0 && x.p >= 0.5 ? 'lead-cause' : ''}" data-action="dp-cause" data-c="${x.c.id}" aria-label="${esc(x.c.name)} – ${pct(x.p)} אחוז">
         <span class="pname">${esc(x.c.name)}${x.c.stop === 'battery' ? ' <span class="tag-stop" title="דורש מומחה סוללות">🔋</span>' : x.c.stop === 'noride' ? ' <span class="tag-stop" title="לא לרכוב עד תיקון">⛔</span>' : ''}<small class="pro-only">${esc(x.c.pro)}</small></span>
         <span class="pp num">${pct(x.p)}%</span>
-        <span class="pbar" aria-hidden="true"><i style="width:${Math.max(2, x.p * 100)}%"></i></span>
+        <span class="pbar" aria-hidden="true"><i data-sw="${Math.max(2, x.p * 100)}"></i></span>
       </button></li>`).join('')}</ol>
       <p class="foot">${evCount() ? `מבוסס על ${evCount()} ראיות. ` : 'עדיין אין ראיות – ההסתברויות לפי שכיחות בדגם. '}האחוזים הם הערכה, לא אבחנה.</p>`;
   }
@@ -16785,9 +17033,9 @@ const DiagPro = (() => {
       <div class="note info beg-only">${ICON.info}<span>בחרו מה קורה (אפשר כמה סימפטומים), והזינו מדידות. המערכת משווה לערכים התקינים של <bdi>${esc(M().short)}</bdi> ומעדכנת את הסבירות של כל סיבה בזמן אמת. ⭐ = המדידה שהכי כדאי לעשות עכשיו.</span></div>
       ${hvBanner()}
       <div class="stack"><h3>מה קורה? <small class="lead">(אפשר לבחור כמה)</small></h3>
-        <div class="sym-chips" role="group" aria-label="סימפטומים">${E.symptoms().map(s => `<button type="button" class="chip symchip" data-action="dp-sym" data-s="${s.id}" aria-pressed="${ev.sym.has(s.id)}" style="--c:#00e5ff"><span aria-hidden="true">${esc(s.glyph)}</span> ${esc(s.name)}<small class="pro-only">&nbsp;· ${esc(s.pro)}</small></button>`).join('')}</div></div>
+        <div class="sym-chips" role="group" aria-label="סימפטומים">${E.symptoms().map(s => `<button type="button" class="chip symchip" data-action="dp-sym" data-s="${s.id}" aria-pressed="${ev.sym.has(s.id)}" data-sx="s4"><span aria-hidden="true">${esc(s.glyph)}</span> ${esc(s.name)}<small class="pro-only">&nbsp;· ${esc(s.pro)}</small></button>`).join('')}</div></div>
       ${heat ? `<div class="note danger">${ICON.warn}<span><b>חום או ריח:</b> אם יש עשן, ריח שרוף, סוללה חמה מאוד או נפוחה – עוצרים עכשיו. <button type="button" class="btn sm danger" data-action="dp-hazard" data-h="smell">יש סימן סכנה</button></span></div>` : ''}
-      <div class="card stack"><div class="spread"><h3>סיבות אפשריות</h3><span class="lead" style="font-size:13px">חיות</span></div><div id="dpProbs" aria-live="polite">${probsHTML(post)}</div></div>
+      <div class="card stack"><div class="spread"><h3>סיבות אפשריות</h3><span class="lead" data-sx="s27">חיות</span></div><div id="dpProbs" aria-live="polite">${probsHTML(post)}</div></div>
       <div class="card stack"><h3>מה למדוד עכשיו?</h3><div id="dpNext">${nextHTML(post)}</div></div>
       <div class="stack"><h3>מדידות לדגם <bdi>${esc(M().short)}</bdi></h3>${E.measurements().map(measCard).join('')}</div>
       <div class="navrow sticky-actions">
@@ -16828,7 +17076,7 @@ const DiagPro = (() => {
         <dt>חלקים</dt><dd>${c.parts.length ? c.parts.map(t => `<span class="chip-s">${TM(t)}</span>`).join(' ') : '—'}</dd></dl></div>
       <div class="card stack"><h3>שלבי תיקון</h3><ol class="bul">${c.fix.map(f => `<li>${TM(f)}</li>`).join('')}</ol>
         ${c.comps.some(x => ['battery', 'chargePort'].includes(x)) ? `<div class="note danger">${ICON.warn}<span>${esc(DATA.meta.batteryNote)}</span></div>` : ''}</div>
-      <div class="card stack" style="border-color:rgba(61,220,132,.4)"><h3>בדיקת אימות אחרי התיקון</h3><p class="verify">${TM(c.verify.text)}</p>
+      <div class="card stack" data-sx="s28"><h3>בדיקת אימות אחרי התיקון</h3><p class="verify">${TM(c.verify.text)}</p>
         ${vm ? `<button type="button" class="btn sm" data-action="dp-open" data-m="${vm.id}">פתיחת המדידה: ${esc(vm.name)}</button>` : ''}</div>
       ${post.length > 1 ? `<div class="card stack"><h3>חלופות</h3>${probsHTML(post.slice(1), 3)}</div>` : ''}
       <div class="row"><button type="button" class="btn sm" data-action="dp-save">שמירה ליומן</button><button type="button" class="btn sm" data-action="dp-copy">העתקת דו״ח</button><button type="button" class="btn sm ghost" data-action="dp-show-cause" data-c="${c.id}">הצג ב-3D</button><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button></div>
@@ -16841,7 +17089,7 @@ const DiagPro = (() => {
     return `
       <button type="button" class="back linkbtn" data-action="dp-back">${ICON.prev} חזרה למדידות</button>
       <div><p class="eyebrow">אסקלציה</p><h2 id="dpTitle" tabindex="-1">לא נמצאה סיבה ברורה</h2><p class="lead">זה קורה בעיקר בתקלות לסירוגין. אלה הצעדים הבאים, לפי כמה כל מדידה צפויה לעזור.</p></div>
-      <div class="card stack"><h3>מה עוד למדוד</h3>${s.length ? s.map(x => `<div class="esc-row"><b>${esc(x.m.name)}</b> ${x.m.live ? Safety.liveBadge() : ''}<p class="lead" style="font-size:13.5px">${T(x.m.how)}</p><p class="num foot">צפוי: ${TM(x.m.expect)}</p><button type="button" class="btn sm" data-action="dp-open" data-m="${x.m.id}">למדידה</button></div>`).join('') : '<p class="lead">עשיתם את כל המדידות הזמינות. עברו ללשונית ״לסירוגין״ ל-Wiggle Test ולבדיקות עומס, חום ולחות.</p>'}</div>
+      <div class="card stack"><h3>מה עוד למדוד</h3>${s.length ? s.map(x => `<div class="esc-row"><b>${esc(x.m.name)}</b> ${x.m.live ? Safety.liveBadge() : ''}<p class="lead" data-sx="s29">${T(x.m.how)}</p><p class="num foot">צפוי: ${TM(x.m.expect)}</p><button type="button" class="btn sm" data-action="dp-open" data-m="${x.m.id}">למדידה</button></div>`).join('') : '<p class="lead">עשיתם את כל המדידות הזמינות. עברו ללשונית ״לסירוגין״ ל-Wiggle Test ולבדיקות עומס, חום ולחות.</p>'}</div>
       <div class="card stack"><h3>איך לתעד לטכנאי</h3><ul class="bul">
         <li>דגם, מספר סידורי ותאריך קנייה</li><li>מה קורה, מתי, וכמה פעמים (יומן אירועים)</li>
         <li>כל המדידות – עם נקודות המדידה המדויקות</li><li>קודי שגיאה ותמונה של הצג בזמן התקלה</li>
@@ -16857,18 +17105,18 @@ const DiagPro = (() => {
       <p class="lead">תקלה שמופיעה ונעלמת היא הקשה ביותר. מתחילים מתיעוד ״מתי זה קורה״, ואז בודקים מקטע אחר מקטע.</p>
       ${hvBanner()}
       <div class="card stack"><h3>מתי זה קורה?</h3>
-        <div class="sym-chips" role="group" aria-label="תנאים">${DATA.pro.interConditions.map(ic => `<button type="button" class="chip" data-action="dp-inter" data-ic="${ic.id}" aria-pressed="${ev.inter.has(ic.id)}" style="--c:#ff9f1a">${esc(ic.name)}</button>`).join('')}</div></div>
+        <div class="sym-chips" role="group" aria-label="תנאים">${DATA.pro.interConditions.map(ic => `<button type="button" class="chip" data-action="dp-inter" data-ic="${ic.id}" aria-pressed="${ev.inter.has(ic.id)}" data-sx="s30">${esc(ic.name)}</button>`).join('')}</div></div>
       <div class="card stack"><h3>Wiggle Test – מקטע אחר מקטע</h3>
         <div class="note warn">${ICON.warn}<span>גלגל ההנעה באוויר, ידיים ובגדים רחוקים מהגלגל. מערכת דולקת, צג דולק ומצערת קלה (או PAS בסיבוב ביד). מנענעים בעדינות כל כבל – בעיקר ליד מחברים, צירי קיפול, יציאת הכבל מהציר וסיבוב הכידון.</span></div>
         <ul class="clean wig-list">${bs.map(b => { const c = circuitById(b.circuit); const r = ev.wig[b.id]; return `<li>
-          <button type="button" class="linkbtn" data-action="dp-wfocus" data-b="${b.id}"><span class="sw" style="--c:${c ? c.color : '#888'}"></span> ${esc(b.label)}</button>
+          <button type="button" class="linkbtn" data-action="dp-wfocus" data-b="${b.id}"><span class="sw" data-sc="${c ? c.color : '#888'}"></span> ${esc(b.label)}</button>
           <span class="row" role="group" aria-label="${esc(b.label)}"><button type="button" class="btn sm choice" data-action="dp-wig" data-b="${b.id}" data-r="ok" aria-pressed="${r === 'ok'}">יציב</button><button type="button" class="btn sm choice bad" data-action="dp-wig" data-b="${b.id}" data-r="cut" aria-pressed="${r === 'cut'}">גורם לניתוק</button></span></li>`; }).join('')}</ul></div>
       <div class="card stack"><h3>בדיקות נוספות</h3>
-        <div class="esc-row"><b>בדיקת עומס</b><p class="lead" style="font-size:13.5px">מדידת צניחת מתח בהאצה – חושפת סוללה חלשה ומחבר עם התנגדות.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_sag">למדידה</button></div>
-        <div class="esc-row"><b>בדיקת חום</b><p class="lead" style="font-size:13.5px">אחרי 10–15 דקות נסיעה: איפה מורגש חום? מחבר חם = התנגדות מגע.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_hot">למדידה</button></div>
-        <div class="esc-row"><b>בדיקת לחות</b><p class="lead" style="font-size:13.5px">ייבוש 24 שעות במקום חם ויבש, ואז ניסיון חוזר. אם זה עזר – סמנו את התנאי ״ייבוש פתר זמנית״ למעלה.</p></div>
+        <div class="esc-row"><b>בדיקת עומס</b><p class="lead" data-sx="s29">מדידת צניחת מתח בהאצה – חושפת סוללה חלשה ומחבר עם התנגדות.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_sag">למדידה</button></div>
+        <div class="esc-row"><b>בדיקת חום</b><p class="lead" data-sx="s29">אחרי 10–15 דקות נסיעה: איפה מורגש חום? מחבר חם = התנגדות מגע.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_hot">למדידה</button></div>
+        <div class="esc-row"><b>בדיקת לחות</b><p class="lead" data-sx="s29">ייבוש 24 שעות במקום חם ויבש, ואז ניסיון חוזר. אם זה עזר – סמנו את התנאי ״ייבוש פתר זמנית״ למעלה.</p></div>
       </div>
-      <div class="card stack"><h3>יומן אירועים</h3><p class="lead" style="font-size:13.5px">כל פעם שזה קורה – רשמו: תאריך, שעה, טמפרטורה, מצב סוללה, מה עשיתם באותו רגע, ומה הצג הראה.</p>
+      <div class="card stack"><h3>יומן אירועים</h3><p class="lead" data-sx="s29">כל פעם שזה קורה – רשמו: תאריך, שעה, טמפרטורה, מצב סוללה, מה עשיתם באותו רגע, ומה הצג הראה.</p>
         <button type="button" class="btn sm" data-action="dp-diary">העתקת תבנית יומן</button>
         <textarea class="input copybox" id="dpCopyBox" hidden rows="6" aria-label="תבנית להעתקה" readonly></textarea></div>
       <div class="card stack"><h3>ההערכה כרגע</h3><div id="dpProbs">${probsHTML(post, 4)}</div>
@@ -16891,11 +17139,11 @@ const DiagPro = (() => {
         <p class="pro-only foot"><span class="mode">${esc(tp.mode)}</span> · אדום: ${esc(tp.red)} · שחור: ${esc(tp.black)}</p>
         <p class="beg-only">חוד אדום: ${esc(tp.red)} · חוד שחור: ${esc(tp.black)}</p>
         <div class="lcd num">${TM(tp.expect)}</div>
-        ${tp.bad ? `<p class="lead" style="font-size:13.5px"><b>ערך חריג:</b> ${T(tp.bad)}</p>` : ''}
+        ${tp.bad ? `<p class="lead" data-sx="s29"><b>ערך חריג:</b> ${T(tp.bad)}</p>` : ''}
         <div class="row"><button type="button" class="btn sm" data-action="tp-show" data-tp="${tp.id}">הצג ב-3D</button>${tp.meas && E.measById(tp.meas) && E.measOK(E.measById(tp.meas)) ? `<button type="button" class="btn sm ghost" data-action="tp-meas" data-m="${tp.meas}">הזנת קריאה לאבחון</button>` : ''}</div>
       </div>`).join('')}</div>
       ${m.hallSequence ? `<div class="card stack"><div class="spread"><h3>רצף Hall תקין</h3>${Conf.badge(m.hallSequence.conf)}</div>
-        <p class="lead" style="font-size:13.5px">${esc(m.hallSequence.note)}</p>
+        <p class="lead" data-sx="s29">${esc(m.hallSequence.note)}</p>
         <div class="hallseq" role="table" aria-label="רצף מצבי Hall"><div role="row" class="hs-h"><span role="columnheader">צעד</span><span role="columnheader">A</span><span role="columnheader">B</span><span role="columnheader">C</span></div>${m.hallSequence.states.map((s, i) => `<div role="row"><span role="cell">${i + 1}</span>${s.split('').map(ch => `<span role="cell" class="${ch === '1' ? 'hi' : 'lo'}">${ch === '1' ? '5V' : '0V'}</span>`).join('')}</div>`).join('')}</div></div>` : ''}
       ${m.connectors ? `<div class="card stack"><h3>מחברים בדגם</h3><dl class="specs">${[['power', 'הספק'], ['charge', 'טעינה'], ['motor', 'מנוע'], ['display', 'צג']].filter(([k]) => m.connectors[k]).map(([k, n]) => `<dt>${n}</dt><dd>${T(m.connectors[k].v)} ${Conf.badge(m.connectors[k].conf)}</dd>`).join('')}
         ${m.displayProtocol ? `<dt>פרוטוקול צג</dt><dd>${T(m.displayProtocol.v)} ${Conf.badge(m.displayProtocol.conf)}</dd>` : ''}</dl></div>` : ''}
@@ -17041,7 +17289,7 @@ const DiagPro = (() => {
     if (!ec) return '';
     const fams = ec.families || [];
     return `<div class="card stack model-card"><div class="spread"><h3>קודים לדגם <bdi>${esc(M().short)}</bdi></h3>${Conf.badge(ec.conf)}</div>
-      <p class="lead" style="font-size:14px">${T(ec.note)}</p>
+      <p class="lead" data-sx="s0">${T(ec.note)}</p>
       ${fams.length ? `<div class="row">${fams.map(f => { const b = DATA.errorCodes.brands.find(x => x.id === f); return `<button type="button" class="btn sm" data-action="dg-brand" data-b="${f}">הצג קודי ${esc(b ? b.name : f)}</button>`; }).join('')}</div>` : '<p class="foot">❓ אין קודים מאומתים לדגם הזה במאגר. לא ממציאים קודים – בדקו במדריך הצג.</p>'}</div>`;
   }
   function codeConf(c) { return Conf.badge((DATA.pro.codeConfidence || {})[c.b] || 'unk'); }
@@ -17078,7 +17326,7 @@ const Academy = (() => {
     const done = mods.filter(m => p.certs[m.id]).length;
     return `<div class="stack"><h3>אקדמיה: מאפס ועד מקצוען</h3>
       <p class="lead">7 שלבים, כל אחד עם שיעורים קצרים, מודל תלת-ממדי שמתעדכן, בוחן ותעודת סיום. התוכן מותאם לדגם <bdi>${esc(M().short)}</bdi> ולרמה שבחרתם (<b>${Level.isBeg() ? 'מתחיל' : 'מקצוען'}</b>).</p>
-      <div class="progress" role="progressbar" aria-label="התקדמות באקדמיה" aria-valuemin="0" aria-valuemax="${mods.length}" aria-valuenow="${done}"><i style="width:${mods.length ? done / mods.length * 100 : 0}%"></i></div>
+      <div class="progress" role="progressbar" aria-label="התקדמות באקדמיה" aria-valuemin="0" aria-valuemax="${mods.length}" aria-valuenow="${done}"><i data-sw="${mods.length ? done / mods.length * 100 : 0}"></i></div>
       <p class="foot num">${done} מתוך ${mods.length} תעודות</p></div>
       <div class="acad-mods">${mods.map((m, i) => { const s = modStatus(m); return `<button type="button" class="acad-mod ${s.cert ? 'done' : ''}" data-action="ac-mod" data-m="${m.id}">
         <span class="n" aria-hidden="true">${s.cert ? '✓' : i + 1}</span><b>${esc(m.title)}</b><small>${esc(m.desc)}</small>
@@ -17089,7 +17337,7 @@ const Academy = (() => {
     return `<button type="button" class="linkbtn" data-action="ac-list">${ICON.prev} כל המודולים</button>
       <div><p class="eyebrow">מודול ${load().modules.indexOf(m) + 1}</p><h2 id="acTitle" tabindex="-1">${esc(m.title)}</h2><p class="lead">${esc(m.desc)}</p></div>
       <div class="lesson-list">${lessonsOf(m).map((l, i) => `<button type="button" data-action="ac-les" data-l="${l.id}" class="${p.read[m.id + '.' + l.id] ? 'read' : ''}"><span class="num">${i + 1}.</span> ${esc(l.title)}${l.sim ? ' · 🔧 סימולטור' : ''}</button>`).join('')}</div>
-      <div class="card stack"><h3>בוחן המודול</h3><p class="lead" style="font-size:14px">${m.quiz.length} שאלות. ציון עובר: ${load().passScore}%. ${s.score != null ? `הציון האחרון: <b>${s.score}%</b>.` : ''}</p>
+      <div class="card stack"><h3>בוחן המודול</h3><p class="lead" data-sx="s0">${m.quiz.length} שאלות. ציון עובר: ${load().passScore}%. ${s.score != null ? `הציון האחרון: <b>${s.score}%</b>.` : ''}</p>
         <div class="row"><button type="button" class="btn primary" data-action="ac-quiz">${s.score != null ? 'לבוחן שוב' : 'לבוחן'}</button>${s.cert ? '<button type="button" class="btn" data-action="ac-cert">התעודה שלי</button>' : ''}</div></div>`;
   }
   function lessonHTML() {
@@ -17097,7 +17345,7 @@ const Academy = (() => {
     if (!l) { view = 'module'; return modHTML(); }
     const beg = Level.isBeg();
     return `<button type="button" class="linkbtn" data-action="ac-mod" data-m="${m.id}">${ICON.prev} ${esc(m.title)}</button>
-      <div class="progress" role="progressbar" aria-label="התקדמות במודול" aria-valuemin="1" aria-valuemax="${ls.length}" aria-valuenow="${i + 1}"><i style="width:${(i + 1) / ls.length * 100}%"></i></div>
+      <div class="progress" role="progressbar" aria-label="התקדמות במודול" aria-valuemin="1" aria-valuemax="${ls.length}" aria-valuenow="${i + 1}"><i data-sw="${(i + 1) / ls.length * 100}"></i></div>
       <div><p class="eyebrow">שיעור ${i + 1} מתוך ${ls.length} · ${beg ? 'מתחיל' : 'מקצוען'}</p><h2 id="acTitle" tabindex="-1">${esc(l.title)}</h2></div>
       <div class="card lesson-body"><p>${md(beg ? l.beg : l.pro)}</p>
         ${beg ? `<details class="concept"><summary>הגרסה המקצועית</summary><div class="body"><p>${md(l.pro)}</p></div></details>` : `<details class="concept"><summary>הסבר פשוט</summary><div class="body"><p>${md(l.beg)}</p></div></details>`}
@@ -17114,7 +17362,7 @@ const Academy = (() => {
     const score = submitted ? Math.round(m.quiz.filter((q, i) => answers[i] === q.a).length / m.quiz.length * 100) : null;
     return `<button type="button" class="linkbtn" data-action="ac-mod" data-m="${m.id}">${ICON.prev} ${esc(m.title)}</button>
       <div><p class="eyebrow">בוחן</p><h2 id="acTitle" tabindex="-1">${esc(m.title)}</h2></div>
-      ${m.quiz.map((q, i) => `<fieldset class="card quiz-q" style="margin:0"><legend class="sr-only">שאלה ${i + 1}</legend>
+      ${m.quiz.map((q, i) => `<fieldset class="card quiz-q" data-sx="s31"><legend class="sr-only">שאלה ${i + 1}</legend>
         <b>${i + 1}. ${T(q.q)}</b>
         ${q.opts.map((o, j) => { let cls = ''; if (submitted) { if (j === q.a) cls = 'right'; else if (answers[i] === j) cls = 'wrong'; }
           return `<button type="button" class="quiz-opt ${cls}" data-action="ac-opt" data-q="${i}" data-o="${j}" aria-pressed="${answers[i] === j}" ${submitted ? 'disabled' : ''}>${T(o)}</button>`; }).join('')}
@@ -17130,10 +17378,10 @@ const Academy = (() => {
     if (!c) { view = 'module'; return modHTML(); }
     const name = ProStore.get('certName', '');
     return `<button type="button" class="linkbtn" data-action="ac-mod" data-m="${m.id}">${ICON.prev} ${esc(m.title)}</button>
-      <div class="field"><label for="certName">השם על התעודה</label><input class="input" id="certName" value="${esc(name)}" autocomplete="name"></div>
+      <div class="field"><label for="certName">השם על התעודה</label><input class="input" id="certName" maxlength="60" value="${esc(name)}" autocomplete="name"></div>
       <div class="print-area"><div class="cert" id="certCard">
         <div class="seal" aria-hidden="true">⚡</div>
-        <p class="eyebrow" style="justify-content:center">מעבדת החיווט · אקדמיה</p>
+        <p class="eyebrow" data-sx="s32">מעבדת החיווט · אקדמיה</p>
         <h3>תעודת סיום</h3>
         <p>מאשרת ש-</p><p class="who" id="certWho">${esc(name || 'שם המסיים/ת')}</p>
         <p>סיים/ה בהצלחה את המודול <b>${esc(m.title)}</b></p>
@@ -17401,7 +17649,7 @@ const Tools = (() => {
   const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה']];
   let sub = ProStore.get('toolsSub', 'calc'), editId = null, delArm = null, printId = null;
   if (!SUBS.some(s => s[0] === sub)) sub = 'calc';
-  const num = id => { const e = $('#' + id); if (!e) return NaN; const v = parseFloat(String(e.value).replace(',', '.')); return isFinite(v) ? v : NaN; };
+  const num = id => { const e = $('#' + id); if (!e) return NaN; const v = Sec.num(e.value, e.min !== '' ? Number(e.min) : -Infinity, e.max !== '' ? Number(e.max) : Infinity); return v === null ? NaN : v; };
   const f1 = x => (Math.round(x * 10) / 10).toString();
   const out = (id, h) => { const e = $('#' + id); if (e) e.innerHTML = h; };
   const kmOf = s => { const m = String(s || '').match(/(\d+(?:\.\d+)?)\s*(?:–|-)?\s*(\d+(?:\.\d+)?)?\s*ק״מ/); return m ? Number(m[2] || m[1]) : null; };
@@ -17410,7 +17658,7 @@ const Tools = (() => {
   function subtabs() {
     return `<div class="subtabs" role="tablist" aria-label="כלים">${SUBS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${sub === id}" data-action="tl-sub" data-sub="${id}">${n}</button>`).join('')}</div>`;
   }
-  const field = (id, label, val, attrs = '') => `<div class="field"><label for="${id}">${label}</label><input class="input num" id="${id}" type="number" inputmode="decimal" value="${val}" ${attrs}></div>`;
+  const field = (id, label, val, attrs = '') => `<div class="field"><label for="${id}">${label}</label><input class="input num" id="${id}" type="number" inputmode="decimal" value="${esc(val)}" ${/min=/.test(attrs) ? '' : 'min="0"'} ${/max=/.test(attrs) ? '' : 'max="100000"'} ${attrs}></div>`;
 
   /* ---------- מחשבונים ---------- */
   function calcHTML() {
@@ -17430,7 +17678,7 @@ const Tools = (() => {
         ${field('cPV', 'מתח (V)', b.nominal)}${field('cPA', 'זרם (A)', amps || 15, 'step="0.5"')}${field('cPW', 'או: הספק רצוי (W)', 250)}
       </div><div class="out-box" id="cPOut"></div></div></details>
       <details class="concept"><summary>התאמת סוללה חלופית</summary><div class="body">
-        <p class="lead" style="font-size:13.5px">מזינים את נתוני הסוללה המוצעת ומשווים לדגם. מארז שלם בלבד – לא בונים ולא פותחים סוללות.</p>
+        <p class="lead" data-sx="s29">מזינים את נתוני הסוללה המוצעת ומשווים לדגם. מארז שלם בלבד – לא בונים ולא פותחים סוללות.</p>
         <div class="tool-grid">
           <div class="field"><label for="cBV">מתח נומינלי</label><select class="input" id="cBV">${vOpts(m.voltage)}</select></div>
           ${field('cBAh', 'קיבולת (Ah)', m.ah, 'step="0.1"')}${field('cBA', 'זרם רציף BMS (A)', 25, 'step="1"')}
@@ -17491,15 +17739,15 @@ const Tools = (() => {
     return `<p class="lead">יומן לכל כלי שמגיע לתיקון. נשמר רק בדפדפן הזה – ייצאו JSON לגיבוי או להעברה למכשיר אחר.</p>
       <form class="card stack" id="logForm" autocomplete="off"><h3>${r ? 'עריכת רשומה' : 'רשומה חדשה'}</h3>
         <div class="tool-grid">
-          <div class="field"><label for="lgCust">לקוח</label><input class="input" id="lgCust" value="${v('customer')}"></div>
+          <div class="field"><label for="lgCust">לקוח</label><input class="input" id="lgCust" maxlength="120" value="${v('customer')}"></div>
           <div class="field"><label for="lgModel">דגם</label><select class="input" id="lgModel">${mOpts}</select></div>
-          <div class="field"><label for="lgSerial">מספר סידורי</label><input class="input" id="lgSerial" value="${v('serial')}"></div>
+          <div class="field"><label for="lgSerial">מספר סידורי</label><input class="input" id="lgSerial" maxlength="60" value="${v('serial')}"></div>
           <div class="field"><label for="lgStatus">סטטוס</label><select class="input" id="lgStatus">${['פתוח', 'בטיפול', 'ממתין לחלק', 'הסתיים'].map(s => `<option ${((r && r.status) || 'פתוח') === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
         </div>
-        <div class="field"><label for="lgSym">תלונה / סימפטומים</label><textarea class="input" id="lgSym" rows="2">${v('symptoms')}</textarea></div>
-        <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
-        <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" value="${v('replaced')}"></div>
-        <div class="field"><label for="lgNotes">הערות</label><textarea class="input" id="lgNotes" rows="2">${v('notes')}</textarea></div>
+        <div class="field"><label for="lgSym">תלונה / סימפטומים</label><textarea class="input" id="lgSym" rows="2" maxlength="2000">${v('symptoms')}</textarea></div>
+        <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
+        <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
+        <div class="field"><label for="lgNotes">הערות</label><textarea class="input" id="lgNotes" rows="2" maxlength="4000">${v('notes')}</textarea></div>
         <div class="row"><button type="submit" class="btn primary">${r ? 'שמירת שינויים' : 'הוספה ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
       </form>
       <div class="stack"><div class="spread"><h3>רשומות (${items.length})</h3>
@@ -17507,13 +17755,14 @@ const Tools = (() => {
         <textarea class="input copybox" id="lgBox" hidden rows="8" aria-label="JSON להעתקה או להדבקה"></textarea>
         <div id="lgImportBox" hidden class="card stack"><div class="field"><label for="lgFile">קובץ JSON</label><input class="input" id="lgFile" type="file" accept="application/json,.json"></div>
           <div class="field"><label for="lgPaste">או הדביקו JSON</label><textarea class="input copybox" id="lgPaste" rows="5"></textarea></div>
-          <label class="check" for="lgMerge" style="border-color:var(--line)"><input type="checkbox" id="lgMerge" checked style="accent-color:var(--accent)"><span>מיזוג עם הרשומות הקיימות (בלי למחוק)</span></label>
+          <label class="check" for="lgMerge" data-sx="s33"><input type="checkbox" id="lgMerge" checked data-sx="s34"><span>מיזוג עם הרשומות הקיימות (בלי למחוק)</span></label>
+          <pre class="import-err" id="lgErr" hidden role="alert"></pre>
           <button type="button" class="btn primary" data-action="lg-doimport">ייבוא</button></div>
         ${items.length ? items.map(x => `<div class="card log-item">
           <div class="spread"><b>${esc(x.customer || 'ללא שם')} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
           ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
-          <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${x.id}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${x.id}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${x.id}">${delArm === x.id ? 'לחצו שוב למחיקה' : 'מחיקה'}</button></div>
+          <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחצו שוב למחיקה' : 'מחיקה'}</button></div>
         </div>`).join('') : '<p class="lead">אין רשומות עדיין. אפשר גם לשמור תוצאת אבחון ישירות מלשונית האבחון.</p>'}
       </div>
       ${printId ? reportHTML(items.find(x => x.id === printId)) : ''}`;
@@ -17529,7 +17778,7 @@ const Tools = (() => {
       <dl class="specs"><dt>תאריך</dt><dd class="num">${esc(x.date)}</dd><dt>לקוח</dt><dd>${esc(x.customer)}</dd><dt>כלי</dt><dd><bdi>${esc(mm.name || x.modelName)}</bdi>${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</dd>
       <dt>תלונה</dt><dd>${esc(x.symptoms)}</dd><dt>מדידות</dt><dd>${esc(x.measurements)}</dd><dt>הוחלף</dt><dd>${esc(x.replaced)}</dd><dt>הערות</dt><dd>${esc(x.notes)}</dd><dt>סטטוס</dt><dd>${esc(x.status)}</dd></dl>
       <p class="foot">${esc(DATA.meta.disclaimer)}</p>
-      <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn sm primary" data-action="lg-print">הדפסה</button>'}<button type="button" class="btn sm" data-action="lg-copyrep" data-id="${x.id}">העתקת הדו״ח</button><button type="button" class="btn sm ghost" data-action="lg-closerep">סגירה</button></div>
+      <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn sm primary" data-action="lg-print">הדפסה</button>'}<button type="button" class="btn sm" data-action="lg-copyrep" data-id="${esc(x.id)}">העתקת הדו״ח</button><button type="button" class="btn sm ghost" data-action="lg-closerep">סגירה</button></div>
       <textarea class="input copybox" id="lgRepBox" hidden rows="6" readonly aria-label="דו״ח להעתקה"></textarea></div>`;
   }
   function bindLog() {
@@ -17542,7 +17791,7 @@ const Tools = (() => {
     const file = $('#lgFile');
     if (file) file.addEventListener('change', () => {
       const f = file.files && file.files[0]; if (!f) return;
-      const rd = new FileReader(); rd.onload = () => { $('#lgPaste').value = String(rd.result || ''); UI.toast('הקובץ נטען – לחצו ״ייבוא״'); }; rd.readAsText(f);
+      const rd = new FileReader(); rd.onload = () => { $('#lgPaste').value = String(rd.result || ''); UI.toast('הקובץ נטען – לחצו ״ייבוא״'); }; if (f.size > RepairLog.MAX_BYTES) { UI.toast('הקובץ גדול מדי'); file.value = ''; return; } rd.readAsText(f);
     });
   }
 
@@ -17568,7 +17817,7 @@ const Tools = (() => {
         <td>${x.controllerAmpsNum ? x.controllerAmpsNum + 'A' : '❓'}${x.controller.count > 1 ? ' ×2' : ''}</td>
         <td class="flagcell">${x.connectors && x.connectors.charge ? esc(x.connectors.charge.v) + ' ' + Conf.badge(x.connectors.charge.conf) : '❓'}</td>
         <td class="flagcell">${x.displayProtocol ? esc(x.displayProtocol.v) + ' ' + Conf.badge(x.displayProtocol.conf) : '❓'}</td></tr>`; }).join('')}</tbody></table></div>
-      <div class="card stack"><h3>מטענים לפי מתח</h3><p class="lead" style="font-size:13.5px">מטען מתאים רק כשמתח המלאה <b>ומחבר הטעינה</b> זהים. מחברים שסומנו ⚠️/❓ – לאמת לפני שימוש.</p>
+      <div class="card stack"><h3>מטענים לפי מתח</h3><p class="lead" data-sx="s29">מטען מתאים רק כשמתח המלאה <b>ומחבר הטעינה</b> זהים. מחברים שסומנו ⚠️/❓ – לאמת לפני שימוש.</p>
         <dl class="specs">${Object.keys(groups).sort((a, c) => a - c).map(k => `<dt class="num">${k}V</dt><dd>${groups[k].map(esc).join(' · ')}</dd>`).join('')}</dl></div>
       <div class="card stack"><h3>רכיבים חלופיים תואמים ל-<bdi>${esc(m.short)}</bdi></h3>
         ${alt.map(([n, crit, c]) => `<div class="esc-row"><b>${n} ${Conf.badge(c)}</b><ul class="bul">${crit.map(x => `<li>${T(x)}</li>`).join('')}</ul></div>`).join('')}
@@ -17625,10 +17874,11 @@ const Tools = (() => {
   UI.on('lg-export', () => { const t = JSON.stringify({ app: 'wiring-lab', type: 'repair-log', version: 1, exported: new Date().toISOString(), items: RepairLog.all() }, null, 1); const box = $('#lgBox'); offerFile('wiring-lab-repair-log.json', t, box); });
   UI.on('lg-import', () => { const b = $('#lgImportBox'); b.hidden = !b.hidden; });
   UI.on('lg-doimport', () => {
-    let obj; try { obj = JSON.parse($('#lgPaste').value); } catch (e) { UI.toast('JSON לא תקין'); return; }
-    const list = Array.isArray(obj) ? obj : (obj && Array.isArray(obj.items) ? obj.items : null);
-    if (!list) { UI.toast('לא נמצאו רשומות בקובץ'); return; }
-    const n = RepairLog.replaceAll(list, $('#lgMerge').checked); UI.toast(`יובאו ${n} רשומות`); render();
+    const errBox = $('#lgErr');
+    const r = RepairLog.parseImport($('#lgPaste').value);
+    if (!r.ok) { if (errBox) { errBox.hidden = false; errBox.textContent = r.errors.slice(0, 8).join('\n') + (r.errors.length > 8 ? `\n…ועוד ${r.errors.length - 8} שגיאות` : ''); } UI.toast('הייבוא נדחה – ראו פירוט'); return; }
+    if (errBox) errBox.hidden = true;
+    const n = RepairLog.replaceAll(r.items, $('#lgMerge').checked); UI.toast(`יובאו ${n} רשומות`); render();
   });
   UI.on('lg-report', el => { printId = el.dataset.id; render(); });
   UI.on('lg-closerep', () => { printId = null; render(); });
@@ -17672,8 +17922,8 @@ const WizardPlus = (() => {
     return `<div class="card stack"><h3>לפני שמתחילים: ${esc(DATA.wizard.scenarios[scenario].name)}</h3>
       ${hv ? `<div class="note danger">${ICON.warn}<span><b>${State.voltage}V:</b> מתח מסוכן במגע. כל שלב עם ${Safety.liveBadge()} – רק טכנאי עם ציוד מבודד.</span></div>` : ''}
       <div class="sec"><h4>תנאים מקדימים</h4><ul class="bul">${x.prereqs.map(p => `<li>${T(p)}</li>`).join('')}</ul></div>
-      <div class="sec" style="--c:var(--danger)"><h4>אל תעשו</h4><ul class="bul donts">${x.donts.map(p => `<li>${T(p)}</li>`).join('')}</ul></div>
-      ${x.compat && x.compat.length ? `<div class="sec" style="--c:var(--warn)"><h4>בדיקת תאימות</h4><ul class="bul">${x.compat.map(p => `<li>${T(p)}</li>`).join('')}</ul></div>` : ''}
+      <div class="sec" data-sx="s35"><h4>אל תעשו</h4><ul class="bul donts">${x.donts.map(p => `<li>${T(p)}</li>`).join('')}</ul></div>
+      ${x.compat && x.compat.length ? `<div class="sec" data-sx="s20"><h4>בדיקת תאימות</h4><ul class="bul">${x.compat.map(p => `<li>${T(p)}</li>`).join('')}</ul></div>` : ''}
       ${tq.length ? `<div class="sec"><h4>מומנטי הידוק</h4><dl class="specs">${tq.map(t => `<dt>${esc(t.part)}</dt><dd class="num">${esc(t.nm)} ${Conf.badge(t.conf)}</dd>`).join('')}</dl></div>` : ''}
     </div>`;
   }
@@ -17684,7 +17934,7 @@ const WizardPlus = (() => {
     if (v.kind === 'num' || v.kind === 'numFree') input = `<label class="field"><span class="lbl">${esc(tpl(v.label))}${v.unit ? ` (${v.unit})` : ''}</span><input class="input num" id="wvIn" inputmode="decimal" autocomplete="off"></label>`;
     else if (v.kind === 'num2') input = `<div class="num3 two"><label class="field"><span class="lbl">במנוחה (V)</span><input class="input num" id="wvIn" inputmode="decimal"></label><label class="field"><span class="lbl">בפתיחה מלאה (V)</span><input class="input num" id="wvIn2" inputmode="decimal"></label></div>`;
     else if (v.kind === 'choice') input = `<div class="choice-row" role="group" aria-label="${esc(v.label)}">${v.options.map((o, i) => `<button type="button" class="btn sm choice" data-wv="${i}" aria-pressed="false">${esc(o)}</button>`).join('')}</div>`;
-    else input = `<label class="check" for="wvChk" style="border-color:rgba(61,220,132,.4)"><input type="checkbox" id="wvChk" style="accent-color:var(--ok)" ${ok ? 'checked' : ''}><span>ביצעתי ובדקתי: ${T(s.verify)}</span></label>`;
+    else input = `<label class="check" for="wvChk" data-sx="s28"><input type="checkbox" id="wvChk" data-sx="s36" ${ok ? 'checked' : ''}><span>ביצעתי ובדקתי: ${T(s.verify)}</span></label>`;
     const range = v.kind === 'num' ? `צפוי: ${nT(v.min)}–${nT(v.max)}${v.unit}` : v.kind === 'num2' ? `צפוי: ${v.ranges[0][0]}–${v.ranges[0][1]}V / ${v.ranges[1][0]}–${v.ranges[1][1]}V` : '';
     return `${cap ? `<div class="note warn">${ICON.warn}<span>לפני מגע בבקר או במחברי ההספק: המתינו 2 דקות אחרי ניתוק ובדקו שיש 0V (הקבלים שומרים מתח).</span></div>` : ''}
       <div class="verify-box" id="wvBox"><b>בדיקת אימות לפני המשך</b>

@@ -79,7 +79,7 @@ const Academy = (() => {
     if (!c) { view = 'module'; return modHTML(); }
     const name = ProStore.get('certName', '');
     return `<button type="button" class="linkbtn" data-action="ac-mod" data-m="${m.id}">${ICON.prev} ${esc(m.title)}</button>
-      <div class="field"><label for="certName">השם על התעודה</label><input class="input" id="certName" value="${esc(name)}" autocomplete="name"></div>
+      <div class="field"><label for="certName">השם על התעודה</label><input class="input" id="certName" maxlength="60" value="${esc(name)}" autocomplete="name"></div>
       <div class="print-area"><div class="cert" id="certCard">
         <div class="seal" aria-hidden="true">⚡</div>
         <p class="eyebrow" style="justify-content:center">מעבדת החיווט · אקדמיה</p>

@@ -14,7 +14,7 @@ const ProStore = {
     if (typeof this._d !== 'object' || !this._d) this._d = {};
     return this._d;
   },
-  get(k, d) { const v = this._load()[k]; return v === undefined ? d : v; },
+  get(k, d) { const o = this._load(); const v = Sec.own(o, k) ? o[k] : undefined; return v === undefined ? d : v; },
   set(k, v) {
     this._load()[k] = v;
     try { window.localStorage.setItem(this.KEY, JSON.stringify(this._d)); } catch (e) { /* אחסון לא זמין */ }
@@ -235,18 +235,41 @@ const RepairLog = (() => {
   function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch); save(); } return r; }
   function remove(id) { load(); items = items.filter(x => x.id !== id); save(); }
   function all() { return load(); }
+  const S = (max, o) => Object.assign({ t: 'str', max, opt: true }, o);
+  /** סכמת רשומה – כל ייבוא עובר דרכה */
+  const ITEM = { t: 'obj', p: {
+    id: { t: 'str', re: /^[A-Za-z0-9_-]{1,40}$/ }, date: S(10, { re: /^(\d{4}-\d{2}-\d{2})?$/ }), model: S(40, { re: /^[A-Za-z0-9_-]*$/ }), modelName: S(120),
+    customer: S(120), phone: S(30, { re: /^[0-9+()\- ]*$/ }), anon: { t: 'bool', opt: true }, serial: S(60), symptoms: S(2000), measurements: S(4000),
+    replaced: S(1000), notes: S(4000), status: S(30), vehicleId: S(40, { re: /^[A-Za-z0-9_-]*$/ }), km: { t: 'num', min: 0, max: 1e6, opt: true },
+    price: { t: 'num', min: 0, max: 1e7, opt: true }, photos: { t: 'arr', max: 20, opt: true, of: { t: 'str', re: /^[A-Za-z0-9_-]{1,40}$/ } },
+    updated: S(30)
+  } };
+  const FILE = { t: 'obj', p: { app: S(40), type: S(40), version: { t: 'num', min: 1, max: 99, opt: true }, exported: S(40), items: { t: 'arr', max: 20000, of: ITEM } } };
+  const MAX_BYTES = 5 * 1024 * 1024;
+  /** ייבוא: גודל → JSON בטוח → סכמה. מחזיר { ok, items, errors } */
+  function parseImport(text) {
+    let obj;
+    try { obj = Sec.parseJSON(text, MAX_BYTES); } catch (e) { return { ok: false, errors: [e.message] }; }
+    if (Array.isArray(obj)) obj = { items: obj };
+    const r = Sec.validate(obj, FILE, 'קובץ');
+    if (!r.ok) return { ok: false, errors: r.errors };
+    return { ok: true, items: r.value.items, errors: [] };
+  }
+  function normalize(x) {
+    return {
+      id: x.id, date: x.date || '', model: Sec.own(DATA.models, x.model) ? x.model : '', modelName: x.modelName || '',
+      customer: x.customer || '', phone: x.phone || '', anon: !!x.anon, serial: x.serial || '', symptoms: x.symptoms || '', measurements: x.measurements || '',
+      replaced: x.replaced || '', notes: x.notes || '', status: x.status || 'פתוח', vehicleId: x.vehicleId || '', km: x.km, price: x.price, photos: x.photos || [], updated: x.updated || ''
+    };
+  }
   function replaceAll(list, merge) {
     load();
-    const clean = list.filter(x => x && typeof x === 'object' && typeof x.id === 'string').map(x => ({
-      id: String(x.id).slice(0, 40), date: String(x.date || '').slice(0, 10), model: String(x.model || ''), modelName: String(x.modelName || ''),
-      customer: String(x.customer || ''), serial: String(x.serial || ''), symptoms: String(x.symptoms || ''), measurements: String(x.measurements || ''),
-      replaced: String(x.replaced || ''), notes: String(x.notes || ''), status: String(x.status || 'פתוח')
-    }));
+    const clean = list.filter(x => x && Sec.isId(x.id)).map(normalize);
     if (merge) { const ids = new Set(items.map(x => x.id)); clean.forEach(x => { if (!ids.has(x.id)) items.push(x); }); }
     else items = clean;
     save(); return clean.length;
   }
-  return { add, update, remove, all, replaceAll };
+  return { add, update, remove, all, replaceAll, parseImport, normalize, ITEM, MAX_BYTES };
 })();
 
 /** העתקה ללוח עם נפילה לבחירת טקסט */

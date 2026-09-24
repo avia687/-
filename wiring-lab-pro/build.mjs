@@ -5,6 +5,7 @@
 //   dist/models.json   – 12 הדגמים כולל כל השדות המורחבים
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -168,6 +169,8 @@ patch('aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון �
 patch('  <div class="toast" id="toast" role="status" aria-live="polite"></div>',
   '  <div class="gtip" id="gtip" role="tooltip" hidden></div>\n  <div class="toast" id="toast" role="status" aria-live="polite"></div>', 'gtip');
 // Store + Modes + boot
+patch("    if (DATA.models[saved.model]) setModelState(saved.model);", "    if (Object.prototype.hasOwnProperty.call(DATA.models, saved.model)) setModelState(saved.model);", 'store hasOwn');
+patch(`<span class="live" style="\${tech ? '' : 'color:var(--ok);background:var(--ok-soft);border-color:rgba(61,220,132,.4)'}">`, `<span class="live\${tech ? '' : ' live-ok'}">`, 'tech style');
 patch("if (['learn', 'wizard', 'diag'].includes(saved.mode)) State.mode = saved.mode;", "if (['learn', 'wizard', 'diag', 'tools'].includes(saved.mode)) State.mode = saved.mode;", 'store modes');
 patch('function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics }; }', 'function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools }; }', 'Modes');
 patch('(function boot() {', 'function bootBase() {', 'boot open');
@@ -215,18 +218,86 @@ patch("onVehicle() { reset(); }, abort() { if (symId)", "onVehicle() { reset(); 
 
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
-  ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
+  ['p06_sec.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
   ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p14_boot_pro.js', 1]
 ];
 let js = MODS.filter(([, s]) => s <= STAGE).map(([f]) => read(f)).join('\n');
 if (STAGE < 4) js = read('stubs.js') + '\n' + js;
 html = html.replace(/\n?$/, '') + `\n<script>\n'use strict';\n${js}\n</script>\n`;
+// SRI ל-Three.js (אותו קובץ בדיוק כמו ב-cdnjs r128 – sha512 נבדק מול החבילה ב-npm)
+const THREE_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+const THREE_LOCAL = path.join(ROOT, 'vendor', 'three.min.js');
+const THREE_SRI = 'sha512-' + crypto.createHash('sha512').update(fs.readFileSync(THREE_LOCAL)).digest('base64');
+patch(`<script src="${THREE_SRC}"></script>`, `<script src="${THREE_SRC}" integrity="${THREE_SRI}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`, 'three sri');
 
-/* ---------- 5. פלט ---------- */
+/* ---------- 5. CSP: בלי style="" ----------
+   סגנון סטטי → data-sx + כלל CSS; רוחב דינמי → data-sw; צבע דינמי → data-sc (מוחלים ב-Sec.applyStyles) */
+const sxRules = [];
+{
+  const map = new Map();
+  html = html.replace(/style="width:\$\{([^"]*)\}%"/g, 'data-sw="${$1}"');
+  html = html.replace(/style="--c:\$\{([^"]*)\}"/g, 'data-sc="${$1}"');
+  html = html.replace(/style="([^"$]*)"/g, (_, css) => {
+    if (!map.has(css)) { map.set(css, 's' + map.size); }
+    return `data-sx="${map.get(css)}"`;
+  });
+  for (const [css, k] of map) sxRules.push(`[data-sx="${k}"]{${css.split(';').filter(Boolean).map(d => d.trim() + ' !important').join(';')}}`);
+  const left = html.match(/style="[^"]*"/g);
+  if (left) throw new Error('inline style left: ' + left.slice(0, 3).join(' | '));
+}
+patch('</style>\n<div id="app">', '</style>\n<style>\n/* generated from inline styles */\n' + sxRules.join('\n') + '\n</style>\n<div id="app">', 'sx css');
+
+/* ---------- 6. פלט ---------- */
 const DIST = path.join(ROOT, 'dist');
 fs.mkdirSync(DIST, { recursive: true });
 fs.writeFileSync(path.join(DIST, 'artifact.html'), html);
 fs.writeFileSync(path.join(DIST, 'index.html'),
   `<!DOCTYPE html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n${html}\n</body>\n</html>\n`);
+/* ---------- גרסת Web (PWA) – CSP קשיח: default-src 'self', בלי קוד inline ---------- */
+{
+  const WEB = path.join(DIST, 'web');
+  fs.rmSync(WEB, { recursive: true, force: true });
+  fs.mkdirSync(path.join(WEB, 'vendor'), { recursive: true });
+  let w = html;
+  const css = [];
+  w = w.replace(/<link rel="preconnect"[^>]*>\n?|<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>\n?/g, '');
+  w = w.replace(/<style>\n?([\s\S]*?)<\/style>\n?/g, (_, c) => { css.push(c); return ''; });
+  const scripts = [];
+  w = w.replace(/<script>\n?([\s\S]*?)<\/script>\n?/g, (_, c) => { scripts.push(c); return `@@SCRIPT${scripts.length - 1}@@`; });
+  if (scripts.length !== 2) throw new Error('expected 2 inline scripts, got ' + scripts.length);
+  const sri = t => 'sha384-' + crypto.createHash('sha384').update(t).digest('base64');
+  fs.writeFileSync(path.join(WEB, 'app.css'), css.join('\n'));
+  fs.writeFileSync(path.join(WEB, 'app.js'), scripts[0]);
+  fs.writeFileSync(path.join(WEB, 'pro.js'), scripts[1]);
+  fs.copyFileSync(THREE_LOCAL, path.join(WEB, 'vendor', 'three.min.js'));
+  w = w.replace(`<script src="${THREE_SRC}" integrity="${THREE_SRI}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`, `<script src="vendor/three.min.js" integrity="${THREE_SRI}"></script>`);
+  w = w.replace('@@SCRIPT0@@', `<script src="app.js" integrity="${sri(scripts[0])}"></script>\n`).replace('@@SCRIPT1@@', `<script src="pro.js" integrity="${sri(scripts[1])}"></script>\n`);
+  if (/<script(?![^>]*(type="application\/json"|src=))/.test(w)) throw new Error('inline script left in web build');
+  if (/\son[a-z]+=["']/i.test(w.replace(/<script type="application\/json"[\s\S]*?<\/script>/g, ''))) throw new Error('inline handler in web build');
+  const CSP = "default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'";
+  fs.writeFileSync(path.join(WEB, 'index.html'), `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="${CSP}">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מעבדת EV</title>
+<link rel="stylesheet" href="app.css" integrity="${sri(css.join('\n'))}">
+</head>
+<body>
+${w}
+</body>
+</html>
+`);
+  // כותרות לשרת (Netlify/Cloudflare Pages) – frame-ancestors לא נתמך ב-meta
+  fs.writeFileSync(path.join(WEB, '_headers'), `/*
+  Content-Security-Policy: ${CSP}; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(self), microphone=(self), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+`);
+}
 fs.writeFileSync(path.join(DIST, 'models.json'), JSON.stringify({ _doc: 'מעבדת החיווט – 12 הדגמים עם שדות מורחבים. conf: ok=✅ מאומת, typ=⚠️ טיפוסי/משוער, unk=❓ לא ידוע.', confLegend: pro.confLegend, torqueRef: pro.torqueRef, models: DATA.models }, null, 1));
 console.log(`built stage ${STAGE}: ${(html.length / 1024).toFixed(0)} KB, models: ${Object.keys(DATA.models).length}`);
