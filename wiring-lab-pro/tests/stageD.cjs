@@ -60,12 +60,17 @@ const CONTRAST = () => {
       ['tools-cmp', () => { document.querySelector('[data-action="tl-sub"][data-sub="cmp"]').click(); }],
       ['tools-sim', () => { document.querySelector('[data-action="tl-sub"][data-sub="sim"]').click(); }],
       ['tools-data', () => { document.querySelector('[data-action="tl-sub"][data-sub="data"]').click(); }],
+      ['build-calc', () => { document.querySelector('[data-mode="build"]').click(); document.querySelector('[data-action="bg-step"][data-s="calc"]').click(); }],
+      ['build-check', () => { document.querySelector('[data-action="bg-step"][data-s="check"]').click(); }],
+      ['build-wiring', () => { document.querySelector('[data-action="bg-step"][data-s="wiring"]').click(); document.querySelector('[data-wire="phase"]').dispatchEvent(new MouseEvent('click', { bubbles: true })); }],
+      ['build-guide', () => { document.querySelector('[data-action="bg-step"][data-s="guide"]').click(); }],
+      ['build-summary', () => { document.querySelector('[data-action="bg-step"][data-s="summary"]').click(); }],
     ];
     for (const [name, fn] of screens) {
       await p.evaluate(`(${fn.toString()})()`); await p.waitForTimeout(250);
       const r = await p.evaluate(CONTRAST);
       total += r.n; r.bad.forEach(b => bad.add(name + ': ' + b));
-      if (SHOTS && (name === 'diag-adv' || name === 'tools-calc' || name === 'learn-model')) await p.screenshot({ path: `${SHOTS}/${theme}-${scheme}-${name}.png` });
+      if (SHOTS && (name === 'diag-adv' || name === 'tools-calc' || name === 'learn-model' || name.startsWith('build-'))) await p.screenshot({ path: `${SHOTS}/${theme}-${scheme}-${name}.png` });
     }
     results[theme + '/' + scheme] = { total, bad: [...bad] };
     if (theme === 'auto' && scheme === 'dark') {

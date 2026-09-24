@@ -148,6 +148,15 @@ if (STAGE >= 3) {
   html = html.replace(OPEN, `<script type="application/json" id="academy-data">${acad}</script>\n${OPEN}`);
 }
 
+/* ---------- 2b. קטלוג רכיבים (components.json – קובץ אחד לעדכון) ---------- */
+const COMPONENTS = JSON.parse(read('components.json'));
+{
+  const bad = COMPONENTS.items.filter(x => !COMPONENTS.categories[x.cat]);
+  if (bad.length) throw new Error('components: unknown category ' + bad.map(x => x.id));
+  for (const [k, c] of Object.entries(COMPONENTS.categories)) if (!c.price || !c.price.updatedAt || typeof c.price.verified !== 'boolean') throw new Error('components: price meta missing for ' + k);
+}
+html = html.replace(OPEN, `<script type="application/json" id="components-data">${JSON.stringify(COMPONENTS).replace(/<\/script/gi, '<\\/script')}</script>\n${OPEN}`);
+
 /* ---------- 3. תיקוני חיבור (כל מחרוזת חייבת להימצא בדיוק פעם אחת) ---------- */
 function patch(from, to, label) {
   const n = html.split(from).length - 1;
@@ -169,7 +178,7 @@ patch('    <nav class="modes" role="tablist" aria-label="מצב עבודה" id="
     </div>
     <nav class="modes" role="tablist" aria-label="מצב עבודה" id="modeTabs">`, 'prefs');
 patch('aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>',
-  'aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>\n      <button type="button" role="tab" id="tab-tools" data-mode="tools" aria-controls="modeView" aria-selected="false" tabindex="-1">כלים</button>', 'tools tab');
+  'aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>\n      <button type="button" role="tab" id="tab-tools" data-mode="tools" aria-controls="modeView" aria-selected="false" tabindex="-1">כלים</button>\n      <button type="button" role="tab" id="tab-build" data-mode="build" aria-controls="modeView" aria-selected="false" tabindex="-1">בנה בעצמך</button>', 'tools tab');
 patch('    <button class="safety-btn" id="hazardOpen" type="button" aria-haspopup="dialog">', '    <nav class="legal-links" aria-label="מסמכים"><a href="terms.html" data-legal="terms">תנאי שימוש</a><a href="privacy.html" data-legal="privacy">פרטיות</a></nav>\n    <button class="safety-btn" id="hazardOpen" type="button" aria-haspopup="dialog">', 'legal links');
 patch('  <div class="toast" id="toast" role="status" aria-live="polite"></div>\n</div>', '  <div class="toast" id="toast" role="status" aria-live="polite"></div>\n</div>\n<template id="tpl-terms">' + read('legal/terms.html') + '</template>\n<template id="tpl-privacy">' + read('legal/privacy.html') + '</template>', 'legal templates');
 patch('  <main class="workspace">', '  <div class="notices" id="notices"></div>\n  <main class="workspace">', 'notices');
@@ -178,8 +187,8 @@ patch('  <div class="toast" id="toast" role="status" aria-live="polite"></div>',
 // Store + Modes + boot
 patch("    if (DATA.models[saved.model]) setModelState(saved.model);", "    if (Object.prototype.hasOwnProperty.call(DATA.models, saved.model)) setModelState(saved.model);", 'store hasOwn');
 patch(`<span class="live" style="\${tech ? '' : 'color:var(--ok);background:var(--ok-soft);border-color:rgba(61,220,132,.4)'}">`, `<span class="live\${tech ? '' : ' live-ok'}">`, 'tech style');
-patch("if (['learn', 'wizard', 'diag'].includes(saved.mode)) State.mode = saved.mode;", "if (['learn', 'wizard', 'diag', 'tools'].includes(saved.mode)) State.mode = saved.mode;", 'store modes');
-patch('function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics }; }', 'function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools }; }', 'Modes');
+patch("if (['learn', 'wizard', 'diag'].includes(saved.mode)) State.mode = saved.mode;", "if (['learn', 'wizard', 'diag', 'tools', 'build'].includes(saved.mode)) State.mode = saved.mode;", 'store modes');
+patch('function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics }; }', 'function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools, build: Builder }; }', 'Modes');
 patch('(function boot() {', 'function bootBase() {', 'boot open');
 {
   const k = html.lastIndexOf('})();\n</script>');
@@ -253,7 +262,7 @@ patch("new THREE.GridHelper(6, 30, 0x0f4652, 0x15232e)", "new THREE.GridHelper(6
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
   ['p06_sec.js', 1], ['p06b_storage.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
-  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p17_perf.js', 1], ['p14_boot_pro.js', 1]
+  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p17_perf.js', 1], ['p18_builder.js', 4], ['p14_boot_pro.js', 1]
 ];
 let js = MODS.filter(([, s]) => s <= STAGE).map(([f]) => read(f)).join('\n');
 if (STAGE < 4) js = read('stubs.js') + '\n' + js;
@@ -367,6 +376,7 @@ fs.writeFileSync(path.join(DIST, 'index.html'),
   fs.writeFileSync(path.join(WEB, 'app.js'), scripts[0]);
   fs.writeFileSync(path.join(WEB, 'pro.js'), scripts[1]);
   fs.copyFileSync(THREE_LOCAL, path.join(WEB, 'vendor', 'three.min.js'));
+  fs.writeFileSync(path.join(WEB, 'components.json'), JSON.stringify(COMPONENTS));
   fs.mkdirSync(path.join(WEB, 'fonts'), { recursive: true });
   for (const f of fs.readdirSync(path.join(ROOT, 'src', 'fonts'))) fs.copyFileSync(path.join(ROOT, 'src', 'fonts', f), path.join(WEB, 'fonts', f));
   w = w.replace(threeCfg(THREE_SRC), threeCfg('vendor/three.min.js'));
@@ -453,5 +463,6 @@ self.addEventListener('message', e => { if (e.data && e.data.type === 'skipWaiti
   Cross-Origin-Opener-Policy: same-origin
 `);
 }
+fs.writeFileSync(path.join(DIST, 'components.json'), JSON.stringify(COMPONENTS, null, 1));
 fs.writeFileSync(path.join(DIST, 'models.json'), JSON.stringify({ _doc: 'מעבדת החיווט – 12 הדגמים עם שדות מורחבים. conf: ok=מאומת, typ=טיפוסי/משוער, unk=לא ידוע.', confLegend: pro.confLegend, torqueRef: pro.torqueRef, models: DATA.models }, null, 1));
 console.log(`built stage ${STAGE}: ${(html.length / 1024).toFixed(0)} KB, models: ${Object.keys(DATA.models).length}`);

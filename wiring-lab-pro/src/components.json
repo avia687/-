@@ -1,0 +1,63 @@
+{
+ "schema": 1,
+ "updatedAt": "2026-09-24",
+ "currency": "ILS",
+ "_doc": "קטלוג רכיבים גנריים לאשף ״בנה בעצמך״. אין כאן דגמים מסחריים, ספקים או קישורים – רק ארכיטיפים לפי מפרט. כל מחיר הוא טווח לקטגוריה: verified=false אומר שהטווח הוא הערכה כללית שלא נבדקה מול ספקים. לעדכון: משנים רק את הקובץ הזה (price.min/max, price.updatedAt, price.source, price.verified). conf: ok=מאומת, typ=טיפוסי/משוער, unk=לא ידוע.",
+ "sourceTypes": {
+  "estimate": "הערכה כללית לקטגוריה – לא נבדקה מול ספק",
+  "supplier": "מחירון ספק (לציין שם ותאריך בשדה note)",
+  "quote": "הצעת מחיר בכתב",
+  "receipt": "קבלה מרכישה בפועל"
+ },
+ "categories": {
+  "motor": { "name": "מנוע Hub", "price": { "min": 450, "max": 1400, "updatedAt": "2026-09-24", "source": "estimate", "verified": false, "note": "ערכת המרה (מנוע בחישוק) משתנה מאוד לפי קוטר גלגל והספק" } },
+  "controller": { "name": "בקר", "price": { "min": 120, "max": 450, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "battery": { "name": "סוללה מוכנה עם BMS", "price": { "min": 900, "max": 3200, "updatedAt": "2026-09-24", "source": "estimate", "verified": false, "note": "תלוי מאוד בקיבולת, בתאים ובתקינה. העדיפו מארז עם תעודת תקן" } },
+  "charger": { "name": "מטען", "price": { "min": 80, "max": 280, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "display": { "name": "צג / מתג הפעלה", "price": { "min": 80, "max": 400, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "throttle": { "name": "מצערת", "price": { "min": 30, "max": 130, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "pas": { "name": "חיישן PAS", "price": { "min": 30, "max": 160, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "brakeSensors": { "name": "חיישני בלם (זוג)", "price": { "min": 30, "max": 140, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "protection": { "name": "נתיך / מפסק DC + מחזיק", "price": { "min": 25, "max": 150, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "wiring": { "name": "כבלים, מחברים, שרוולים מתכווצים", "price": { "min": 60, "max": 220, "updatedAt": "2026-09-24", "source": "estimate", "verified": false } },
+  "packParts": { "name": "חלקי מארז (תאים, BMS, פס ניקל, בידוד) – מתקדם", "price": { "min": 600, "max": 2400, "updatedAt": "2026-09-24", "source": "estimate", "verified": false, "note": "לא כולל ריתוך נקודתי. לא מומלץ בלי הכשרה" } },
+  "tools": { "name": "כלים (מולטימטר, מלחם, מכווץ, מפתח מומנט)", "price": { "min": 150, "max": 700, "updatedAt": "2026-09-24", "source": "estimate", "verified": false, "note": "אם אין לכם כבר" } }
+ },
+ "items": [
+  { "id": "mot_rear_250_36", "cat": "motor", "name": "מנוע Hub אחורי 250W, 36V (גנרי)", "spec": { "voltage": [36], "wNom": 250, "wPeak": 500, "pos": "rear", "hall": true, "phaseConn": "bullet", "hallConn": "julet", "weightKg": 3.2 }, "conf": "typ", "legalRoad": true },
+  { "id": "mot_rear_250_48", "cat": "motor", "name": "מנוע Hub אחורי 250W, 48V (גנרי)", "spec": { "voltage": [48], "wNom": 250, "wPeak": 600, "pos": "rear", "hall": true, "phaseConn": "bullet", "hallConn": "julet", "weightKg": 3.4 }, "conf": "typ", "legalRoad": true },
+  { "id": "mot_front_250_36", "cat": "motor", "name": "מנוע Hub קדמי 250W, 36V (גנרי)", "spec": { "voltage": [36], "wNom": 250, "wPeak": 450, "pos": "front", "hall": true, "phaseConn": "bullet", "hallConn": "julet", "weightKg": 2.8 }, "conf": "typ", "legalRoad": true, "note": "מזלג קדמי חייב להיות מפלדה ומתאים למומנט – Torque arm חובה" },
+  { "id": "mot_rear_500_48", "cat": "motor", "name": "מנוע Hub אחורי 500W, 48V (גנרי)", "spec": { "voltage": [48], "wNom": 500, "wPeak": 900, "pos": "rear", "hall": true, "phaseConn": "bullet", "hallConn": "julet", "weightKg": 4.5 }, "conf": "typ", "legalRoad": false },
+  { "id": "mot_rear_1000_48", "cat": "motor", "name": "מנוע Hub אחורי 1000W, 48V (גנרי)", "spec": { "voltage": [48, 52], "wNom": 1000, "wPeak": 1600, "pos": "rear", "hall": true, "phaseConn": "bullet", "hallConn": "julet", "weightKg": 6.5 }, "conf": "typ", "legalRoad": false },
+
+  { "id": "ctl_36_15", "cat": "controller", "name": "בקר 36V, 15A (גנרי, Sine wave)", "spec": { "voltage": [36], "amps": 15, "lvc": 31, "type": "sine", "hall": true }, "conf": "typ" },
+  { "id": "ctl_48_15", "cat": "controller", "name": "בקר 36–48V, 15A (גנרי, Sine wave)", "spec": { "voltage": [36, 48], "amps": 15, "lvc": 39, "type": "sine", "hall": true }, "conf": "typ" },
+  { "id": "ctl_48_22", "cat": "controller", "name": "בקר 48V, 22A (גנרי)", "spec": { "voltage": [48], "amps": 22, "lvc": 39, "type": "sine", "hall": true }, "conf": "typ" },
+  { "id": "ctl_52_35", "cat": "controller", "name": "בקר 48–52V, 35A (גנרי)", "spec": { "voltage": [48, 52], "amps": 35, "lvc": 42, "type": "sine", "hall": true }, "conf": "typ" },
+
+  { "id": "bat_36_10", "cat": "battery", "name": "מארז 36V 10Ah עם BMS (10S)", "spec": { "voltage": 36, "s": 10, "ah": 10, "bmsA": 20, "conn": "xt60", "weightKg": 2.6 }, "conf": "typ" },
+  { "id": "bat_36_14", "cat": "battery", "name": "מארז 36V 14Ah עם BMS (10S)", "spec": { "voltage": 36, "s": 10, "ah": 14, "bmsA": 25, "conn": "xt60", "weightKg": 3.4 }, "conf": "typ" },
+  { "id": "bat_48_13", "cat": "battery", "name": "מארז 48V 13Ah עם BMS (13S)", "spec": { "voltage": 48, "s": 13, "ah": 13, "bmsA": 25, "conn": "xt60", "weightKg": 3.9 }, "conf": "typ" },
+  { "id": "bat_48_17", "cat": "battery", "name": "מארז 48V 17.5Ah עם BMS (13S)", "spec": { "voltage": 48, "s": 13, "ah": 17.5, "bmsA": 30, "conn": "xt90", "weightKg": 4.8 }, "conf": "typ" },
+  { "id": "bat_52_20", "cat": "battery", "name": "מארז 52V 20Ah עם BMS (14S)", "spec": { "voltage": 52, "s": 14, "ah": 20, "bmsA": 40, "conn": "xt90", "weightKg": 5.9 }, "conf": "typ" },
+
+  { "id": "chg_42_2", "cat": "charger", "name": "מטען 42V 2A (ל-36V)", "spec": { "vOut": 42, "amps": 2, "forV": 36 }, "conf": "ok" },
+  { "id": "chg_546_2", "cat": "charger", "name": "מטען 54.6V 2A (ל-48V)", "spec": { "vOut": 54.6, "amps": 2, "forV": 48 }, "conf": "ok" },
+  { "id": "chg_546_4", "cat": "charger", "name": "מטען 54.6V 4A (ל-48V)", "spec": { "vOut": 54.6, "amps": 4, "forV": 48 }, "conf": "ok" },
+  { "id": "chg_588_3", "cat": "charger", "name": "מטען 58.8V 3A (ל-52V)", "spec": { "vOut": 58.8, "amps": 3, "forV": 52 }, "conf": "ok" },
+
+  { "id": "dsp_led", "cat": "display", "name": "צג LED בסיסי (רמות סיוע + מתח)", "spec": { "voltage": [24, 36, 48], "protocol": "לפי יצרן הבקר", "conn": "julet5" }, "conf": "typ", "note": "צג ובקר חייבים לדבר באותו פרוטוקול – קונים כערכה" },
+  { "id": "dsp_lcd", "cat": "display", "name": "צג LCD (מהירות, מרחק, פרמטרים)", "spec": { "voltage": [36, 48, 52], "protocol": "לפי יצרן הבקר", "conn": "julet5" }, "conf": "typ", "note": "צג ובקר חייבים לדבר באותו פרוטוקול – קונים כערכה" },
+
+  { "id": "thr_thumb", "cat": "throttle", "name": "מצערת אגודל (Hall, 3 חוטים)", "spec": { "wires": 3, "signal": "0.8–4.2V" }, "conf": "typ", "note": "בדקו את החוק העדכני לגבי מצערת באופניים חשמליים" },
+  { "id": "pas_12", "cat": "pas", "name": "חיישן PAS 12 מגנטים", "spec": { "magnets": 12, "wires": 3 }, "conf": "typ" },
+  { "id": "brk_pair", "cat": "brakeSensors", "name": "חיישני בלם מגנטיים (זוג)", "spec": { "type": "NO/Hall", "wires": 2 }, "conf": "typ" },
+
+  { "id": "fuse_blade", "cat": "protection", "name": "מחזיק נתיך להב + נתיכים", "spec": { "type": "blade", "sizes": [15, 20, 25, 30, 40], "maxV": 58 }, "conf": "typ", "note": "ודאו שדירוג המתח של המחזיק והנתיך מעל מתח הסוללה המלאה" },
+  { "id": "breaker_dc", "cat": "protection", "name": "מפסק DC (Circuit breaker)", "spec": { "type": "breaker", "sizes": [20, 30, 40], "maxV": 60 }, "conf": "typ" },
+  { "id": "wire_kit", "cat": "wiring", "name": "ערכת כבל סיליקון + מחברים + שרוולים", "spec": { "awg": [18, 14, 12, 10] }, "conf": "typ" }
+ ],
+ "cell18650": { "name": "תא 18650 טיפוסי", "v": 3.6, "vFull": 4.2, "vEmpty": 3.0, "ah": 3.0, "maxA": 10, "weightKg": 0.047, "conf": "typ", "note": "ערכים טיפוסיים לחישוב בלבד – השתמשו בגיליון הנתונים של התא שאתם קונים" },
+ "wireGauge": { "conf": "typ", "note": "לכבלי סיליקון באורך עד כ-1 מטר. אורך גדול יותר או חום – עוברים לחתך עבה יותר", "rows": [ { "maxA": 10, "awg": 18, "mm2": 0.8 }, { "maxA": 20, "awg": 14, "mm2": 2.1 }, { "maxA": 30, "awg": 12, "mm2": 3.3 }, { "maxA": 45, "awg": 10, "mm2": 5.3 } ] },
+ "fuseSizes": [10, 15, 20, 25, 30, 40, 50]
+}

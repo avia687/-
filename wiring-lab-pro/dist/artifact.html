@@ -7,6 +7,7 @@
   תבניות טקסט: {V} מתח נומינלי, {full} מתח מלא, {empty} מתח ריקה, {ctrl} סוג בקר, {ctrlNote} הערת בקר.
 -->
 <script type="application/json" id="academy-data">{"passScore":80,"modules":[{"id":"m1","title":"יסודות חשמל","desc":"מתח, זרם, התנגדות, הספק, חוק אוהם, Wh מול Ah, טורי ומקבילי.","lessons":[{"id":"l1","title":"מתח, זרם והתנגדות","focus":{"comp":"battery","bundle":"power"},"beg":"דמיינו צינור מים. **מתח** (וולט, V) הוא הלחץ שדוחף את המים. **זרם** (אמפר, A) הוא כמה מים עוברים בכל שנייה. **התנגדות** (אוהם, Ω) היא כמה הצינור צר ומפריע לזרימה. בסוללה של 48V יש ״לחץ״ גבוה יותר מאשר בסוללה של 36V.","pro":"V = לחץ חשמלי (EMF), I = קצב זרימת מטען, R = התנגדות. בכלים שלנו: 36–84V DC, זרמי הספק 15–65A, התנגדות פאזות 0.1–1Ω, התנגדות מגע במחבר תקין < 1mΩ."},{"id":"l2","title":"חוק אוהם והספק","focus":{"comp":"controller","bundle":"power"},"beg":"**חוק אוהם:** מתח = זרם × התנגדות. אם יודעים שניים – מחשבים את השלישי. **הספק** (וואט, W) = מתח × זרם. בקר של 20A על סוללה של 48V נותן עד כ-960W. מחבר עם התנגדות קטנה מאוד כבר מתחמם כשעובר בו זרם גדול – לכן מחברי הספק עבים.","pro":"V = I·R ; P = V·I = I²·R. דוגמה: מחבר עם 10mΩ ב-30A: P = 30² × 0.01 = 9W חום מקומי – מספיק כדי להשחיר XT60. צניחת מתח: ΔV = I·R_int."},{"id":"l3","title":"Wh מול Ah","focus":{"comp":"battery","bundle":"power"},"beg":"**Ah** אומר כמה זרם הסוללה נותנת לאורך שעה. **Wh** הוא כמות האנרגיה האמיתית – כמו נפח מיכל הדלק: Wh = מתח × Ah. לכן 48V 10Ah (480Wh) מכילה יותר אנרגיה מ-36V 12Ah (432Wh). משווים סוללות תמיד לפי Wh.","pro":"E[Wh] = V_nom × C[Ah]. צריכה טיפוסית: אופניים 8–15Wh/ק״מ, קורקינט עירוני 12–20Wh/ק״מ, קורקינט ביצועים 20–40Wh/ק״מ. טווח ≈ E × 0.85 / צריכה."},{"id":"l4","title":"טורי ומקבילי (S ו-P)","focus":{"comp":"battery","bundle":"power"},"beg":"סוללה בנויה מהרבה תאים קטנים. תאים **בטור** (S) מוסיפים מתח – כמו לשים בקבוקים אחד על השני ולקבל לחץ גבוה יותר. תאים **במקביל** (P) מוסיפים קיבולת – כמו לחבר עוד מיכלים זה לצד זה. 13S = 13 תאים בטור ≈ 48V. זה ידע להבנה בלבד – לא בונים ולא פותחים סוללות בבית.","pro":"V_pack = S × V_cell (3.6–3.7V נומינלי, 4.2V מלא, ~3.0V ריק). C_pack = P × C_cell. I_max ≈ P × I_cell. 13S4P מתאי 3.5Ah/10A → 48V, 14Ah, ~40A, 672Wh (תיאורטי)."}],"quiz":[{"q":"בקר מגביל ל-15A וסוללה 48V. מה ההספק המרבי בערך?","opts":["63W","720W","3.2W","480W"],"a":1,"why":"P = V × I = 48 × 15 = 720W."},{"q":"איזו סוללה מכילה יותר אנרגיה?","opts":["36V 14Ah","48V 11Ah","שתיהן זהות","אי אפשר לדעת"],"a":1,"why":"36×14=504Wh, 48×11=528Wh. משווים לפי Wh."},{"q":"מחבר עם התנגדות 0.02Ω ועובר בו זרם 25A. כמה חום הוא מייצר?","opts":["0.5W","12.5W","50W","1250W"],"a":1,"why":"P = I²R = 625 × 0.02 = 12.5W – מחבר כזה יתחמם מאוד."},{"q":"מה מגדיל חיבור תאים בטור?","opts":["קיבולת (Ah)","מתח (V)","משקל בלבד","שום דבר"],"a":1,"why":"טור (S) מחבר מתחים; מקביל (P) מחבר קיבולות."}]},{"id":"m2","title":"המולטימטר","desc":"מתח DC, רציפות, התנגדות, זרם, טעויות נפוצות וסימולטור מדידות.","lessons":[{"id":"l1","title":"מדידת מתח DC","focus":{"comp":"battery","bundle":"power"},"beg":"מסובבים את הבורר ל-**V⎓** (מתח ישר). חוד שחור לפין COM, חוד אדום לפין V. בוחרים טווח גבוה מהמתח הצפוי (לסוללת 48V – טווח 200V). נוגעים: אדום ב-+, שחור ב-−. אם מופיע מינוס – החודים הפוכים (לא מזיק במדידת מתח). חוד אחד בכל פעם, ולא לקצר בין פינים.","pro":"V DC, קלט 10MΩ. Back-probe עם מחטים כשהמחבר מחובר. בטווח ידני: קריאה OL = חריגה מהטווח. מעל 60V DC: מולטימטר CAT III, מחטים מבודדות, יד אחת."},{"id":"l2","title":"רציפות והתנגדות","focus":{"comp":"brakes","bundle":"brakeL"},"beg":"**רציפות** (סמל רמקול): המולטימטר מצפצף אם יש חיבור בין שתי נקודות – כך בודקים חוט או מתג בלם. **התנגדות** (Ω): כמה החוט ״מפריע״. חשוב מאוד: מודדים רציפות והתנגדות **רק כשהסוללה מנותקת**, אחרת הקריאה שגויה ואפשר להזיק למכשיר.","pro":"Ω/רציפות רק במעגל מנותק ובלי מתח שיורי (קבלים!). התנגדות נמוכה: לאפס קודם את החודים (REL) – חודים זולים ≈0.2–0.5Ω. פאזות: ערכים נמוכים ושווים; בידוד פאזה לגוף: OL."},{"id":"l3","title":"מדידת זרם – ולמה בדרך כלל לא","focus":{"comp":"controller","bundle":"power"},"beg":"כדי למדוד זרם צריך להעביר את כל הזרם **דרך** המולטימטר, בטור. מד רגיל עומד בערך ב-10A, ובכלי שלנו עוברים 15–40A – המד או הנתיך שלו עלולים להישרף. לכן כמעט אף פעם לא מודדים זרם הנעה עם מולטימטר. לעולם לא מחברים מד במצב זרם (A) ישר על הסוללה – זה קצר!","pro":"A-mode = shunt של מיליאוהמים; במקביל למקור = קצר. לזרם הנעה: מד צבת DC, או watt-meter בקו ההספק (בדוק דירוג). זרם סרק/זליגה (mA) כן אפשר למדוד בטור, בסוללה מנותקת מהעומס."},{"id":"l4","title":"סימולטור מדידות","focus":{"comp":"controller"},"sim":true,"beg":"כאן מתרגלים בלי סיכון: בוחרים מצב במולטימטר, איפה לשים כל חוד, ומשנים את מצב הכלי (דלוק, מצערת, סיבוב גלגל). אפשר גם ללחוץ על רכיב במודל התלת-ממדי כדי להניח עליו את החוד האדום. במצב ״תרגיל״ יש תקלה נסתרת – מצאו אותה.","pro":"סימולציה של רשת פוטנציאלים לפי הדגם שנבחר: V_pack לפי מתח הדגם ומצב טעינה 60%, 5V rail, אות מצערת ליניארי, רצף Hall 120°, פאזות 0.3Ω. תרגיל: הזרקת תקלה אקראית."}],"quiz":[{"q":"איזה טווח לבחור למדידת סוללת 48V?","opts":["20V DC","200V DC","200Ω","10A"],"a":1,"why":"הטווח חייב להיות גבוה מהמתח הצפוי (עד 54.6V)."},{"q":"מתי מודדים התנגדות בין פאזות?","opts":["כשהמערכת דולקת","כשהסוללה מנותקת והמחבר מנותק מהבקר","בזמן רכיבה","לא משנה"],"a":1,"why":"Ω רק במעגל מנותק, בלי מתח ובלי הבקר במקביל."},{"q":"מה יקרה אם מחברים מולטימטר במצב A ישר על הדקי הסוללה?","opts":["יראה את מתח הסוללה","קצר – נתיך/מד נשרפים","יראה 0","יצפצף"],"a":1,"why":"במצב זרם המד כמעט חוט – מחובר במקביל למקור זה קצר."},{"q":"המד מראה ‎-48.2V‎. מה המשמעות?","opts":["הסוללה הפוכה ומסוכנת","החודים הפוכים","הסוללה ריקה","המד תקול"],"a":1,"why":"במדידת מתח סימן מינוס רק מראה שהחודים הפוכים."}]},{"id":"m3","title":"סוללות","desc":"תאי 18650/21700, XsYp, BMS, איזון, התנגדות פנימית, בלאי, אחסון וסכנות.","lessons":[{"id":"l1","title":"תאים ותצורה","focus":{"comp":"battery","bundle":"power"},"beg":"בתוך הסוללה יש עשרות תאים גליליים – לרוב בגודל **18650** או **21700** (הקוטר והאורך במילימטרים). הם מחוברים בטור ובמקביל (XsYp). תא מלא הוא 4.2V, ריק בערך 3.0V. את כל זה לומדים כדי להבין את המספרים – לא כדי לפתוח סוללה.","pro":"18650: 2.5–3.5Ah, 10–20A. 21700: 4–5Ah, 15–35A. חלון עבודה 3.0–4.2V; אחסון 3.6–3.8V. 13S = 54.6V מלא, 16S = 67.2V, 20S = 84V."},{"id":"l2","title":"ה-BMS: שומר הראש","focus":{"comp":"battery","bundle":"charge"},"beg":"ה-**BMS** הוא מעגל בתוך הסוללה שמנתק כשיש סכנה: טעינת יתר, ריקון יתר, זרם גבוה מדי, קצר או חום. אם הכלי ״מת״ פתאום בעלייה – לפעמים זה ה-BMS שמגן. ה-BMS גם מאזן בין התאים. **לא פותחים, לא עוקפים ולא ״מתקנים״ BMS.**","pro":"הגנות: OVP/UVP לתא, OCP (רציף ורגעי), SCP, OTP. איזון פסיבי (~30–60mA) בסוף טעינה. ניתוק בעומס = OCP או UVP בתא חלש. אבחון פנימי – מעבדה בלבד."},{"id":"l3","title":"התנגדות פנימית ובלאי","focus":{"comp":"battery","bundle":"power"},"beg":"עם הזמן לסוללה קשה יותר לתת זרם: היא ״מתעייפת״. רואים את זה כשהמתח צונח חזק בהאצה (**Sag**) והטווח יורד. אחרי 300–800 מחזורים זה טבעי. בודקים את זה במדידת מתח במנוחה ובעומס – בלי לפתוח.","pro":"R_int ≈ ΔV/ΔI. צניחה >10% בעומס מלא = חשד; >20% = סוללה בסוף חייה או תא חלש. SoH נמדד בבדיקת קיבולת במעבדה. חום מאיץ בלאי."},{"id":"l4","title":"אחסון בטוח וסכנות","focus":{"comp":"battery"},"beg":"שומרים את הסוללה בערך חצי טעונה אם לא רוכבים שבועות. טוענים על משטח לא דליק, לא ליד יציאה מהבית, ולא בלילה בלי השגחה. **סוללה נפוחה, חמה מאוד, מריחה, מעשנת, רטובה או אחרי מכה – מפסיקים מיד** ולוחצים ״דיווח על סכנה״.","pro":"אחסון 40–60% SoC, 10–25°C. אסור טעינה מתחת ל-0°C. Thermal runaway: פליטת גז, עשן לבן, התלקחות – פינוי וחיוג 102. פסולת: נקודת איסוף ייעודית בלבד."}],"quiz":[{"q":"מה המתח המלא של סוללת 13S?","opts":["48V","54.6V","52V","58.8V"],"a":1,"why":"13 × 4.2V = 54.6V."},{"q":"הכלי נכבה בעלייה ונדלק אחרי מנוחה. מה סביר?","opts":["הצג שבור","ה-BMS או LVC מגנים (Sag)","צמיג פנצ׳ר","מצערת הפוכה"],"a":1,"why":"תחת עומס המתח צונח לסף ההגנה."},{"q":"הסוללה נפוחה. מה עושים?","opts":["לוחצים עליה שתתיישר","ממשיכים לרכוב בזהירות","מפסיקים, מרחיקים מחומרים דליקים ופונים למומחה","טוענים עד הסוף"],"a":2,"why":"נפיחות = סכנת שריפה."},{"q":"איך בודקים בלאי בלי לפתוח את הסוללה?","opts":["מודדים צניחת מתח בעומס","פותחים ומודדים כל תא","שוקלים את הסוללה","אי אפשר"],"a":0,"why":"צניחה גדולה בעומס מעידה על התנגדות פנימית גבוהה."}]},{"id":"m4","title":"מנועים","desc":"BLDC, Hub מול Mid-Drive, פאזות, חיישני Hall ורצף תקין, Sensorless.","lessons":[{"id":"l1","title":"מנוע BLDC","focus":{"comp":"motor","bundle":"phase"},"beg":"המנוע שלנו הוא **BLDC** – בלי מברשות. בתוך הטבור יש סלילים (אלקטרומגנטים) ומגנטים קבועים. הבקר מדליק את הסלילים בתורות, והמגנטים ״רודפים״ אחריהם – והגלגל מסתובב.","pro":"3 פאזות בחיבור Y/Δ, 20–46 קטבים. Geared Hub: פלנטרי ~1:5, קל, עם Freewheel. Direct Drive: כבד, מאפשר רגנרציה. התנגדות פאזה-פאזה 0.1–1Ω."},{"id":"l2","title":"Hub מול Mid-Drive","focus":{"comp":"motor"},"beg":"**Hub**: המנוע בגלגל – פשוט וזול, אבל מוסיף משקל לגלגל. **Mid-Drive**: המנוע ליד הפדלים ומניע דרך השרשרת וההילוכים – חזק בעליות ומרגיש טבעי, אבל שוחק שרשרת. כל הדגמים במעבדה הם Hub.","pro":"Mid-Drive מנצל יחס העברה → מומנט גבוה בעלייה, יעילות טובה במהירות נמוכה, בלאי הנעה ×2–3. Hub: אין עומס על ההנעה, מסה בלתי מרוסנת גבוהה."},{"id":"l3","title":"פאזות וסדר","focus":{"comp":"motor","bundle":"phase"},"beg":"שלושת החוטים העבים (צהוב, ירוק, כחול) הם **הפאזות**. אם מחליפים את הסדר – המנוע מסתובב הפוך או רועד. צבעים זהים לא מבטיחים סדר נכון בין יצרנים. לרוב יש לבקר חוט **Self-Learning** שלומד את הסדר לבד.","pro":"6 צירופי פאזה × 6 צירופי Hall = 36; רק 1–2 חלקים לשני הכיוונים. סימן לסדר שגוי: זרם סרק גבוה, רעידה, חום. Self-Learning או טבלת מיפוי."},{"id":"l4","title":"חיישני Hall ורצף תקין","focus":{"comp":"motor","bundle":"hall"},"beg":"שלושה חיישנים קטנים במנוע מדווחים לבקר איפה המגנטים. כשמסובבים את הגלגל לאט, כל חוט אות מתחלף בין 0V ל-5V. בכל צעד משתנה רק חוט אחד. חוט שנתקע = חיישן תקול או חוט קרוע. בלי חיישנים (**Sensorless**) המנוע עובד, אבל ההתנעה קופצנית.","pro":"120°: 101→100→110→010→011→001. 000/111 = תקלה (או 60°). אספקה 5V, יציאות Open-Collector עם Pull-up בבקר. בדיקה: V DC מול GND בסיבוב איטי."}],"quiz":[{"q":"בסיבוב איטי, אות Hall B נשאר 0V תמיד. מה הכי סביר?","opts":["חיישן Hall B או החוט שלו","סוללה חלשה","צג תקול","בלם תקוע"],"a":0,"why":"אות תקוע = חיישן או חוט."},{"q":"איזה מצב Hall לא אמור להופיע במנוע 120°?","opts":["101","110","111","010"],"a":2,"why":"ב-120° אף פעם לא כל השלושה 1 או כל השלושה 0."},{"q":"אחרי החלפת בקר המנוע רועד וחם. מה בודקים קודם?","opts":["לחץ אוויר","סדר פאזות/Hall (Self-Learning)","הצג","הפנס"],"a":1,"why":"סדר לא תואם גורם לרעידה וחום."},{"q":"מה היתרון העיקרי של Mid-Drive?","opts":["זול יותר","ניצול הילוכים – חזק בעליות","אין שרשרת","שקט לגמרי"],"a":1,"why":"המנוע עובד דרך יחס ההעברה."}]},{"id":"m5","title":"בקרים","desc":"MOSFET, קבלים, הגבלת זרם, LVC, רגנרציה ותקשורת לצג.","lessons":[{"id":"l1","title":"MOSFET וקבלים","focus":{"comp":"controller","bundle":"phase"},"beg":"בתוך הבקר יש **MOSFET** – מתגים אלקטרוניים שמדליקים ומכבים את החשמל למנוע אלפי פעמים בשנייה. יש גם **קבלים** גדולים ששומרים מתח – גם אחרי שמנתקים את הסוללה! לכן תמיד מחכים 2 דקות ובודקים 0V לפני שנוגעים.","pro":"גשר תלת-פאזי: 6 מתגים (לרוב 12–18 MOSFET במקביל), PWM 8–20kHz. קבלי DC-link 470–2200µF – ניצוץ בחיבור הוא טעינת inrush (לכן XT90-S). MOSFET שרוף לרוב קצר → גלגל ״נועל״."},{"id":"l2","title":"הגבלת זרם ו-LVC","focus":{"comp":"controller","bundle":"power"},"beg":"הבקר מגביל כמה זרם יוצא, כדי להגן על הסוללה, המנוע והבקר עצמו. **LVC** הוא ניתוק במתח נמוך: כשהסוללה כמעט ריקה, הבקר מפסיק לתת כוח. כשמשנים מגבלות מעבר לחוק – זה לא חוקי ועלול לבטל ביטוח. המעבדה לא מלמדת את זה.","pro":"Battery current limit מול Phase current limit (phase > battery במהירות נמוכה). LVC טיפוסי ≈ 3.0–3.1V לתא × S. זרם בקר חייב להיות ≤ זרם רציף של ה-BMS."},{"id":"l3","title":"רגנרציה ובלימה חשמלית","focus":{"comp":"brakes","bundle":"brakeL"},"beg":"בחלק מהקורקינטים (ובמנוע Direct Drive) המנוע יכול לבלום ולהחזיר קצת אנרגיה לסוללה – **בלימה רגנרטיבית**. זה חוסך בלאי בבלמים, אבל תמיד צריך גם בלם מכני.","pro":"Regen מחייב Direct Drive (Geared עם Freewheel לא מעביר). החזרה מעשית 3–8% מהטווח. סכנה: טעינה לסוללה מלאה → OVP ב-BMS; בקרים מגבילים regen ליד 100%."},{"id":"l4","title":"תקשורת לצג","focus":{"comp":"display","bundle":"display"},"beg":"הצג והבקר ״מדברים״ כל הזמן בשני חוטים (TX ו-RX). אם צג מיצרן אחר – הם לא מבינים אחד את השני, גם אם המחבר זהה, ומופיע קוד תקשורת. חוט נוסף (Power Lock) הוא ״המפתח״ שמדליק את הבקר.","pro":"UART חד-כיווני/דו-כיווני, TTL 5V או ברמת סוללה בחלק מהתכנונים. פרוטוקולים: KT, Bafang, ייעודי (Ninebot/Xiaomi). הפרוטוקול המדויק לדגם – מסומן ״לא ידוע״ אם לא פורסם; לא מנחשים."}],"quiz":[{"q":"ניתקתם סוללה. מתי בטוח לגעת בפיני הבקר?","opts":["מיד","אחרי 2 דקות ובדיקה של 0V","אחרי 10 שניות","רק עם כפפות"],"a":1,"why":"הקבלים שומרים מתח."},{"q":"למה יש ניצוץ כשמחברים XT60?","opts":["קצר","טעינת הקבלים בבקר","מחבר שבור","סוללה ריקה"],"a":1,"why":"זרם inrush לקבלי הכניסה."},{"q":"בקר 40A וסוללה עם BMS של 25A רציף. מה צפוי?","opts":["עובד מצוין","ניתוקי BMS תחת עומס","הצג לא יידלק","אין שינוי"],"a":1,"why":"הבקר מושך יותר ממה שה-BMS מאפשר."},{"q":"צג KT על בקר Bafang, אותו מחבר. מה יקרה?","opts":["יעבוד","קוד תקשורת – פרוטוקול שונה","יגביר מהירות","יטען את הסוללה"],"a":1,"why":"מחבר זהה ≠ פרוטוקול תואם."}]},{"id":"m6","title":"מערכות משנה","desc":"מצערת, PAS, בלמים עם ניתוק מנוע, תאורה, DC-DC.","lessons":[{"id":"l1","title":"מצערת","focus":{"comp":"throttle","bundle":"throttle"},"requires":["throttle"],"beg":"המצערת מקבלת 5V מהבקר ומחזירה אות: בערך 0.8V כשהיא משוחררת ועד 4.2V בפתיחה מלאה. אם האות ״נתקע״ גבוה – המנוע עלול להאיץ לבד, ולכן מנתקים מיד.","pro":"Hall ליניארי (כמו SS49E), 0.8–4.2V טיפוסי. בקרים חוסמים הנעה אם בהדלקה האות > ~1.2V (קוד 22 ב-KT / 04 ב-Bafang)."},{"id":"l2","title":"חיישן PAS","focus":{"comp":"pas","bundle":"pas"},"requires":["pas"],"beg":"דיסק עם מגנטים מסתובב עם הפדלים, וחיישן סופר כל מגנט שעובר. הבקר מבין שאתם מדוושים ומוסיף עזרה לפי הרמה בצג. מרווח של 2–5 מ״מ, ודיסק בכיוון הנכון.","pro":"Cadence: 6/8/12/24 מגנטים, פולסים 0/5V; חלק עם שני חיישנים לזיהוי כיוון. Torque sensor: אות אנלוגי 0.8–3.5V. מספר המגנטים חייב להתאים להגדרה בצג."},{"id":"l3","title":"בלמים עם ניתוק מנוע","focus":{"comp":"brakes","bundle":"brakeL"},"beg":"בכל ידית בלם יש חיישן. ברגע שלוחצים – הבקר מפסיק לדחוף. זה רכיב בטיחות: אם חיישן תקוע ״לחוץ״ – אין הנעה; אם החוט קרוע – המנוע לא יפסיק בבלימה, וזה מסוכן.","pro":"NO (נסגר בלחיצה, High→Low) נפוץ; NC קיים. Hall-brake: 3 חוטים (5V/GND/Sig). בדיקה: רציפות במערכת כבויה, או V על האות במערכת דולקת."},{"id":"l4","title":"תאורה ו-DC-DC","focus":{"comp":"lightFront","bundle":"lightF"},"beg":"הפנסים מקבלים מתח מהבקר, מהצג או מממיר (DC-DC) שמוריד את מתח הסוללה ל-6V או 12V. לפני שמחליפים פנס – מודדים את המתח ביציאה. פנס 12V על 48V יישרף מיד.","pro":"יציאת תאורה: 6V/12V מממיר מובנה (100–500mA), או מתח סוללה דרך מתג. DC-DC חיצוני: קלט רחב 36–72V, יציאה 12V; הגנה בנתיך. המתח לדגם ספציפי לא תמיד פורסם – מדדו."}],"quiz":[{"q":"האות במצערת משוחררת הוא 4.1V. מה עושים?","opts":["ממשיכים לרכוב","מנתקים מיד – סכנת האצה","מכוונים את הצג","מנפחים צמיג"],"a":1,"why":"אות גבוה במנוחה = מצערת תקועה."},{"q":"ה-PAS עובד רק כשמדוושים אחורה. מה הסיבה?","opts":["דיסק מגנטים הפוך","סוללה ריקה","פאזות הפוכות","בלם תקוע"],"a":0,"why":"דיסק הפוך הופך את זיהוי הכיוון."},{"q":"חוט חיישן הבלם קרוע (NO). מה הסכנה?","opts":["אין הנעה","המנוע לא יתנתק בבלימה","הצג כבה","אין"],"a":1,"why":"המגע לא ייסגר לעולם – אין אות ניתוק."},{"q":"לפני החלפת פנס, מה בודקים?","opts":["צבע הפנס","מתח יציאת התאורה","לחץ אוויר","קוד שגיאה"],"a":1,"why":"המתח משתנה בין דגמים."}]},{"id":"m7","title":"מחברים וחיווט","desc":"XT60/XT90, Julet, Higo, הלחמה, כיווץ ואיתור קצר.","lessons":[{"id":"l1","title":"מחברי הספק","focus":{"comp":"battery","bundle":"power"},"beg":"בין הסוללה לבקר יש מחבר חזק: **XT60** או **XT90** (צהובים) או **Anderson** (אדום-שחור). מחבר רופף או שחור מתחמם ויכול להימס – מחליפים את שני החצאים.","pro":"XT60 ~30A רציף, XT90 ~40–45A, XT90-S עם נגד Anti-Spark. Anderson PP45 – בדקו כיוון הרכבה (אפשר להפוך קוטביות). השחרה = התנגדות מגע → I²R."},{"id":"l2","title":"Julet ו-Higo","focus":{"comp":"display","bundle":"display"},"beg":"המחברים העגולים והאטומים ברתמה הם **Julet** (עם חץ יישור) או **Higo**. מספר הפינים רומז על התפקיד: 2 – בלם או תאורה, 3 – מצערת או PAS, 5 – צג או Hall. Julet ו-Higo לא מתחברים זה לזה.","pro":"Julet: 2–9 פינים, IP65 כשנעול. Higo Z910/Z812: 2–9 פינים. Pinout לפי יצרן – מסומן ״לא ידוע״ אם לא פורסם; מאמתים ברציפות, לא לפי צבע."},{"id":"l3","title":"הלחמה וכיווץ","focus":{"comp":"motor","bundle":"phase"},"beg":"חיבור טוב: מסובבים, מלחימים עם מלחם חם מספיק, ומכסים בשרוול מתכווץ. בדיקה: משיכה עדינה – החוט לא זז, ואין נחושת גלויה. עובדים רק כשהסוללה מנותקת.","pro":"מלחם 60–80W לחוטי 12–14AWG, בדיל 60/40 או SAC305, פלקס. שרוול דבק (Adhesive-lined) לאטימות. Crimp: כלי ייעודי לפינים, לא צבת."},{"id":"l4","title":"איתור קצר","focus":{"comp":"frame","bundle":"all"},"beg":"קצר = חשמל שהולך ״קיצור דרך״. סימנים: ה-5V נופל, נתיך נשרף, ריח. מאתרים בשיטת חלוקה: מנתקים הכול, מחברים רכיב אחד בכל פעם ומודדים. תמיד מתחילים בכבלים שעוברים בצירים ובקיפול.","pro":"חלוקה בינארית של הרתמה; רציפות לגוף (שלדה) מכל מוליך; מדידת Ω בין 5V ל-GND במצב מנותק (קצר < 50Ω חשוד). Wiggle Test לתקלות לסירוגין."}],"quiz":[{"q":"מחבר XT60 מושחר וחם. מה עושים?","opts":["מנקים וממשיכים","מחליפים את שני החצאים","מחליפים רק חצי אחד","עוטפים בבידוד"],"a":1,"why":"שני החצאים נפגעו מהתנגדות מגע."},{"q":"מחבר של 2 פינים ברתמה – מה הוא כנראה?","opts":["צג","Hall","בלם או תאורה","פאזות"],"a":2,"why":"2 פינים = בלם או תאורה."},{"q":"ה-5V נופל ל-0.4V. מה השלב הראשון?","opts":["להחליף בקר","לנתק את כל החיישנים ולחבר אחד-אחד","להחליף סוללה","לכוון PAS"],"a":1,"why":"שיטת חלוקה מאתרת את החיישן המקוצר."},{"q":"איך מוודאים הלחמה טובה?","opts":["לפי הצבע","משיכה עדינה + אין נחושת גלויה","לפי הריח","לא צריך"],"a":1,"why":"חיבור מכני תקין ומבודד."}]}]}</script>
+<script type="application/json" id="components-data">{"schema":1,"updatedAt":"2026-09-24","currency":"ILS","_doc":"קטלוג רכיבים גנריים לאשף ״בנה בעצמך״. אין כאן דגמים מסחריים, ספקים או קישורים – רק ארכיטיפים לפי מפרט. כל מחיר הוא טווח לקטגוריה: verified=false אומר שהטווח הוא הערכה כללית שלא נבדקה מול ספקים. לעדכון: משנים רק את הקובץ הזה (price.min/max, price.updatedAt, price.source, price.verified). conf: ok=מאומת, typ=טיפוסי/משוער, unk=לא ידוע.","sourceTypes":{"estimate":"הערכה כללית לקטגוריה – לא נבדקה מול ספק","supplier":"מחירון ספק (לציין שם ותאריך בשדה note)","quote":"הצעת מחיר בכתב","receipt":"קבלה מרכישה בפועל"},"categories":{"motor":{"name":"מנוע Hub","price":{"min":450,"max":1400,"updatedAt":"2026-09-24","source":"estimate","verified":false,"note":"ערכת המרה (מנוע בחישוק) משתנה מאוד לפי קוטר גלגל והספק"}},"controller":{"name":"בקר","price":{"min":120,"max":450,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"battery":{"name":"סוללה מוכנה עם BMS","price":{"min":900,"max":3200,"updatedAt":"2026-09-24","source":"estimate","verified":false,"note":"תלוי מאוד בקיבולת, בתאים ובתקינה. העדיפו מארז עם תעודת תקן"}},"charger":{"name":"מטען","price":{"min":80,"max":280,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"display":{"name":"צג / מתג הפעלה","price":{"min":80,"max":400,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"throttle":{"name":"מצערת","price":{"min":30,"max":130,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"pas":{"name":"חיישן PAS","price":{"min":30,"max":160,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"brakeSensors":{"name":"חיישני בלם (זוג)","price":{"min":30,"max":140,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"protection":{"name":"נתיך / מפסק DC + מחזיק","price":{"min":25,"max":150,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"wiring":{"name":"כבלים, מחברים, שרוולים מתכווצים","price":{"min":60,"max":220,"updatedAt":"2026-09-24","source":"estimate","verified":false}},"packParts":{"name":"חלקי מארז (תאים, BMS, פס ניקל, בידוד) – מתקדם","price":{"min":600,"max":2400,"updatedAt":"2026-09-24","source":"estimate","verified":false,"note":"לא כולל ריתוך נקודתי. לא מומלץ בלי הכשרה"}},"tools":{"name":"כלים (מולטימטר, מלחם, מכווץ, מפתח מומנט)","price":{"min":150,"max":700,"updatedAt":"2026-09-24","source":"estimate","verified":false,"note":"אם אין לכם כבר"}}},"items":[{"id":"mot_rear_250_36","cat":"motor","name":"מנוע Hub אחורי 250W, 36V (גנרי)","spec":{"voltage":[36],"wNom":250,"wPeak":500,"pos":"rear","hall":true,"phaseConn":"bullet","hallConn":"julet","weightKg":3.2},"conf":"typ","legalRoad":true},{"id":"mot_rear_250_48","cat":"motor","name":"מנוע Hub אחורי 250W, 48V (גנרי)","spec":{"voltage":[48],"wNom":250,"wPeak":600,"pos":"rear","hall":true,"phaseConn":"bullet","hallConn":"julet","weightKg":3.4},"conf":"typ","legalRoad":true},{"id":"mot_front_250_36","cat":"motor","name":"מנוע Hub קדמי 250W, 36V (גנרי)","spec":{"voltage":[36],"wNom":250,"wPeak":450,"pos":"front","hall":true,"phaseConn":"bullet","hallConn":"julet","weightKg":2.8},"conf":"typ","legalRoad":true,"note":"מזלג קדמי חייב להיות מפלדה ומתאים למומנט – Torque arm חובה"},{"id":"mot_rear_500_48","cat":"motor","name":"מנוע Hub אחורי 500W, 48V (גנרי)","spec":{"voltage":[48],"wNom":500,"wPeak":900,"pos":"rear","hall":true,"phaseConn":"bullet","hallConn":"julet","weightKg":4.5},"conf":"typ","legalRoad":false},{"id":"mot_rear_1000_48","cat":"motor","name":"מנוע Hub אחורי 1000W, 48V (גנרי)","spec":{"voltage":[48,52],"wNom":1000,"wPeak":1600,"pos":"rear","hall":true,"phaseConn":"bullet","hallConn":"julet","weightKg":6.5},"conf":"typ","legalRoad":false},{"id":"ctl_36_15","cat":"controller","name":"בקר 36V, 15A (גנרי, Sine wave)","spec":{"voltage":[36],"amps":15,"lvc":31,"type":"sine","hall":true},"conf":"typ"},{"id":"ctl_48_15","cat":"controller","name":"בקר 36–48V, 15A (גנרי, Sine wave)","spec":{"voltage":[36,48],"amps":15,"lvc":39,"type":"sine","hall":true},"conf":"typ"},{"id":"ctl_48_22","cat":"controller","name":"בקר 48V, 22A (גנרי)","spec":{"voltage":[48],"amps":22,"lvc":39,"type":"sine","hall":true},"conf":"typ"},{"id":"ctl_52_35","cat":"controller","name":"בקר 48–52V, 35A (גנרי)","spec":{"voltage":[48,52],"amps":35,"lvc":42,"type":"sine","hall":true},"conf":"typ"},{"id":"bat_36_10","cat":"battery","name":"מארז 36V 10Ah עם BMS (10S)","spec":{"voltage":36,"s":10,"ah":10,"bmsA":20,"conn":"xt60","weightKg":2.6},"conf":"typ"},{"id":"bat_36_14","cat":"battery","name":"מארז 36V 14Ah עם BMS (10S)","spec":{"voltage":36,"s":10,"ah":14,"bmsA":25,"conn":"xt60","weightKg":3.4},"conf":"typ"},{"id":"bat_48_13","cat":"battery","name":"מארז 48V 13Ah עם BMS (13S)","spec":{"voltage":48,"s":13,"ah":13,"bmsA":25,"conn":"xt60","weightKg":3.9},"conf":"typ"},{"id":"bat_48_17","cat":"battery","name":"מארז 48V 17.5Ah עם BMS (13S)","spec":{"voltage":48,"s":13,"ah":17.5,"bmsA":30,"conn":"xt90","weightKg":4.8},"conf":"typ"},{"id":"bat_52_20","cat":"battery","name":"מארז 52V 20Ah עם BMS (14S)","spec":{"voltage":52,"s":14,"ah":20,"bmsA":40,"conn":"xt90","weightKg":5.9},"conf":"typ"},{"id":"chg_42_2","cat":"charger","name":"מטען 42V 2A (ל-36V)","spec":{"vOut":42,"amps":2,"forV":36},"conf":"ok"},{"id":"chg_546_2","cat":"charger","name":"מטען 54.6V 2A (ל-48V)","spec":{"vOut":54.6,"amps":2,"forV":48},"conf":"ok"},{"id":"chg_546_4","cat":"charger","name":"מטען 54.6V 4A (ל-48V)","spec":{"vOut":54.6,"amps":4,"forV":48},"conf":"ok"},{"id":"chg_588_3","cat":"charger","name":"מטען 58.8V 3A (ל-52V)","spec":{"vOut":58.8,"amps":3,"forV":52},"conf":"ok"},{"id":"dsp_led","cat":"display","name":"צג LED בסיסי (רמות סיוע + מתח)","spec":{"voltage":[24,36,48],"protocol":"לפי יצרן הבקר","conn":"julet5"},"conf":"typ","note":"צג ובקר חייבים לדבר באותו פרוטוקול – קונים כערכה"},{"id":"dsp_lcd","cat":"display","name":"צג LCD (מהירות, מרחק, פרמטרים)","spec":{"voltage":[36,48,52],"protocol":"לפי יצרן הבקר","conn":"julet5"},"conf":"typ","note":"צג ובקר חייבים לדבר באותו פרוטוקול – קונים כערכה"},{"id":"thr_thumb","cat":"throttle","name":"מצערת אגודל (Hall, 3 חוטים)","spec":{"wires":3,"signal":"0.8–4.2V"},"conf":"typ","note":"בדקו את החוק העדכני לגבי מצערת באופניים חשמליים"},{"id":"pas_12","cat":"pas","name":"חיישן PAS 12 מגנטים","spec":{"magnets":12,"wires":3},"conf":"typ"},{"id":"brk_pair","cat":"brakeSensors","name":"חיישני בלם מגנטיים (זוג)","spec":{"type":"NO/Hall","wires":2},"conf":"typ"},{"id":"fuse_blade","cat":"protection","name":"מחזיק נתיך להב + נתיכים","spec":{"type":"blade","sizes":[15,20,25,30,40],"maxV":58},"conf":"typ","note":"ודאו שדירוג המתח של המחזיק והנתיך מעל מתח הסוללה המלאה"},{"id":"breaker_dc","cat":"protection","name":"מפסק DC (Circuit breaker)","spec":{"type":"breaker","sizes":[20,30,40],"maxV":60},"conf":"typ"},{"id":"wire_kit","cat":"wiring","name":"ערכת כבל סיליקון + מחברים + שרוולים","spec":{"awg":[18,14,12,10]},"conf":"typ"}],"cell18650":{"name":"תא 18650 טיפוסי","v":3.6,"vFull":4.2,"vEmpty":3,"ah":3,"maxA":10,"weightKg":0.047,"conf":"typ","note":"ערכים טיפוסיים לחישוב בלבד – השתמשו בגיליון הנתונים של התא שאתם קונים"},"wireGauge":{"conf":"typ","note":"לכבלי סיליקון באורך עד כ-1 מטר. אורך גדול יותר או חום – עוברים לחתך עבה יותר","rows":[{"maxA":10,"awg":18,"mm2":0.8},{"maxA":20,"awg":14,"mm2":2.1},{"maxA":30,"awg":12,"mm2":3.3},{"maxA":45,"awg":10,"mm2":5.3}]},"fuseSizes":[10,15,20,25,30,40,50]}</script>
 <script type="application/json" id="lab-data">
 {
  "meta": {
@@ -14303,6 +14304,36 @@ dl.specs dd.num,dl.specs dd .num{font-size:15px}
 .sim-dev{background:#1b1f24;border-color:#394049;color:#e8eaed;border-radius:var(--radius)}
 .sim-dev .lbl,.sim-dev label,.sim-dev .foot{color:#d7dce1}
 
+/* ---------- בנה בעצמך ---------- */
+.calc-why{display:grid;gap:0;margin:0}
+.calc-why .cw{display:grid;grid-template-columns:minmax(110px,34%) 1fr;gap:4px 12px;padding:10px 0;border-top:var(--bw) solid var(--line)}
+.calc-why .cw:first-child{border-top:0}
+.calc-why dt{color:var(--muted);font-size:14px}
+.calc-why dd{margin:0;display:grid;gap:3px}
+.calc-why dd>b{font-size:20px;font-weight:600}
+.calc-why .why{font-size:13.5px;color:var(--muted);line-height:1.5}
+.calc-why .why b{color:var(--text);font-weight:600}
+.price{font-size:15px;font-weight:600;white-space:nowrap}
+.price-meta{font-size:12.5px}
+.bd-wrap{overflow-x:auto;border:var(--bw) solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.bd-wrap{direction:ltr}
+.bd{display:block;width:100%;max-width:460px;margin:0 auto;height:auto;font-family:var(--font)}
+.bd-node rect{fill:var(--surface2);stroke:var(--line2);stroke-width:1.5}
+.bd-node text{fill:var(--text);font-size:14px;font-weight:600}
+.bd-wire path{fill:none;stroke-width:4;stroke-linecap:round}
+.bd-wire path.hit{stroke:transparent;stroke-width:18;cursor:pointer}
+.bd-wire text{fill:var(--muted);font-size:11.5px;font-family:var(--mono);paint-order:stroke;stroke:var(--surface);stroke-width:4px}
+.bd-wire path.casing{stroke:var(--line2);stroke-width:7}
+.bd text{unicode-bidi:plaintext}
+.bd-wire:hover path.core,.bd-wire.sel path.core{stroke-width:7}
+.bd-wire:hover path.casing,.bd-wire.sel path.casing{stroke-width:10}
+.bd-wire:focus-visible{outline:none}.bd-wire:focus-visible path.core{stroke-width:7}.bd-wire:focus-visible path.hit{stroke:var(--accent);stroke-opacity:.35}
+.bd-wire.sel text,.bd-wire:focus-visible text{fill:var(--text);font-weight:700}
+#bdInfo{display:grid;gap:4px}
+.chk-list li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:var(--bw) solid var(--line)}
+.chk-list li:first-child{border-top:0}
+.subtabs button .num{font-size:12px;color:var(--faint);margin-inline-end:2px}
+
 </style>
 <div id="app">
   <div class="safety" role="note" aria-label="הודעת בטיחות">
@@ -14344,6 +14375,7 @@ dl.specs dd.num,dl.specs dd .num{font-size:15px}
       <button type="button" role="tab" id="tab-wizard" data-mode="wizard" aria-controls="modeView" aria-selected="false" tabindex="-1">אשף התקנה</button>
       <button type="button" role="tab" id="tab-diag" data-mode="diag" aria-controls="modeView" aria-selected="false" tabindex="-1">אבחון תקלות</button>
       <button type="button" role="tab" id="tab-tools" data-mode="tools" aria-controls="modeView" aria-selected="false" tabindex="-1">כלים</button>
+      <button type="button" role="tab" id="tab-build" data-mode="build" aria-controls="modeView" aria-selected="false" tabindex="-1">בנה בעצמך</button>
     </nav>
   </header>
 
@@ -14625,7 +14657,7 @@ const Store = {
     if (!saved || typeof saved !== 'object') return;
     if (Object.prototype.hasOwnProperty.call(DATA.models, saved.model)) setModelState(saved.model);
     else setModelState(saved.vehicle === 'scooter' ? 'oxo' : DATA.defaultModel);
-    if (['learn', 'wizard', 'diag', 'tools'].includes(saved.mode)) State.mode = saved.mode;
+    if (['learn', 'wizard', 'diag', 'tools', 'build'].includes(saved.mode)) State.mode = saved.mode;
     if (['normal', 'xray', 'explode'].includes(saved.view)) State.view = saved.view;
     State.flow = !!saved.flow;
     if (saved.circuit === 'all' || circuitById(saved.circuit)) State.circuit = saved.circuit;
@@ -16183,7 +16215,7 @@ const UI = (() => {
       }
     } catch (e) { toast('מסך מלא לא זמין כאן'); }
   }
-  function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools }; }
+  function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools, build: Builder }; }
 
   /* ---------- אתחול ---------- */
   function init() {
@@ -17340,7 +17372,7 @@ const Level = (() => {
 /* ---------- מילון מונחים + tooltip אוטומטי במצב מתחיל ---------- */
 const Glossary = (() => {
   let re = null, map = null, observer = null, pending = false, tipFor = null;
-  const SKIP = 'button,a,script,style,input,select,textarea,label,.term,.lcd,.code,.gtip,summary,[data-noterm],.mode,.pins,.conn-tag,.brand-chip';
+  const SKIP = 'svg,button,a,script,style,input,select,textarea,label,.term,.lcd,.code,.gtip,summary,[data-noterm],.mode,.pins,.conn-tag,.brand-chip';
   function build() {
     if (re) return;
     map = new Map();
@@ -19293,6 +19325,367 @@ const Perf = (() => {
   if (ModelData.lazy()) idleAll();
   function idleAll() { (window.requestIdleCallback || (f => setTimeout(f, 300)))(() => ModelData.all()); }
 });
+
+/* =====================================================================
+   p18 · Builder – אשף ״בנה בעצמך״ (לשונית ״בנה בעצמך״)
+   מטרה ← חישוב (עם ״למה״ לכל ערך) ← רכיבים מהקטלוג ← תאימות ← דיאגרמת חיווט (SVG)
+   ← מדריך הרכבה עם נקודות ״עצור ומדוד״ ← סיכום, רשימת קניות ושמירה.
+   · הקטלוג (components.json): רכיבים גנריים בלבד, מחירים כטווח לקטגוריה עם תאריך
+     וסימון ״לא מאומת״. מתעדכן מקובץ אחד (בגרסת ה-Web נטען מחדש מהשרת אם חדש יותר).
+   · סוללה: ברירת המחדל מארז מוכן עם BMS. בניית מארז – ״מתקדם בלבד״, עם הסכמה.
+   · מסומן ״לשימוש בשטח פרטי / לימודי״. במטרה ״דרך ציבורית״ – מגבלות 250W ו-25 קמ״ש.
+   ===================================================================== */
+const Builder = (() => {
+  let CAT = JSON.parse(document.getElementById('components-data').textContent);
+  const STEPS = [['goal', 'מטרה'], ['calc', 'חישוב'], ['parts', 'רכיבים'], ['check', 'תאימות'], ['wiring', 'חיווט'], ['guide', 'הרכבה'], ['summary', 'סיכום']];
+  const S_OF = { 36: 10, 48: 13, 52: 14 };
+  const REQ = ['motor', 'controller', 'battery', 'charger', 'protection', 'wiring'];
+  const OPT = ['display', 'throttle', 'pas', 'brakeSensors'];
+  let p = null, step = 'goal', gIdx = 0, wireSel = null;
+  const newProject = () => ({
+    id: 'p' + Date.now().toString(36), name: 'פרויקט המרה', created: new Date().toISOString(), updated: '',
+    goal: { use: 'road', riderKg: 80, rangeKm: 40, terrain: 'mixed', speedKmh: 25, voltage: 36, packMode: 'ready' },
+    sel: { motor: 'mot_rear_250_36', controller: 'ctl_36_15', battery: 'bat_36_14', charger: 'chg_42_2', display: 'dsp_led', throttle: '', pas: 'pas_12', brakeSensors: 'brk_pair', protection: 'breaker_dc', wiring: 'wire_kit' },
+    guide: {}
+  });
+  const item = id => CAT.items.find(x => x.id === id) || null;
+  const itemsOf = cat => CAT.items.filter(x => x.cat === cat);
+  const r1 = x => Math.round(x * 10) / 10;
+  const cell = () => CAT.cell18650;
+
+  /* ---------- חישוב הנדסי: כל ערך עם ״למה״ ---------- */
+  function calc() {
+    const g = p.goal, V = Number(g.voltage), S = S_OF[V], c0 = { flat: 9, mixed: 12, hilly: 16 }[g.terrain] || 12;
+    const whKm = r1(Math.max(6, c0 * (g.riderKg + 25) / 105));
+    const needWh = Math.round(g.rangeKm * whKm * 1.2);
+    const needAh = r1(needWh / V);
+    const P = Math.max(1, Math.ceil(needAh / cell().ah));
+    const mot = item(p.sel.motor), ctl = item(p.sel.controller), bat = item(p.sel.battery);
+    const ctlA = ctl ? ctl.spec.amps : null;
+    const batMaxA = g.packMode === 'build' ? P * cell().maxA : (bat ? bat.spec.bmsA : null);
+    const batAh = g.packMode === 'build' ? P * cell().ah : (bat ? bat.spec.ah : null);
+    const cRate = ctlA && batAh ? r1(ctlA / batAh) : null;
+    const wg = CAT.wireGauge.rows.find(r => ctlA && ctlA <= r.maxA) || CAT.wireGauge.rows[CAT.wireGauge.rows.length - 1];
+    const fuse = ctlA ? CAT.fuseSizes.find(f => f >= ctlA * 1.25) || CAT.fuseSizes[CAT.fuseSizes.length - 1] : null;
+    const batWh = batAh ? Math.round(batAh * V) : null;
+    const rangeEst = batWh ? Math.round(batWh * 0.8 / whKm) : null;
+    const peakW = ctlA ? Math.round(ctlA * V) : null;
+    const speed = g.use === 'road' ? 25 : (mot ? (mot.spec.wNom <= 250 ? 27 : mot.spec.wNom <= 500 ? 32 : 40) : null);
+    const full = r1(S * cell().vFull), empty = r1(S * cell().vEmpty);
+    return {
+      V, S, P, whKm, needWh, needAh, ctlA, batMaxA, batAh, cRate, wg, fuse, batWh, rangeEst, peakW, speed, full, empty,
+      rows: [
+        ['מתח מערכת', `${V}V (${S}S)`, `${S} תאים בטור × 3.6V נומינלי. ${V === 36 ? '36V: פשוט וזול, מספיק ל-250W.' : 'מתח גבוה יותר = פחות זרם לאותו הספק, כבלים דקים יותר וחום נמוך יותר.'} טעון מלא ${full}V, ריק ${empty}V.`],
+        ['צריכה משוערת', `${whKm} Wh/ק״מ`, `בסיס ${c0} Wh/ק״מ לשטח ${({ flat: 'מישורי', mixed: 'מעורב', hilly: 'הררי' })[g.terrain]}, מותאם למשקל רוכב+אופניים (${g.riderKg + 25} ק״ג). הערכה טיפוסית – לא מדידה.`],
+        ['אנרגיה נדרשת', `${needWh} Wh`, `${g.rangeKm} ק״מ × ${whKm} Wh/ק״מ × 1.2 (מרווח 20% להזדקנות, קור ורוח).`],
+        ['קיבולת נדרשת', `${needAh} Ah`, `${needWh} Wh ÷ ${V}V.`],
+        ['תצורת תאים', `${S}S${P}P`, `P = ${needAh}Ah ÷ ${cell().ah}Ah לתא (18650 טיפוסי), מעוגל למעלה. ${S * P} תאים, כ-${r1(S * P * cell().weightKg)} ק״ג תאים.`],
+        ['זרם מרבי (בקר)', ctlA ? `${ctlA} A` : '—', ctlA ? `לפי הבקר שבחרתם. הספק שיא ≈ ${ctlA}A × ${V}V = ${peakW}W.` : 'בחרו בקר.'],
+        ['זרם שהסוללה מספקת', batMaxA ? `${batMaxA} A` : '—', g.packMode === 'build' ? `${P} ענפים × ${cell().maxA}A לתא (טיפוסי). בפועל – לפי גיליון הנתונים של התא.` : 'לפי זרם ה-BMS של המארז. חייב להיות ≥ זרם הבקר.'],
+        ['C-rate', cRate != null ? `${cRate}C` : '—', cRate != null ? `${ctlA}A ÷ ${batAh}Ah. ${cRate <= 1 ? 'נמוך – הסוללה לא מתאמצת.' : cRate <= 2 ? 'סביר לתאי אנרגיה.' : 'גבוה – חום והזדקנות מהירה. הגדילו קיבולת או הקטינו זרם.'}` : ''],
+        ['חתך כבל ההספק', `${wg.awg} AWG (${wg.mm2} מ״מ²)`, `לזרם עד ${wg.maxA}A. ${CAT.wireGauge.note}.`],
+        ['נתיך / מפסק', fuse ? `${fuse} A` : '—', fuse ? `הגודל התקני הראשון שמעל ${ctlA}A × 1.25. מגן על הכבל מקצר – לא על הבקר.` : ''],
+        ['טווח משוער', rangeEst ? `${rangeEst} ק״מ` : '—', batWh ? `${batWh}Wh × 80% שמיש ÷ ${whKm} Wh/ק״מ.` : ''],
+        ['מהירות', speed ? `${speed} קמ״ש` : '—', g.use === 'road' ? 'בדרך ציבורית הסיוע מוגבל ל-25 קמ״ש (לאמת מול החוק העדכני).' : 'הערכה טיפוסית לפי הספק המנוע, קוטר גלגל ומתח. בשטח פרטי בלבד.']
+      ]
+    };
+  }
+
+  /* ---------- בדיקת תאימות ---------- */
+  function checks() {
+    const c = calc(), g = p.goal, out = [];
+    const mot = item(p.sel.motor), ctl = item(p.sel.controller), bat = item(p.sel.battery), chg = item(p.sel.charger), prot = item(p.sel.protection), dsp = item(p.sel.display), thr = item(p.sel.throttle);
+    const add = (lvl, t, why) => out.push({ lvl, t, why });
+    REQ.forEach(k => { if (!item(p.sel[k]) && !(k === 'battery' && g.packMode === 'build')) add('bad', `חסר: ${CAT.categories[k].name}`, 'רכיב חובה למערכת.'); });
+    if (bat && g.packMode === 'ready') bat.spec.voltage === c.V ? add('ok', `סוללה ${bat.spec.voltage}V = מתח המערכת`, '') : add('bad', `סוללה ${bat.spec.voltage}V ≠ מערכת ${c.V}V`, 'מתח לא תואם שורף בקר או לא מפעיל אותו.');
+    if (ctl) ctl.spec.voltage.includes(c.V) ? add('ok', `בקר תומך ב-${c.V}V`, `ניתוק מתח נמוך (LVC) ${ctl.spec.lvc}V – מעל ${c.empty}V של סוללה ריקה.`) : add('bad', `בקר לא תומך ב-${c.V}V`, `הבקר מיועד ל-${ctl.spec.voltage.join('/')}V.`);
+    if (mot) mot.spec.voltage.includes(c.V) ? add('ok', `מנוע מתוכנן ל-${c.V}V`, '') : add('warn', `מנוע מתוכנן ל-${mot.spec.voltage.join('/')}V, המערכת ${c.V}V`, 'מתח גבוה מהמתוכנן מעלה מהירות וחום; נמוך – מאבד מהירות.');
+    if (chg) chg.spec.forV === c.V ? add('ok', `מטען ${chg.spec.vOut}V מתאים ל-${c.V}V`, '') : add('bad', `מטען ${chg.spec.vOut}V לא מתאים ל-${c.V}V`, 'מטען במתח לא נכון עלול לגרום לשריפה.');
+    if (c.ctlA && c.batMaxA) c.batMaxA >= c.ctlA ? add('ok', `הסוללה מספקת ${c.batMaxA}A ≥ בקר ${c.ctlA}A`, '') : add('bad', `הסוללה מספקת ${c.batMaxA}A < בקר ${c.ctlA}A`, 'ה-BMS ינתק תחת עומס, או שהתאים יתחממו.');
+    if (c.cRate != null && c.cRate > 2) add('warn', `C-rate גבוה (${c.cRate}C)`, 'בחרו קיבולת גדולה יותר או בקר חלש יותר.');
+    if (mot && c.peakW) c.peakW <= mot.spec.wPeak * 1.3 ? add('ok', `הספק שיא ${c.peakW}W מתאים למנוע`, '') : add('warn', `הבקר יכול לדחוף ${c.peakW}W – מעל שיא המנוע ${mot.spec.wPeak}W`, 'המנוע יתחמם; בחרו בקר חלש יותר.');
+    if (prot && c.fuse) {
+      const vOk = prot.spec.maxV >= c.full, sz = prot.spec.sizes.includes(c.fuse) || prot.spec.sizes.some(s => s >= c.fuse);
+      vOk ? add('ok', `${prot.name}: דירוג ${prot.spec.maxV}V ≥ ${c.full}V`, '') : add('bad', `${prot.name}: דירוג ${prot.spec.maxV}V נמוך ממתח מלא ${c.full}V`, 'נתיך במתח נמוך מדי לא מפסיק קשת DC. בחרו מפסק DC מתאים.');
+      if (!sz) add('warn', `אין גודל ${c.fuse}A ב${prot.name}`, '');
+    }
+    if (mot && mot.spec.pos === 'front') add('warn', 'מנוע קדמי: Torque arm חובה ומזלג פלדה', 'מזלג אלומיניום/קרבון עלול להישבר.');
+    if (dsp) add('warn', 'צג ובקר – קונים כערכה אחת', 'אין תקן אחיד לפרוטוקול הצג (לא ידוע עד שהיצרן מפרסם).');
+    if (g.use === 'road') {
+      const legal = mot && mot.legalRoad && mot.spec.wNom <= 250;
+      legal ? add('ok', 'מנוע 250W נומינלי – בגבולות האופניים החשמליים', 'לאמת מול החוק העדכני: גם אישור תקן ותווית.') : add('bad', 'המנוע לא מתאים לדרך ציבורית', 'מעל 250W נומינלי. לאמת מול החוק העדכני.');
+      if (thr) add('warn', 'מצערת', 'בדקו את החוק העדכני לגבי מצערת באופניים חשמליים.');
+    } else add('warn', 'לשימוש בשטח פרטי בלבד', 'הכלי לא מיועד לדרך ציבורית.');
+    if (g.packMode === 'build') add('warn', 'בניית מארז – מתקדם בלבד', 'ריתוך נקודתי, נתיכים, איזון ופיקוח על טעינה ראשונה. ברירת המחדל המומלצת: מארז מוכן עם BMS.');
+    return out;
+  }
+
+  /* ---------- דיאגרמת חיווט (SVG) ---------- */
+  function wires() {
+    const c = calc(), W = [];
+    const add = (id, from, to, color, label, info) => W.push({ id, from, to, color, label, info });
+    add('bplus', 'bat', 'prot', '#e53935', `+ · ${c.wg.awg}AWG`, `חיובי מהסוללה לנתיך/מפסק. אדום, ${c.wg.awg} AWG, מחבר ${(item(p.sel.battery) || { spec: { conn: 'xt60' } }).spec.conn.toUpperCase()}. זרם עד ${c.ctlA}A.`);
+    add('pctl', 'prot', 'ctl', '#e53935', `+ · ${c.fuse}A`, `מהנתיך (${c.fuse}A) לכניסת הבקר. אדום, ${c.wg.awg} AWG.`);
+    add('bminus', 'bat', 'ctl', '#222', `− · ${c.wg.awg}AWG`, `שלילי מהסוללה לבקר. שחור, ${c.wg.awg} AWG. לא עובר דרך הנתיך.`);
+    add('phase', 'ctl', 'mot', '#f2c200', '3 פאזות', `שלוש פאזות: צהוב, ירוק, כחול. ${c.wg.awg} AWG, מחברי Bullet. סדר לא נכון – המנוע רועד או מסתובב הפוך.`);
+    add('hall', 'mot', 'ctl', '#2e7d32', 'Hall · 5 חוטים', 'חיישני Hall: אדום 5V, שחור GND, צהוב/ירוק/כחול אותות. חוטים דקים, מחבר Julet. לא לחבר עם ההספק מחובר.');
+    if (item(p.sel.display)) add('disp', 'ctl', 'dsp', '#1e88e5', 'צג · 5 פינים', 'V+ (מתח סוללה), GND, חוט הדלקה, TX, RX. מחבר Julet 5 פינים (טיפוסי – לפי הערכה).');
+    if (item(p.sel.throttle)) add('thr', 'ctl', 'thr', '#8e24aa', 'מצערת · 3', '5V (אדום), GND (שחור), אות (ירוק) 0.8–4.2V.');
+    if (item(p.sel.pas)) add('pas', 'ctl', 'pas', '#00897b', 'PAS · 3', '5V, GND, אות פולסים.');
+    if (item(p.sel.brakeSensors)) add('brk', 'ctl', 'brk', '#6d4c41', 'בלמים · 2×2', 'חיישן לכל ידית. לחיצה = ניתוק הנעה מיידי. חובה.');
+    add('chg', 'chg', 'bat', '#555', 'טעינה', `מטען ${(item(p.sel.charger) || { spec: { vOut: c.full } }).spec.vOut}V לשקע הטעינה בסוללה. לא דרך הבקר.`);
+    return W;
+  }
+  function svgHTML() {
+    // פריסה אנכית שמתאימה לרוחב הפאנל: מקור ← הגנה ← בקר ← מנוע וחיישנים
+    const N = { bat: [95, 50, 'סוללה'], chg: [305, 50, 'מטען'], prot: [95, 170, 'נתיך / מפסק'], dsp: [305, 170, 'צג'], ctl: [200, 300, 'בקר'], mot: [95, 430, 'מנוע'], thr: [305, 430, 'מצערת'], brk: [95, 550, 'חיישני בלם'], pas: [305, 550, 'PAS'] };
+    const present = new Set(['bat', 'prot', 'chg', 'ctl', 'mot']);
+    const W = wires(); W.forEach(w => { present.add(w.from); present.add(w.to); });
+    const HW = 58, HH = 22;
+    const box = id => { const [x, y, t] = N[id]; return `<g class="bd-node" data-node="${id}"><rect x="${x - HW}" y="${y - HH}" width="${HW * 2}" height="${HH * 2}" rx="4"/><text x="${x}" y="${y + 5}" text-anchor="middle">${esc(t)}</text></g>`; };
+    const off = { bplus: -10, bminus: 10, hall: 12, phase: -12 };
+    const edge = (a, b) => { const [x1, y1] = N[a], [x2, y2] = N[b]; const dx = x2 - x1, dy = y2 - y1; return Math.abs(dy) >= Math.abs(dx) * 0.6 ? [x1, y1 + Math.sign(dy) * HH, 'v'] : [x1 + Math.sign(dx) * HW, y1, 'h']; };
+    const line = w => {
+      const o = off[w.id] || 0;
+      let [x1, y1, k1] = edge(w.from, w.to), [x2, y2, k2] = edge(w.to, w.from);
+      if (k1 === 'v') x1 += o; else y1 += o; if (k2 === 'v') x2 += o; else y2 += o;
+      const c1 = k1 === 'v' ? `${x1} ${(y1 + y2) / 2}` : `${(x1 + x2) / 2} ${y1}`, c2 = k2 === 'v' ? `${x2} ${(y1 + y2) / 2}` : `${(x1 + x2) / 2} ${y2}`;
+      const d = `M${x1} ${y1} C${c1} ${c2} ${x2} ${y2}`;
+      const lp = { phase: 0.3, hall: 0.22, brk: 0.8, pas: 0.8, thr: 0.8 }[w.id] || 0.5;
+      const mx = x1 + (x2 - x1) * lp + (k1 === 'v' && x1 === x2 ? 6 : 0), my = y1 + (y2 - y1) * lp;
+      const casing = /^#(1|2)/.test(w.color) ? `<path class="casing" d="${d}"/>` : '';
+      return `<g class="bd-wire${wireSel === w.id ? ' sel' : ''}" data-wire="${w.id}" tabindex="0" role="button" aria-label="${esc(w.label + ': ' + w.info)}">${casing}<path class="core" d="${d}" stroke="${w.color}"/><path class="hit" d="${d}"/><text x="${mx}" y="${my}" text-anchor="${k1 === 'v' && x1 === x2 ? 'start' : 'middle'}" dy="-4">${esc(w.label)}</text></g>`;
+    };
+    const cur = W.find(w => w.id === wireSel);
+    return `<div class="bd-wrap" data-noterm><svg class="bd" viewBox="0 0 400 590" role="group" aria-label="דיאגרמת חיווט – בחרו כבל לפרטים">${W.map(line).join('')}${[...present].map(box).join('')}</svg></div>
+      <div class="out-box" id="bdInfo" aria-live="polite">${cur ? `<b>${esc(cur.label)}</b><span>${esc(cur.info)}</span>` : '<span>בחר כבל בדיאגרמה כדי לראות צבע, חתך, מחבר וזרם.</span>'}</div>`;
+  }
+  /* ---------- מדריך הרכבה: עצור ומדוד ---------- */
+  function guide() {
+    const c = calc(), mot = item(p.sel.motor);
+    return [
+      { t: 'בדוק את השלדה והמזלג', do: ['ודא שהנשירה (Dropout) מתאימה לרוחב ציר המנוע.', mot && mot.spec.pos === 'front' ? 'מנוע קדמי: מזלג פלדה בלבד ו-Torque arm.' : 'מנוע אחורי: בדוק מקום לקסטה ולמעביר.', 'בדוק בלמים לפני כל שינוי – הם יעצרו כלי כבד ומהיר יותר.'], m: { kind: 'check', label: 'השלדה והבלמים תקינים ומתאימים' }, comp: 'motor' },
+      { t: 'התקן את המנוע', do: ['התקן גלגל, Torque arm ואומי ציר במומנט לפי היצרן.', 'כבל המנוע יוצא כלפי מטה, עם לולאת טפטוף.'], m: { kind: 'num', label: 'התנגדות בין שתי פאזות (Ω)', min: 0.05, max: 1.5, unit: 'Ω', why: 'מודדים לפני חיבור לבקר. OL = חוט קרוע; 0 מוחלט = קצר.' }, comp: 'motor' },
+      { t: 'בדוק בידוד המנוע לגוף', do: ['מולטימטר במצב רציפות: כל פאזה מול הציר.'], m: { kind: 'check', label: 'אין רציפות בין אף פאזה לציר' }, comp: 'motor' },
+      { t: 'מקם את הבקר', do: ['במקום מאוורר, מוגן ממים ומבוץ, מחברים כלפי מטה.', 'קבע ברצועות – בלי מתח על הכבלים.'], m: null, comp: 'controller' },
+      { t: 'חבר מנוע ובקר (בלי סוללה)', do: ['פאזות: צבע לצבע. Hall: מחבר Julet עד הסוף.', 'בודד כל מחבר Bullet בשרוול מתכווץ.'], m: { kind: 'check', label: 'כל חיבורי הפאזה מבודדים, אין נחושת גלויה' }, comp: 'controller' },
+      { t: 'חווט נתיך ומחבר סוללה – עדיין לא מחברים', do: [`כבל ${c.wg.awg} AWG, נתיך/מפסק ${c.fuse}A קרוב ככל האפשר לסוללה.`, 'אדום ל-+, שחור ל-−, בדוק פעמיים.'], m: { kind: 'num', label: 'מתח הסוללה במחבר (V)', min: c.empty, max: c.full + 0.3, unit: 'V', why: `חייב להיות חיובי ובין ${c.empty} ל-${c.full}V. מספר שלילי = קוטביות הפוכה – לא מחברים.` }, comp: 'battery' },
+      { t: 'חבר צג, מצערת, PAS וחיישני בלם', do: ['כל מחבר לפי הסימון בבקר. לא לכפות מחבר.', 'חיישני בלם – חובה, גם אם מוותרים על מצערת.'], m: null, comp: 'display' },
+      { t: 'הדלקה ראשונה – גלגל באוויר', do: ['הרם את הגלגל. חבר סוללה, הדלק צג.', 'מדוד 5V במחבר המצערת/PAS.'], m: { kind: 'num', label: 'אספקת 5V לחיישנים (V)', min: 4.7, max: 5.3, unit: 'V', why: 'נמוך מ-4.7V = קצר באחד החיישנים או בעיה בבקר. נתק ובדוק.' }, comp: 'controller' },
+      { t: 'בדוק את מתח כניסת הבקר', do: ['מדוד בכניסת הבקר עם הצג דולק.'], m: { kind: 'num', label: 'מתח בכניסת הבקר (V)', min: c.empty, max: c.full + 0.3, unit: 'V', why: 'צריך להיות כמו מתח הסוללה (±0.5V). הפרש גדול = התנגדות בנתיך או במחבר.' }, comp: 'controller' },
+      { t: 'בדוק ניתוק בבלם', do: ['סובב את הגלגל בסיוע נמוך ולחץ על כל ידית בלם.'], m: { kind: 'check', label: 'כל ידית מנתקת את ההנעה מיד' }, comp: 'brakes' },
+      { t: 'נסיעת מבחן קצרה בשטח פרטי', do: ['5 דקות בסיוע נמוך. עצור ובדוק חום בבקר, במנוע ובמחברים.', 'חם מאוד למגע = נתק ובדוק חתך כבלים ומחברים.'], m: { kind: 'check', label: 'אין התחממות חריגה, אין ריח, אין רעשים' }, comp: 'motor' }
+    ];
+  }
+
+  /* ---------- מחיר ומשקל ---------- */
+  function totals() {
+    const cats = new Set();
+    Object.entries(p.sel).forEach(([k, v]) => { if (v && item(v) && !(k === 'battery' && p.goal.packMode === 'build')) cats.add(k); });
+    if (p.goal.packMode === 'build') cats.add('packParts');
+    let min = 0, max = 0, unverified = 0;
+    const lines = [...cats].map(k => {
+      const cat = CAT.categories[k], pr = cat.price, it = k === 'packParts' ? null : item(p.sel[k]);
+      min += pr.min; max += pr.max; if (!pr.verified) unverified++;
+      return { cat: cat.name, item: it ? it.name : (k === 'packParts' ? `${calc().S}S${calc().P}P – ${calc().S * calc().P} תאים + BMS ${calc().S}S` : ''), qty: 1, min: pr.min, max: pr.max, verified: !!pr.verified, updatedAt: pr.updatedAt, source: pr.source, conf: it ? it.conf : 'unk' };
+    });
+    const c = calc();
+    let kg = 1.0;
+    ['motor', 'battery'].forEach(k => { const it = item(p.sel[k]); if (it && it.spec.weightKg && !(k === 'battery' && p.goal.packMode === 'build')) kg += it.spec.weightKg; });
+    if (p.goal.packMode === 'build') kg += c.S * c.P * cell().weightKg * 1.25;
+    return { lines, min, max, unverified, kg: r1(kg) };
+  }
+  const money = n => '₪' + Math.round(n).toLocaleString('he-IL');
+
+  /* ---------- תצוגות ---------- */
+  const confB = c => Conf.badge(c || 'typ');
+  function goalHTML() {
+    const g = p.goal;
+    const opt = (name, v, t, d) => `<label class="check"><input type="radio" name="${name}" value="${v}" ${String(g[name === 'bgUse' ? 'use' : name === 'bgTer' ? 'terrain' : name === 'bgV' ? 'voltage' : 'packMode']) === String(v) ? 'checked' : ''}><span><b>${t}</b>${d ? ` – ${d}` : ''}</span></label>`;
+    return `<div class="card stack"><h3>לאן רוכבים?</h3>
+        ${opt('bgUse', 'road', 'דרך ציבורית', 'אופניים חשמליים: 250W נומינלי, סיוע עד 25 קמ״ש, תקן')}
+        ${opt('bgUse', 'private', 'שטח פרטי / לימודי בלבד', 'בלי מגבלות הדרך – ובלי היתר לרכוב בכביש')}
+        ${Legal.modelNote({ cat: 'ebike', motor: { nominal: '' }, speed: '' })}</div>
+      <div class="card stack"><h3>מה צריך</h3><div class="tool-grid">
+        <div class="field"><label for="bgRange">טווח רצוי (ק״מ)</label><input class="input num" id="bgRange" type="number" inputmode="decimal" min="5" max="200" value="${g.rangeKm}"></div>
+        <div class="field"><label for="bgKg">משקל רוכב (ק״ג)</label><input class="input num" id="bgKg" type="number" inputmode="decimal" min="30" max="160" value="${g.riderKg}"></div>
+      </div>
+        <fieldset class="stack plain"><legend class="lbl">שטח</legend>${opt('bgTer', 'flat', 'מישורי', '')}${opt('bgTer', 'mixed', 'מעורב', '')}${opt('bgTer', 'hilly', 'הררי', '')}</fieldset>
+        <fieldset class="stack plain"><legend class="lbl">מתח מערכת</legend>${opt('bgV', 36, '36V', 'פשוט, מספיק ל-250W')}${opt('bgV', 48, '48V', 'פחות זרם, יותר מקום לעליות')}${opt('bgV', 52, '52V', 'שטח פרטי – הספק גבוה')}</fieldset></div>
+      <div class="card stack"><h3>סוללה</h3>
+        ${opt('bgPack', 'ready', 'מארז מוכן עם BMS (מומלץ)', 'עם תעודת תקן, מחבר ומטען תואמים')}
+        ${opt('bgPack', 'build', 'בניית מארז – מתקדם בלבד', 'ריתוך נקודתי, נתיכים, איזון, טעינה ראשונה בפיקוח')}
+        ${g.packMode === 'build' ? packHTML() : ''}</div>`;
+  }
+  function packHTML() {
+    const c = calc();
+    return `<div class="note danger">${ICON.warn}<span><b>מתקדם בלבד.</b> בניית מארז ליתיום דורשת הכשרה, ציוד ופיקוח. טעות אחת מספיקה לשריפה שלא נכבית במים.</span></div>
+      <ul class="bul">
+        <li>ריתוך נקודתי בלבד – לא מלחימים ישירות לתאים.</li>
+        <li>תאים מאותו דגם ואותה סדרה, במתח זהה (הפרש עד 0.05V) לפני חיבור.</li>
+        <li>נתיך לכל ענף או חוט נתיך, ונתיך ראשי.</li>
+        <li>BMS ל-${c.S}S, בזרם ≥ ${c.ctlA || '—'}A, עם איזון.</li>
+        <li>בידוד: טבעות בידוד על הקטבים, שכבת Fish paper, שרוול מתכווץ חיצוני.</li>
+        <li>מדידת מתח כל קבוצה מקבילית לפני סגירה.</li>
+        <li>טעינה ראשונה בפיקוח רציף, בחוץ, על משטח לא דליק, עם מטען תואם.</li>
+      </ul>`;
+  }
+  function calcHTML() {
+    const c = calc();
+    return `<div class="card stack"><h3>החישוב</h3><p class="foot">כל שורה – ערך ולמה. ערכים טיפוסיים לחישוב, לא מדידה.</p>
+      <dl class="calc-why">${c.rows.map(([k, v, why]) => `<div class="cw"><dt>${esc(k)}</dt><dd><b class="num">${esc(v)}</b><span class="why"><b>למה:</b> ${esc(why)}</span></dd></div>`).join('')}</dl></div>`;
+  }
+  function partsHTML() {
+    const cats = REQ.concat(OPT).filter(k => !(k === 'battery' && p.goal.packMode === 'build'));
+    return `<p class="lead">רכיבים גנריים לפי מפרט – בלי דגמים וספקים. המחיר הוא טווח לקטגוריה.</p>
+      ${cats.map(k => { const cat = CAT.categories[k], pr = cat.price; return `<div class="card stack"><div class="spread"><h3>${esc(cat.name)}${OPT.includes(k) ? ' <small class="foot">(לא חובה)</small>' : ''}</h3><span class="num price">${money(pr.min)}–${money(pr.max)}</span></div>
+        <label class="sr-only" for="bp-${k}">${esc(cat.name)}</label><select class="input" id="bp-${k}" data-cat="${k}">${OPT.includes(k) ? '<option value="">בלי</option>' : ''}${itemsOf(k).map(x => `<option value="${x.id}" ${p.sel[k] === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
+        ${(() => { const it = item(p.sel[k]); return it ? `<p class="foot">${confB(it.conf)} ${it.note ? esc(it.note) : ''}</p>` : ''; })()}
+        <p class="foot price-meta">${pr.verified ? 'מחיר מאומת' : 'הערכה – לא מאומת'} · עודכן ${esc(pr.updatedAt)} · ${esc(CAT.sourceTypes[pr.source] || pr.source)}</p></div>`; }).join('')}`;
+  }
+  function checkHTML() {
+    const L = checks(), bad = L.filter(x => x.lvl === 'bad').length, warn = L.filter(x => x.lvl === 'warn').length;
+    return `<div class="card stack"><h3>${bad ? MK.bad + `${bad} בעיות חוסמות` : warn ? MK.warn + `תואם, עם ${warn} דברים לבדוק` : MK.ok + 'הכול תואם'}</h3>
+      <ul class="clean chk-list">${L.map(x => `<li class="verdict ${x.lvl}">${x.lvl === 'ok' ? MK.ok : x.lvl === 'bad' ? MK.bad : MK.warn}<span><b>${esc(x.t)}</b>${x.why ? `<br><span class="foot">${esc(x.why)}</span>` : ''}</span></li>`).join('')}</ul></div>`;
+  }
+  function guideHTML() {
+    const G = guide(), s = G[gIdx], k = 'g' + gIdx, done = !!p.guide[k];
+    const verify = s.m ? (s.m.kind === 'num'
+      ? `<label class="field"><span class="lbl">${esc(s.m.label)} · צפוי ${s.m.min}–${s.m.max}${esc(s.m.unit)}</span><input class="input num" id="bgMeas" inputmode="decimal" autocomplete="off" value="${p.guide[k] != null && p.guide[k] !== true ? esc(p.guide[k]) : ''}"></label><p class="foot">${esc(s.m.why)}</p>`
+      : `<label class="check"><input type="checkbox" id="bgChk" ${done ? 'checked' : ''}><span>${esc(s.m.label)}</span></label>`) : '<p class="foot">אין מדידה בשלב הזה.</p>';
+    return `${Legal.privateUse()}
+      <div class="progress" aria-hidden="true"><i data-sw="${(gIdx + 1) / G.length * 100}"></i></div>
+      <div class="card stack"><p class="eyebrow num">שלב ${gIdx + 1} מתוך ${G.length}</p><h3>${esc(s.t)}</h3><ul class="bul">${s.do.map(d => `<li>${esc(d)}</li>`).join('')}</ul>
+        ${s.m ? `<div class="verify-box" id="bgBox"><b>עצור ומדוד</b>${verify}<span class="vres" id="bgRes" aria-live="polite">${done ? MK.ok + 'אומת' : ''}</span></div>` : ''}</div>
+      <div class="navrow row"><button type="button" class="btn" data-action="bg-g" data-i="${gIdx - 1}" ${gIdx ? '' : 'disabled'}>הקודם</button>
+        <button type="button" class="btn primary" data-action="bg-g" data-i="${gIdx + 1}" id="bgNext" ${!s.m || done ? '' : 'disabled'}>${gIdx === G.length - 1 ? 'סיים' : 'הבא'}</button></div>`;
+  }
+  function summaryHTML() {
+    const c = calc(), t = totals(), L = checks(), bad = L.some(x => x.lvl === 'bad');
+    return `${Legal.privateUse()}
+      <div class="card stack print-area" id="bgSummary"><h3>${esc(p.name)}</h3>
+        <div class="kv-grid"><div class="kv"><span>עלות משוערת</span><b>${money(t.min)}–${money(t.max)}</b></div><div class="kv"><span>משקל תוספת</span><b>${t.kg} ק״ג</b></div>
+          <div class="kv"><span>טווח משוער</span><b>${c.rangeEst ?? '—'} ק״מ</b></div><div class="kv"><span>מהירות</span><b>${c.speed ?? '—'} קמ״ש</b></div>
+          <div class="kv"><span>מערכת</span><b>${c.V}V ${c.ctlA ?? '—'}A</b></div><div class="kv"><span>תאימות</span><b>${bad ? 'יש חסימות' : 'תקין'}</b></div></div>
+        ${t.unverified ? `<div class="note warn">${ICON.warn}<span>${t.unverified} מחירים הם הערכה לא מאומתת. אמתו מול ספק לפני קנייה.</span></div>` : ''}
+        <div class="tbl-wrap"><table class="volt"><caption class="sr-only">רשימת קניות</caption><thead><tr><th scope="col">קטגוריה</th><th scope="col">פריט</th><th scope="col">טווח מחיר</th><th scope="col">מקור</th></tr></thead>
+        <tbody>${t.lines.map(l => `<tr><th scope="row">${esc(l.cat)}</th><td>${esc(l.item)}</td><td class="num">${money(l.min)}–${money(l.max)}</td><td>${l.verified ? 'מאומת' : 'לא מאומת'} · ${esc(l.updatedAt)}</td></tr>`).join('')}</tbody></table></div>
+        <p class="foot">${esc(CAT._doc.split('.')[0])}. מחירים עודכנו ${esc(CAT.updatedAt)}.</p></div>
+      <div class="field"><label for="bgName">שם הפרויקט</label><input class="input" id="bgName" maxlength="80" value="${esc(p.name)}"></div>
+      <div class="row"><button type="button" class="btn primary" data-action="bg-save">שמור פרויקט</button><button type="button" class="btn" data-action="bg-log">שמור ליומן</button>
+        <button type="button" class="btn" data-action="bg-export">ייצא רשימת קניות</button>${IN_FRAME ? '' : '<button type="button" class="btn ghost" data-action="bg-print">הדפס</button>'}</div>
+      <textarea class="input copybox" id="bgBox2" hidden rows="6" readonly aria-label="רשימת קניות להעתקה"></textarea>
+      ${projectsHTML()}`;
+  }
+  function projectsHTML() {
+    if (Persist.isLocked()) return DataUI.lockedCard('הפרויקטים');
+    const list = Persist.get('projects');
+    return list.length ? `<div class="card stack"><h3>הפרויקטים שלי (${list.length})</h3><ul class="clean">${list.map(x => `<li class="spread"><span><b>${esc(x.name)}</b> <span class="foot num">${esc((x.updated || x.created || '').slice(0, 10))}</span></span><span class="row"><button type="button" class="btn sm" data-action="bg-open" data-id="${esc(x.id)}">פתח</button><button type="button" class="btn sm ghost" data-action="bg-del" data-id="${esc(x.id)}">מחק</button></span></li>`).join('')}</ul></div>` : '';
+  }
+
+  function render() {
+    if (!p) p = newProject();
+    const body = step === 'goal' ? goalHTML() : step === 'calc' ? calcHTML() : step === 'parts' ? partsHTML() : step === 'check' ? checkHTML() : step === 'wiring' ? svgHTML() : step === 'guide' ? guideHTML() : summaryHTML();
+    $('#modeView').innerHTML = `<div><p class="eyebrow">בנה בעצמך · ערכת המרה לאופניים</p><h2>תכנן, חשב, הרכב</h2></div>
+      ${Legal.privateUse()}
+      <div class="subtabs" role="tablist" aria-label="שלבי הבנייה">${STEPS.map(([id, n], i) => `<button type="button" role="tab" aria-selected="${step === id}" data-action="bg-step" data-s="${id}"><span class="num">${i + 1}</span> ${n}</button>`).join('')}</div>
+      <div class="stack">${body}</div>
+      ${step !== 'guide' ? `<div class="navrow row">${STEPS.findIndex(s => s[0] === step) > 0 ? '<button type="button" class="btn" data-action="bg-prev">הקודם</button>' : ''}${step !== 'summary' ? '<button type="button" class="btn primary" data-action="bg-next">הבא</button>' : ''}</div>` : ''}`;
+    bind(); highlight();
+  }
+  function touch() { p.updated = new Date().toISOString(); }
+  function bind() {
+    $$('#modeView input[type="radio"]').forEach(r => r.addEventListener('change', async () => {
+      const g = p.goal;
+      if (r.name === 'bgUse') g.use = r.value;
+      if (r.name === 'bgTer') g.terrain = r.value;
+      if (r.name === 'bgV') { g.voltage = Number(r.value); autoPick(); }
+      if (r.name === 'bgPack') {
+        if (r.value === 'build' && !(await Consent.confirm('buildPack'))) { render(); return; }
+        g.packMode = r.value;
+      }
+      if (g.use === 'road' && g.voltage === 52) { g.voltage = 48; autoPick(); UI.toast('בדרך ציבורית – 36V או 48V עם מנוע 250W'); }
+      touch(); render();
+    }));
+    [['#bgRange', 'rangeKm', 5, 200], ['#bgKg', 'riderKg', 30, 160]].forEach(([s, k, lo, hi]) => { const e = $(s); if (e) e.addEventListener('change', () => { const n = Sec.num(e.value, lo, hi); if (n !== null) { p.goal[k] = n; touch(); } }); });
+    $$('#modeView select[data-cat]').forEach(sel => sel.addEventListener('change', () => { if (sel.value && !item(sel.value)) return; p.sel[sel.dataset.cat] = sel.value; touch(); render(); }));
+    $$('#modeView [data-wire]').forEach(g => {
+      const pick = () => { wireSel = g.dataset.wire; render(); const x = $(`[data-wire="${wireSel}"]`); if (x) x.focus(); };
+      g.addEventListener('click', pick); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    });
+    const G = step === 'guide' ? guide()[gIdx] : null;
+    if (G && G.m) {
+      const k = 'g' + gIdx, next = $('#bgNext'), res = $('#bgRes');
+      const set = (ok, msg, fail) => { p.guide[k] = ok ? (p.guide[k] === undefined || p.guide[k] === false ? true : p.guide[k]) : false; next.disabled = !ok; res.innerHTML = msg ? (ok ? MK.ok : fail ? MK.bad : '') + msg : ''; };
+      if (G.m.kind === 'num') {
+        const i = $('#bgMeas');
+        i.addEventListener('input', () => {
+          const n = Sec.num(i.value); if (n === null) { set(false, ''); return; }
+          if (n < 0) { set(false, 'ערך שלילי: קוטביות הפוכה. אל תחבר – תקן ובדוק שוב.', true); return; }
+          if (n >= G.m.min && n <= G.m.max) { set(true, `${n}${G.m.unit} בטווח. אפשר להמשיך.`); p.guide[k] = String(n); }
+          else set(false, `${n}${G.m.unit} מחוץ לטווח ${G.m.min}–${G.m.max}${G.m.unit}. עצור ובדוק לפני שממשיכים.`, true);
+        });
+      } else { const c = $('#bgChk'); c.addEventListener('change', () => set(c.checked, c.checked ? 'אומת' : '')); }
+    }
+    const nm = $('#bgName'); if (nm) nm.addEventListener('change', () => { p.name = Sec.str(nm.value.trim(), 80) || 'פרויקט המרה'; touch(); });
+  }
+  /** בחירה אוטומטית של רכיבים תואמים אחרי שינוי מתח */
+  function autoPick() {
+    const V = p.goal.voltage, road = p.goal.use === 'road';
+    const pick = (cat, ok) => { const cur = item(p.sel[cat]); if (cur && ok(cur)) return; const x = itemsOf(cat).find(ok); if (x) p.sel[cat] = x.id; };
+    pick('motor', x => x.spec.voltage.includes(V) && (!road || x.legalRoad));
+    pick('controller', x => x.spec.voltage.includes(V));
+    pick('battery', x => x.spec.voltage === V);
+    pick('charger', x => x.spec.forV === V);
+  }
+  const COMP_OF = { motor: 'motor', controller: 'controller', battery: 'battery', display: 'display', brakes: 'brakes' };
+  function highlight() {
+    const G = step === 'guide' ? guide()[gIdx] : null;
+    const id = G ? COMP_OF[G.comp] : step === 'wiring' ? 'controller' : null;
+    Scene.select(id && State.vehicle === 'ebike' && Scene.hasComp(id) ? id : null, !!id);
+    Scene.highlightBundle(null);
+  }
+  function shoppingText() {
+    const t = totals(), c = calc();
+    return `רשימת קניות – ${p.name}\nמעבדת EV · ${new Date().toLocaleDateString('he-IL')}\nמערכת: ${c.V}V, בקר ${c.ctlA}A, כבל ${c.wg.awg}AWG, נתיך ${c.fuse}A\n\n` +
+      t.lines.map(l => `- ${l.cat}: ${l.item} | ₪${l.min}–₪${l.max} (${l.verified ? 'מאומת' : 'הערכה, לא מאומת'}, ${l.updatedAt})`).join('\n') +
+      `\n\nסה״כ משוער: ₪${t.min}–₪${t.max}\nלשימוש בשטח פרטי / לימודי. מחירים – לאמת מול ספק.`;
+  }
+  function save() {
+    if (Persist.isLocked()) { UI.toast('פתח את הנעילה כדי לשמור'); return false; }
+    touch();
+    const list = Persist.get('projects').filter(x => x.id !== p.id);
+    list.unshift(JSON.parse(JSON.stringify(p)));
+    return Persist.set('projects', list.slice(0, 200));
+  }
+  UI.on('bg-step', el => { step = el.dataset.s; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('bg-next', () => { const i = STEPS.findIndex(s => s[0] === step); step = STEPS[Math.min(STEPS.length - 1, i + 1)][0]; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('bg-prev', () => { const i = STEPS.findIndex(s => s[0] === step); step = STEPS[Math.max(0, i - 1)][0]; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('bg-g', el => { const n = Number(el.dataset.i), G = guide(); if (n >= G.length) { step = 'summary'; UI.toast('ההרכבה הושלמה'); } else gIdx = Math.max(0, n); render(); });
+  UI.on('bg-save', () => { if (save()) { UI.toast('הפרויקט נשמר'); render(); } });
+  UI.on('bg-log', () => {
+    if (!save()) return;
+    const c = calc(), t = totals();
+    RepairLog.add({ model: '', modelName: 'בנה בעצמך: ' + p.name, symptoms: 'פרויקט בנייה', measurements: Object.entries(p.guide).filter(([, v]) => typeof v === 'string').map(([k, v]) => `${guide()[Number(k.slice(1))].m.label}: ${v}`).join(' · '), replaced: t.lines.map(l => l.item).join(', '), notes: `${c.V}V ${c.ctlA}A · עלות משוערת ₪${t.min}–₪${t.max} · לשימוש בשטח פרטי / לימודי`, status: 'בטיפול' });
+    UI.toast('נשמר ליומן');
+  });
+  UI.on('bg-export', () => offerFile(`shopping-list-${p.id}.txt`, shoppingText(), $('#bgBox2')));
+  UI.on('bg-print', () => { document.body.classList.add('printing'); const done = () => { document.body.classList.remove('printing'); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); try { window.print(); } catch (e) { done(); } setTimeout(done, 3000); });
+  UI.on('bg-open', el => { const x = Persist.get('projects').find(y => y.id === el.dataset.id); if (x) { p = JSON.parse(JSON.stringify(x)); step = 'summary'; gIdx = 0; render(); } });
+  UI.on('bg-del', el => { Persist.set('projects', Persist.get('projects').filter(x => x.id !== el.dataset.id)); UI.toast('נמחק'); render(); });
+
+  /** עדכון קטלוג מקובץ components.json בשרת (Web בלבד), אם חדש יותר ועובר בדיקה */
+  function refreshCatalog() {
+    if (!/^https?:$/.test(location.protocol) || IN_FRAME) return;
+    fetch('components.json', { cache: 'no-cache' }).then(r => (r.ok ? r.text() : null)).then(t => {
+      if (!t) return;
+      const o = Sec.parseJSON(t, 1024 * 1024);
+      if (o && o.schema === 1 && Array.isArray(o.items) && o.categories && typeof o.updatedAt === 'string' && o.updatedAt > CAT.updatedAt && o.items.every(x => Sec.isId(x.id) && Sec.own(o.categories, x.cat))) CAT = o;
+    }).catch(() => { /* נשארים עם הקטלוג המוטמע */ });
+  }
+  return { render, restore: highlight, onVehicle() {}, calc: () => calc(), checks: () => checks(), totals: () => totals(), guide: () => guide(), refreshCatalog, catalog: () => CAT, project: () => p, reset() { p = newProject(); step = 'goal'; gIdx = 0; } };
+})();
+(window.BootHooks = window.BootHooks || []).push(() => Builder.refreshCatalog());
 
 /* =====================================================================
    p14 · Boot Pro – טוען את האחסון המקומי, מאתחל את שכבת ה-Pro ואז את האתחול המקורי

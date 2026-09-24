@@ -114,7 +114,7 @@ const Level = (() => {
 /* ---------- מילון מונחים + tooltip אוטומטי במצב מתחיל ---------- */
 const Glossary = (() => {
   let re = null, map = null, observer = null, pending = false, tipFor = null;
-  const SKIP = 'button,a,script,style,input,select,textarea,label,.term,.lcd,.code,.gtip,summary,[data-noterm],.mode,.pins,.conn-tag,.brand-chip';
+  const SKIP = 'svg,button,a,script,style,input,select,textarea,label,.term,.lcd,.code,.gtip,summary,[data-noterm],.mode,.pins,.conn-tag,.brand-chip';
   function build() {
     if (re) return;
     map = new Map();

@@ -95,7 +95,7 @@ const Store = {
     if (!saved || typeof saved !== 'object') return;
     if (Object.prototype.hasOwnProperty.call(DATA.models, saved.model)) setModelState(saved.model);
     else setModelState(saved.vehicle === 'scooter' ? 'oxo' : DATA.defaultModel);
-    if (['learn', 'wizard', 'diag', 'tools'].includes(saved.mode)) State.mode = saved.mode;
+    if (['learn', 'wizard', 'diag', 'tools', 'build'].includes(saved.mode)) State.mode = saved.mode;
     if (['normal', 'xray', 'explode'].includes(saved.view)) State.view = saved.view;
     State.flow = !!saved.flow;
     if (saved.circuit === 'all' || circuitById(saved.circuit)) State.circuit = saved.circuit;
@@ -1653,7 +1653,7 @@ const UI = (() => {
       }
     } catch (e) { toast('מסך מלא לא זמין כאן'); }
   }
-  function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools }; }
+  function Modes() { return { learn: Learn, wizard: Wizard, diag: Diagnostics, tools: Tools, build: Builder }; }
 
   /* ---------- אתחול ---------- */
   function init() {
