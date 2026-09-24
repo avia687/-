@@ -246,7 +246,7 @@ const RepairLog = (() => {
     return r;
   }
   function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch, { updated: new Date().toISOString() }); save(); } return r; }
-  function remove(id) { load(); items = items.filter(x => x.id !== id); save(); }
+  function remove(id) { load(); const r = items.find(x => x.id === id); if (r && r.photos && typeof Photos !== 'undefined') Photos.remove(r.photos); items = items.filter(x => x.id !== id); save(); }
   function all() { return load(); }
   const S = (max, o) => Object.assign({ t: 'str', max, opt: true }, o);
   /** סכמת רשומה – כל ייבוא עובר דרכה */

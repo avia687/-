@@ -65,6 +65,11 @@ const CONTRAST = () => {
       ['build-wiring', () => { document.querySelector('[data-action="bg-step"][data-s="wiring"]').click(); document.querySelector('[data-wire="phase"]').dispatchEvent(new MouseEvent('click', { bubbles: true })); }],
       ['build-guide', () => { document.querySelector('[data-action="bg-step"][data-s="guide"]').click(); }],
       ['build-summary', () => { document.querySelector('[data-action="bg-step"][data-s="summary"]').click(); }],
+      ['search', () => { const i = document.querySelector('#gSearch'); i.value = 'לא טוען'; i.dispatchEvent(new Event('input')); }],
+      ['vehicles', () => { document.querySelector('#gsList').hidden = true; Tools.go('vehicles'); }],
+      ['quote', () => { Tools.go('quote'); }],
+      ['cards', () => { UI.setMode('learn'); document.querySelector('[data-action="learn-sub"][data-sub="cards"]').click(); document.querySelector('[data-action="fc-show"]').click(); }],
+      ['workshop', () => { Level.setWorkshop(true); UI.setMode('diag'); }],
     ];
     for (const [name, fn] of screens) {
       await p.evaluate(`(${fn.toString()})()`); await p.waitForTimeout(250);

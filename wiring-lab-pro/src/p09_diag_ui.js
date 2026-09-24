@@ -151,6 +151,7 @@ const DiagPro = (() => {
     const s = E.suggest(ev, post, 6);
     return `
       <button type="button" class="back linkbtn" data-action="dp-back">${ICON.prev} חזרה למדידות</button>
+      <div class="note info">${ICON.info}<span><b>צריך עזרה?</b> נכין סיכום מסודר לטכנאי עם הכלי, הסימפטומים והמדידות שלך. <button type="button" class="linkbtn" data-action="ask-open">הכן סיכום לטכנאי</button></span></div>
       <div><p class="eyebrow">אסקלציה</p><h2 id="dpTitle" tabindex="-1">לא נמצאה סיבה ברורה</h2><p class="lead">זה קורה בעיקר בתקלות לסירוגין. אלה הצעדים הבאים, לפי כמה כל מדידה צפויה לעזור.</p></div>
       <div class="card stack"><h3>מה עוד למדוד</h3>${s.length ? s.map(x => `<div class="esc-row"><b>${esc(x.m.name)}</b> ${x.m.live ? Safety.liveBadge() : ''}<p class="lead" style="font-size:13.5px">${T(x.m.how)}</p><p class="num foot">צפוי: ${TM(x.m.expect)}</p><button type="button" class="btn sm" data-action="dp-open" data-m="${x.m.id}">למדידה</button></div>`).join('') : '<p class="lead">עשיתם את כל המדידות הזמינות. עברו ללשונית ״לסירוגין״ ל-Wiggle Test ולבדיקות עומס, חום ולחות.</p>'}</div>
       <div class="card stack"><h3>איך לתעד לטכנאי</h3><ul class="bul">
@@ -357,5 +358,9 @@ const DiagPro = (() => {
   }
   function codeConf(c) { return Conf.badge((DATA.pro.codeConfidence || {})[c.b] || 'unk'); }
 
-  return { subtabs, handles, html, bind, highlight, reset, modelCodesCard, codeConf, openTP, reportText };
+  /** מחיפוש גלובלי: פותח אבחון לפי מדידות עם סימפטום מסומן */
+  function selectSymptom(id) { if (!DATA.pro.bayesSymptoms.some(x => x.id === id)) return; reset(); ev.sym.add(id); curSub = 'adv'; }
+  const evidence = () => ({ sym: [...ev.sym], meas: Object.assign({}, vals) });
+  function topCause() { if (!ev.sym.size && !Object.keys(vals).length) return null; const post = E.posterior(ev); return post[0] && post[0].p >= 0.3 ? post[0].c.id : null; }
+  return { subtabs, handles, html, bind, highlight, reset, modelCodesCard, codeConf, openTP, reportText, selectSymptom, evidence, topCause };
 })();

@@ -167,7 +167,8 @@ function patch(from, to, label) {
 patch('</style>\n<div id="app">', '</style>\n<style>\n' + read('pro.css') + '\n</style>\n<div id="app">', 'css');
 // HTML: רמות משתמש + מצב סדנה
 patch('    <nav class="modes" role="tablist" aria-label="מצב עבודה" id="modeTabs">',
-  `    <div class="prefs" id="prefs">
+  `    <div class="gsearch" role="search"><label class="sr-only" for="gSearch">חיפוש: תקלה, קוד, מונח</label><input class="input" id="gSearch" type="search" placeholder="חפש תקלה, קוד או מונח  ( / )" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="gsList" maxlength="120"><ul id="gsList" class="gs-list" role="listbox" aria-label="תוצאות חיפוש" hidden></ul></div>
+    <div class="prefs" id="prefs">
       <div class="seg" role="radiogroup" aria-label="רמת משתמש" id="levelSeg">
         <button type="button" role="radio" data-level="beg" aria-checked="true">מתחיל</button>
         <button type="button" role="radio" data-level="pro" aria-checked="false">מקצוען</button>
@@ -204,8 +205,8 @@ patch("      ${modelCompHTML(id)}\n      <div class=\"card stack\"><h3>מפרט 
   "      ${modelCompHTML(id)}\n      ${ProUI.compExtra(id)}\n      <div class=\"card stack\"><h3>מפרט אופייני</h3>", 'comp extra');
 // Learn: אקדמיה, מילון, אמינות במפרט
 patch("const SUBS = [['model', 'הדגם'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים']];",
-  "const SUBS = [['model', 'הדגם'], ['academy', 'אקדמיה'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים'], ['glossary', 'מילון']];", 'learn subs');
-patch("    const body = sub === 'model' ? modelHTML()", "    const body = sub === 'academy' ? Academy.html() : sub === 'glossary' ? Glossary.html() : sub === 'model' ? modelHTML()", 'learn body');
+  "const SUBS = [['model', 'הדגם'], ['academy', 'אקדמיה'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים'], ['glossary', 'מילון'], ['cards', 'כרטיסיות']];", 'learn subs');
+patch("    const body = sub === 'model' ? modelHTML()", "    const body = sub === 'academy' ? Academy.html() : sub === 'glossary' ? Glossary.html() : sub === 'cards' ? Cards.html() : sub === 'model' ? modelHTML()", 'learn body');
 patch("    if (sub === 'volts') { ['socNom', 'socMeas'].forEach(id => $('#' + id).addEventListener('input', updateSoc)); updateSoc(); }",
   "    if (sub === 'volts') { ['socNom', 'socMeas'].forEach(id => $('#' + id).addEventListener('input', updateSoc)); updateSoc(); }\n    if (sub === 'academy') Academy.bind();\n    if (sub === 'glossary') Glossary.bind();", 'learn bind');
 patch("  function highlight(focus = true) {\n    if (sub === 'tour' && step >= 0) {",
@@ -262,7 +263,7 @@ patch("new THREE.GridHelper(6, 30, 0x0f4652, 0x15232e)", "new THREE.GridHelper(6
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
   ['p06_sec.js', 1], ['p06b_storage.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
-  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p17_perf.js', 1], ['p18_builder.js', 4], ['p14_boot_pro.js', 1]
+  ['p12_tools.js', 4], ['p13_wizard_plus.js', 4], ['p15_data_ui.js', 4], ['p16_legal.js', 4], ['p17_perf.js', 1], ['p18_builder.js', 4], ['p19_search.js', 4], ['p20_workshop.js', 4], ['p21_vehicles.js', 4], ['p22_cards.js', 4], ['p14_boot_pro.js', 1]
 ];
 let js = MODS.filter(([, s]) => s <= STAGE).map(([f]) => read(f)).join('\n');
 if (STAGE < 4) js = read('stubs.js') + '\n' + js;

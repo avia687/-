@@ -4,7 +4,8 @@
    השוואת דגמים ורכיבים חלופיים, בדיקת עקביות מפרט, סימולטור, מצב סדנה.
    ===================================================================== */
 const Tools = (() => {
-  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה'], ['data', 'גיבוי ופרטיות']];
+  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה'], ['vehicles', 'כרטיסי כלי'], ['quote', 'הצעת מחיר'], ['data', 'גיבוי ופרטיות']];
+  let prefill = null, pendPhotos = null, origPhotos = [];
   let sub = null, editId = null, delArm = null, printId = null;
   const num = id => { const e = $('#' + id); if (!e) return NaN; const v = Sec.num(e.value, e.min !== '' ? Number(e.min) : -Infinity, e.max !== '' ? Number(e.max) : Infinity); return v === null ? NaN : v; };
   const f1 = x => (Math.round(x * 10) / 10).toString();
@@ -92,6 +93,7 @@ const Tools = (() => {
   function logHTML() {
     if (Persist.isLocked()) return DataUI.lockedCard('היומן');
     const items = RepairLog.all(), r = editId ? items.find(x => x.id === editId) : null;
+    if (pendPhotos === null) { origPhotos = r ? (r.photos || []).slice() : []; pendPhotos = origPhotos.slice(); }
     const v = k => esc(r ? r[k] : (k === 'model' ? State.model : ''));
     const mOpts = Object.keys(DATA.models).map(id => `<option value="${id}" ${(r ? r.model : State.model) === id ? 'selected' : ''}>${esc(DATA.models[id].short)}</option>`).join('');
     return `<p class="lead">יומן לכל כלי שמגיע לתיקון. נשמר רק בדפדפן הזה – ייצאו JSON לגיבוי או להעברה למכשיר אחר.</p>
@@ -108,6 +110,12 @@ const Tools = (() => {
         <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
         <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
         <div class="field"><label for="lgNotes">הערות</label><textarea class="input" id="lgNotes" rows="2" maxlength="4000">${v('notes')}</textarea></div>
+        <div class="tool-grid">
+          <div class="field"><label for="lgVeh">כרטיס כלי</label><select class="input" id="lgVeh"><option value="">בלי כרטיס</option>${Vehicles.all().map(x => `<option value="${esc(x.id)}" ${(r ? r.vehicleId : (prefill && prefill.vehicleId)) === x.id ? 'selected' : ''}>${esc(Vehicles.label(x))}</option>`).join('')}</select></div>
+          <div class="field"><label for="lgKm">ק״מ בכניסה</label><input class="input num" id="lgKm" type="number" inputmode="numeric" min="0" max="1000000" value="${esc(r && typeof r.km === 'number' ? r.km : (prefill && prefill.km) || '')}"></div>
+          <div class="field"><label for="lgPrice">מחיר התיקון (₪)</label><input class="input num" id="lgPrice" type="number" inputmode="decimal" min="0" max="10000000" value="${esc(r && typeof r.price === 'number' ? r.price : '')}"></div></div>
+        <div class="field"><label for="lgPhotos">תמונות (עד ${Photos.MAX_PER}, נדחסות במכשיר, בלי מיקום)</label><input class="input" id="lgPhotos" type="file" accept="image/*" capture="environment" multiple>
+          <div class="thumbs" id="lgThumbs">${Photos.thumbs(pendPhotos || [], true)}</div></div>
         <div class="row"><button type="submit" class="btn primary">${r ? 'שמור שינויים' : 'שמור ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
       </form>
       <div class="stack"><div class="spread"><h3>רשומות (${items.length})</h3>
@@ -121,7 +129,7 @@ const Tools = (() => {
         ${items.length ? items.map(x => `<div class="card log-item">
           <div class="spread"><b>${esc(x.anon ? 'לקוח אנונימי' : (x.customer || 'ללא שם'))} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
-          ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
+          ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}${x.photos && x.photos.length ? `<div class="thumbs">${Photos.thumbs(x.photos)}</div>` : ''}
           <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחץ שוב למחיקה' : 'מחק'}</button></div>
         </div>`).join('') : '<p class="lead">אין רשומות עדיין. אפשר גם לשמור תוצאת אבחון ישירות מלשונית האבחון.</p>'}
       </div>
@@ -144,14 +152,23 @@ const Tools = (() => {
   function bindLog() {
     if (!$('#logForm')) return;
     const an = $('#lgAnon');
+    const ph = $('#lgPhotos');
+    ph.addEventListener('change', async () => {
+      const room = Photos.MAX_PER - pendPhotos.length; if (room <= 0) { UI.toast('עד ' + Photos.MAX_PER + ' תמונות לרשומה'); ph.value = ''; return; }
+      const ids = await Photos.add([...ph.files].slice(0, room)); pendPhotos.push(...ids); ph.value = '';
+      const t = $('#lgThumbs'); if (t) { t.innerHTML = Photos.thumbs(pendPhotos, true); Photos.fill(t); }
+      if (ids.length) UI.toast(`נוספו ${ids.length} תמונות`);
+    });
     an.addEventListener('change', () => { ['#lgCust', '#lgPhone'].forEach(s => { const e = $(s); e.disabled = an.checked; if (an.checked) e.value = ''; }); });
     $('#logForm').addEventListener('submit', e => {
       e.preventDefault();
       const anon = $('#lgAnon').checked, phone = anon ? '' : Sec.str($('#lgPhone').value.trim(), 30);
       if (phone && !/^[0-9+()\- ]{6,30}$/.test(phone)) { Sec.fieldMsg($('#lgPhone'), 'ספרות, רווח, + ( ) - בלבד'); $('#lgPhone').focus(); return; }
       const rec = { anon, phone, customer: anon ? '' : Sec.str($('#lgCust').value.trim(), 120), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
-      if (editId) { RepairLog.update(editId, rec); UI.toast('הרשומה עודכנה'); } else { RepairLog.add(rec); UI.toast('נוסף ליומן'); }
-      editId = null; render();
+      const vid = $('#lgVeh').value; rec.vehicleId = Sec.isId(vid) ? vid : ''; rec.km = Sec.num($('#lgKm').value, 0, 1e6); rec.price = Sec.num($('#lgPrice').value, 0, 1e7); rec.photos = (pendPhotos || []).slice();
+      if (rec.km === null) delete rec.km; if (rec.price === null) delete rec.price;
+      if (editId) { RepairLog.update(editId, rec); UI.toast('הרשומה עודכנה'); } else { RepairLog.add(rec); UI.toast('נשמר ליומן'); }
+      editId = null; prefill = null; pendPhotos = null; render();
     });
     const file = $('#lgFile');
     if (file) file.addEventListener('change', () => {
@@ -215,6 +232,10 @@ const Tools = (() => {
     return `<div class="card stack"><h3>מצב סדנה</h3>
       <p class="lead">טקסט וכפתורים גדולים, כפתורי ״הקודם/הבא״ נצמדים לתחתית – נוח לעבודה ביד אחת, עם כפפות, ומטר מהמסך.</p>
       <button type="button" class="btn ${on ? '' : 'primary'} block" data-action="tl-shop">${on ? 'כיבוי מצב סדנה' : 'הפעלת מצב סדנה'}</button></div>
+      <div class="card stack"><h3>ידיים עסוקות</h3>
+        <p class="lead">במצב סדנה מופיע סרגל קבוע למטה: <b>הקרא</b> מקריא את השלב, <b>הבא</b> מתקדם (רק אחרי אימות), ו<b>פקודה קולית</b> מאפשרת לומר ״הבא״, ״הקודם״, ״שוב״ או ״עצור״.</p>
+        <div class="row">${Voice.canSpeak() ? '<button type="button" class="btn" data-action="vc-read">הקרא את השלב הנוכחי</button>' : '<span class="foot">הדפדפן לא תומך בהקראה.</span>'}${Voice.canListen() ? `<button type="button" class="btn" data-action="vc-mic" aria-pressed="${Voice.listening()}">${Voice.listening() ? 'כבה פקודות קוליות' : 'הפעל פקודות קוליות'}</button>` : '<span class="foot">הדפדפן לא תומך בזיהוי דיבור.</span>'}</div>
+        <p class="foot">זיהוי דיבור בחלק מהדפדפנים עובר דרך שרת של ספק הדפדפן. כבוי כברירת מחדל.</p></div>
       <div class="card stack"><h3>טיפים לעבודה ביד אחת</h3><ul class="bul">
         <li>במובייל: משכו את הפאנל למעלה (חצי מסך) – המודל נשאר גלוי.</li>
         <li>באשף: כל שלב נפתח רק אחרי בדיקת אימות. הזינו קריאה והמשיכו.</li>
@@ -224,19 +245,26 @@ const Tools = (() => {
 
   function render() {
     if (sub === null) { sub = ProStore.get('toolsSub', 'calc'); if (!SUBS.some(s => s[0] === sub)) sub = 'calc'; }
-    const body = sub === 'data' ? DataUI.html() : sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
+    const body = sub === 'vehicles' ? Vehicles.html() : sub === 'quote' ? Quote.html() : sub === 'data' ? DataUI.html() : sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
     if (sub !== 'sim') MeterSim.detach();
     $('#modeView').innerHTML = `<div><p class="eyebrow">${ICON.tech} כלים · <bdi>${esc(M().short)}</bdi></p><h2>ארגז הכלים של הטכנאי</h2></div>${subtabs()}<div class="stack">${body}</div>`;
     if (sub === 'calc') { $$('#modeView input, #modeView select').forEach(i => i.addEventListener('input', updCalc)); updCalc(); }
     if (sub === 'log') bindLog();
     if (sub === 'data') DataUI.bind();
+    if (sub === 'vehicles') Vehicles.bind();
+    if (sub === 'quote') Quote.bind();
+    if (sub === 'log' || sub === 'vehicles') Photos.fill($('#modeView'));
     if (sub === 'sim') MeterSim.bind(); else { Scene.select(null); Scene.highlightBundle(null); }
     if (printId) { const r = $('#lgReport'); if (r) r.scrollIntoView({ block: 'nearest' }); }
   }
-  UI.on('tl-sub', el => { sub = el.dataset.sub; ProStore.set('toolsSub', sub); editId = null; printId = null; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('tl-sub', el => { if (el.dataset.sub !== sub) dropPending(); sub = el.dataset.sub; ProStore.set('toolsSub', sub); editId = null; printId = null; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('vc-read', () => Voice.speak());
+  UI.on('vc-mic', async () => { await Voice.toggleListening(); if (sub === 'shop') render(); });
   UI.on('tl-shop', () => { Level.setWorkshop(!Level.workshop()); render(); });
-  UI.on('lg-edit', el => { editId = el.dataset.id; printId = null; render(); $('#panelScroll').scrollTop = 0; });
-  UI.on('lg-cancel', () => { editId = null; render(); });
+  UI.on('ph-del', el => { const id = el.dataset.id; pendPhotos = (pendPhotos || []).filter(x => x !== id); if (!origPhotos.includes(id)) Photos.remove([id]); const t = $('#lgThumbs'); if (t) { t.innerHTML = Photos.thumbs(pendPhotos, true); Photos.fill(t); } });
+  UI.on('lg-edit', el => { dropPending(); editId = el.dataset.id; printId = null; render(); $('#panelScroll').scrollTop = 0; });
+  function dropPending() { if (pendPhotos) Photos.remove(pendPhotos.filter(x => !origPhotos.includes(x))); pendPhotos = null; }
+  UI.on('lg-cancel', () => { dropPending(); editId = null; prefill = null; render(); });
   UI.on('lg-del', el => { if (delArm === el.dataset.id) { RepairLog.remove(el.dataset.id); delArm = null; UI.toast('נמחק'); } else { delArm = el.dataset.id; setTimeout(() => { if (delArm === el.dataset.id) { delArm = null; if (State.mode === 'tools' && sub === 'log') render(); } }, 4000); } render(); });
   UI.on('lg-export', () => { const t = JSON.stringify({ app: 'wiring-lab', type: 'repair-log', version: 1, exported: new Date().toISOString(), items: RepairLog.all() }, null, 1); const box = $('#lgBox'); offerFile('wiring-lab-repair-log.json', t, box); });
   UI.on('lg-import', () => { const b = $('#lgImportBox'); b.hidden = !b.hidden; });
@@ -257,6 +285,7 @@ const Tools = (() => {
     try { window.print(); } catch (e) { done(); }
     setTimeout(done, 3000);
   });
-  function go(s) { sub = s; ProStore.set('toolsSub', s); editId = null; printId = null; if (State.mode === 'tools') { render(); $('#panelScroll').scrollTop = 0; } else UI.setMode('tools'); }
-  return { render, go, restore() {}, onVehicle() { editId = null; } };
+  function newLogFor(v) { dropPending(); editId = null; prefill = { vehicleId: v.id, km: Vehicles.kmOf(v) }; go('log'); setTimeout(() => { const m = $('#lgModel'); if (m && Sec.own(DATA.models, v.model)) m.value = v.model; }, 0); }
+  function go(s) { if (s !== 'log') dropPending(); sub = s; ProStore.set('toolsSub', s); editId = null; printId = null; if (State.mode === 'tools') { render(); $('#panelScroll').scrollTop = 0; } else UI.setMode('tools'); }
+  return { render, go, newLogFor, restore() {}, onVehicle() { editId = null; } };
 })();

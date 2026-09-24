@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/apple-180.png">
 <link rel="preload" href="fonts/plex-he-hebrew-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/plex-he-hebrew-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="app.css" integrity="sha384-KMxesIaB8LaauVZk3GDASNRWIy72nDzQ0Pjb16BAao5vbmnT3tZUZlyNcHnHd29E">
+<link rel="stylesheet" href="app.css" integrity="sha384-Nto1oZcawnUrxILRAOesnSHq7exkGVLJK73xmgzSBkFfAuuacJtXzloW7qUf8p3N">
 </head>
 <body>
 <meta name="theme-color" content="#0b0f14">
@@ -54,6 +54,7 @@
       <label class="sr-only" for="modelSelect">בחירת דגם</label>
       <select id="modelSelect" class="input model-select"></select>
     </div>
+    <div class="gsearch" role="search"><label class="sr-only" for="gSearch">חיפוש: תקלה, קוד, מונח</label><input class="input" id="gSearch" type="search" placeholder="חפש תקלה, קוד או מונח  ( / )" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="gsList" maxlength="120"><ul id="gsList" class="gs-list" role="listbox" aria-label="תוצאות חיפוש" hidden></ul></div>
     <div class="prefs" id="prefs">
       <div class="seg" role="radiogroup" aria-label="רמת משתמש" id="levelSeg">
         <button type="button" role="radio" data-level="beg" aria-checked="true">מתחיל</button>
@@ -253,9 +254,9 @@
 </template>
 
 <script type="application/json" id="three-src">{"src":"vendor/three.min.js","sri":"sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="}</script>
-<script src="app.js" integrity="sha384-0EPPQWaXi7CWGhSUKRl0Vvgm+G/bJFs5DbVlz3CcO0XuLsfrfRIAP0d4X3OS6I2b"></script>
+<script src="app.js" integrity="sha384-JcvJ+BU/C7TuQdYzb/f92QkEo7N8sygj10OkekfQ4DcRXdaGoHkqPwMYuv/XPPdh"></script>
 
-<script src="pro.js" integrity="sha384-DTpaiPTj+0+Q77pSR4KSzdAyhB7pgPZWiNbnKi9Zi4J8Iga0D79pnZh5ip7cQkku"></script>
+<script src="pro.js" integrity="sha384-grh/oMvwy/heSja0XbrGYqOTCoKKLkvhXJkHWhUVWu0+umRK1SFul/UCdT80qPVP"></script>
 
 </body>
 </html>

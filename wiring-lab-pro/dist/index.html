@@ -14342,6 +14342,50 @@ dl.specs dd.num,dl.specs dd .num{font-size:15px}
 .chk-list li:first-child{border-top:0}
 .subtabs button .num{font-size:12px;color:var(--faint);margin-inline-end:2px}
 
+/* ---------- חיפוש גלובלי ---------- */
+.gsearch{position:relative;flex:1 1 240px;max-width:420px}
+.gsearch .input{width:100%;min-height:40px}
+.gs-list{position:absolute;z-index:40;top:calc(100% + 4px);inset-inline:0;margin:0;padding:4px;list-style:none;background:var(--bg2);border:var(--bw) solid var(--line2);border-radius:var(--radius);max-height:min(60vh,440px);overflow:auto}
+.gs-list li{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;align-items:center}
+.gs-list li[aria-selected="true"],.gs-list li:hover{background:var(--accent-soft)}
+.gs-type{grid-row:span 2;font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line2);border-radius:var(--radius-sm);padding:2px 6px;align-self:start;white-space:nowrap}
+.gs-t{font-weight:600}.gs-sub{font-size:13px;color:var(--muted);grid-column:2}
+.gs-ask{border-top:var(--bw) solid var(--line)}
+.ask-out{white-space:pre-wrap;font:inherit;font-size:13.5px;background:var(--surface2);border:var(--bw) solid var(--line);border-radius:var(--radius-sm);padding:10px;margin:0;color:var(--text)}
+
+/* ---------- סדנה: סרגל ידיים עסוקות, תמונות ---------- */
+.voice-bar{position:fixed;z-index:30;bottom:calc(12px + env(safe-area-inset-bottom,0px));inset-inline-start:12px;display:flex;gap:8px;background:var(--bg2);border:var(--bw) solid var(--line2);border-radius:var(--radius);padding:8px}
+.voice-bar .btn{min-height:56px;min-width:88px;font-size:17px}
+.voice-bar #vbMic[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumb{margin:0;display:grid;gap:4px;justify-items:center}
+.thumb img{width:96px;height:72px;object-fit:cover;border-radius:var(--radius-sm);border:var(--bw) solid var(--line);background:var(--surface3)}
+
+/* ---------- כרטיסי כלי, תזכורות, גרף ---------- */
+.due-tag{font-size:12.5px;font-weight:700;color:var(--action-ink);background:var(--action);border-radius:var(--radius-sm);padding:2px 8px}
+.kmv{font-size:20px;font-weight:600}
+.rem-list li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:var(--bw) solid var(--line)}
+.rem-list li:first-child{border-top:0}
+.rem.due{border-inline-start:4px solid var(--action);padding-inline-start:8px}
+.rem.soon{border-inline-start:4px solid var(--accent);padding-inline-start:8px}
+.sag-graph{margin:0}
+.sag-graph svg{width:100%;height:auto;display:block;direction:ltr}
+.sag-graph .ax{stroke:var(--line2);stroke-width:1}
+.sag-graph .g-ok{stroke:var(--ok);stroke-dasharray:4 4}.sag-graph .g-bad{stroke:var(--danger);stroke-dasharray:4 4}
+.sag-graph .gline{fill:none;stroke:var(--accent);stroke-width:2.5}
+.sag-graph circle{fill:var(--accent)}
+.sag-graph text{font-family:var(--mono);font-size:11px;fill:var(--muted)}.sag-graph .gv{fill:var(--text);font-weight:600}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:10px;border-inline-start:2px solid var(--line2);padding-inline-start:12px}
+.timeline li{display:grid;gap:2px}
+.qt-line{display:grid;grid-template-columns:1fr 120px auto;gap:6px;align-items:center}
+dd.total{font-size:22px;font-weight:700}
+
+/* ---------- כרטיסיות ---------- */
+.flash{border-inline-start:4px solid var(--accent)}
+.flash-front{font-size:19px;font-weight:600;line-height:1.45}
+.flash-back{font-size:16px;line-height:1.55;border-top:var(--bw) solid var(--line);padding-top:10px}
+@media (max-width: 900px){.gsearch{order:5;flex-basis:100%;max-width:none}}
+
 </style>
 <div id="app">
   <div class="safety" role="note" aria-label="הודעת בטיחות">
@@ -14368,6 +14412,7 @@ dl.specs dd.num,dl.specs dd .num{font-size:15px}
       <label class="sr-only" for="modelSelect">בחירת דגם</label>
       <select id="modelSelect" class="input model-select"></select>
     </div>
+    <div class="gsearch" role="search"><label class="sr-only" for="gSearch">חיפוש: תקלה, קוד, מונח</label><input class="input" id="gSearch" type="search" placeholder="חפש תקלה, קוד או מונח  ( / )" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="gsList" maxlength="120"><ul id="gsList" class="gs-list" role="listbox" aria-label="תוצאות חיפוש" hidden></ul></div>
     <div class="prefs" id="prefs">
       <div class="seg" role="radiogroup" aria-label="רמת משתמש" id="levelSeg">
         <button type="button" role="radio" data-level="beg" aria-checked="true">מתחיל</button>
@@ -16288,7 +16333,7 @@ const UI = (() => {
 /* ===================== Learn (מצב לימוד) ===================== */
 const Learn = (() => {
   let sub = 'model', step = -1;
-  const SUBS = [['model', 'הדגם'], ['academy', 'אקדמיה'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים'], ['glossary', 'מילון']];
+  const SUBS = [['model', 'הדגם'], ['academy', 'אקדמיה'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים'], ['glossary', 'מילון'], ['cards', 'כרטיסיות']];
   const steps = () => DATA.tour.filter(s => vehicleComps().includes(s.comp) && (!s.bundle || bundleById(s.bundle)));
 
   function subtabs() {
@@ -16434,7 +16479,7 @@ const Learn = (() => {
     } else { Scene.select(null); Scene.highlightBundle(null); }
   }
   function render() {
-    const body = sub === 'academy' ? Academy.html() : sub === 'glossary' ? Glossary.html() : sub === 'model' ? modelHTML() : sub === 'compare' ? compareHTML() : sub === 'tour' ? tourHTML() : sub === 'concepts' ? conceptsHTML() : sub === 'volts' ? voltsHTML() : compsHTML();
+    const body = sub === 'academy' ? Academy.html() : sub === 'glossary' ? Glossary.html() : sub === 'cards' ? Cards.html() : sub === 'model' ? modelHTML() : sub === 'compare' ? compareHTML() : sub === 'tour' ? tourHTML() : sub === 'concepts' ? conceptsHTML() : sub === 'volts' ? voltsHTML() : compsHTML();
     $('#modeView').innerHTML = `
       <div><p class="eyebrow">${ICON.bolt} מצב לימוד · <bdi>${esc(M().short)}</bdi></p><h2>איך הכול מחובר?</h2></div>
       ${subtabs()}<div class="stack">${body}</div>
@@ -17512,7 +17557,7 @@ const RepairLog = (() => {
     return r;
   }
   function update(id, patch) { load(); const r = items.find(x => x.id === id); if (r) { Object.assign(r, patch, { updated: new Date().toISOString() }); save(); } return r; }
-  function remove(id) { load(); items = items.filter(x => x.id !== id); save(); }
+  function remove(id) { load(); const r = items.find(x => x.id === id); if (r && r.photos && typeof Photos !== 'undefined') Photos.remove(r.photos); items = items.filter(x => x.id !== id); save(); }
   function all() { return load(); }
   const S = (max, o) => Object.assign({ t: 'str', max, opt: true }, o);
   /** סכמת רשומה – כל ייבוא עובר דרכה */
@@ -17854,6 +17899,7 @@ const DiagPro = (() => {
     const s = E.suggest(ev, post, 6);
     return `
       <button type="button" class="back linkbtn" data-action="dp-back">${ICON.prev} חזרה למדידות</button>
+      <div class="note info">${ICON.info}<span><b>צריך עזרה?</b> נכין סיכום מסודר לטכנאי עם הכלי, הסימפטומים והמדידות שלך. <button type="button" class="linkbtn" data-action="ask-open">הכן סיכום לטכנאי</button></span></div>
       <div><p class="eyebrow">אסקלציה</p><h2 id="dpTitle" tabindex="-1">לא נמצאה סיבה ברורה</h2><p class="lead">זה קורה בעיקר בתקלות לסירוגין. אלה הצעדים הבאים, לפי כמה כל מדידה צפויה לעזור.</p></div>
       <div class="card stack"><h3>מה עוד למדוד</h3>${s.length ? s.map(x => `<div class="esc-row"><b>${esc(x.m.name)}</b> ${x.m.live ? Safety.liveBadge() : ''}<p class="lead" data-sx="s29">${T(x.m.how)}</p><p class="num foot">צפוי: ${TM(x.m.expect)}</p><button type="button" class="btn sm" data-action="dp-open" data-m="${x.m.id}">מדוד</button></div>`).join('') : '<p class="lead">עשיתם את כל המדידות הזמינות. עברו ללשונית ״לסירוגין״ ל-Wiggle Test ולבדיקות עומס, חום ולחות.</p>'}</div>
       <div class="card stack"><h3>איך לתעד לטכנאי</h3><ul class="bul">
@@ -18060,7 +18106,11 @@ const DiagPro = (() => {
   }
   function codeConf(c) { return Conf.badge((DATA.pro.codeConfidence || {})[c.b] || 'unk'); }
 
-  return { subtabs, handles, html, bind, highlight, reset, modelCodesCard, codeConf, openTP, reportText };
+  /** מחיפוש גלובלי: פותח אבחון לפי מדידות עם סימפטום מסומן */
+  function selectSymptom(id) { if (!DATA.pro.bayesSymptoms.some(x => x.id === id)) return; reset(); ev.sym.add(id); curSub = 'adv'; }
+  const evidence = () => ({ sym: [...ev.sym], meas: Object.assign({}, vals) });
+  function topCause() { if (!ev.sym.size && !Object.keys(vals).length) return null; const post = E.posterior(ev); return post[0] && post[0].p >= 0.3 ? post[0].c.id : null; }
+  return { subtabs, handles, html, bind, highlight, reset, modelCodesCard, codeConf, openTP, reportText, selectSymptom, evidence, topCause };
 })();
 
 /* =====================================================================
@@ -18412,7 +18462,8 @@ const MeterSim = (() => {
    השוואת דגמים ורכיבים חלופיים, בדיקת עקביות מפרט, סימולטור, מצב סדנה.
    ===================================================================== */
 const Tools = (() => {
-  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה'], ['data', 'גיבוי ופרטיות']];
+  const SUBS = [['calc', 'מחשבונים'], ['log', 'יומן תיקונים'], ['cmp', 'השוואה ותאימות'], ['spec', 'בדיקת מפרט'], ['sim', 'סימולטור'], ['shop', 'מצב סדנה'], ['vehicles', 'כרטיסי כלי'], ['quote', 'הצעת מחיר'], ['data', 'גיבוי ופרטיות']];
+  let prefill = null, pendPhotos = null, origPhotos = [];
   let sub = null, editId = null, delArm = null, printId = null;
   const num = id => { const e = $('#' + id); if (!e) return NaN; const v = Sec.num(e.value, e.min !== '' ? Number(e.min) : -Infinity, e.max !== '' ? Number(e.max) : Infinity); return v === null ? NaN : v; };
   const f1 = x => (Math.round(x * 10) / 10).toString();
@@ -18500,6 +18551,7 @@ const Tools = (() => {
   function logHTML() {
     if (Persist.isLocked()) return DataUI.lockedCard('היומן');
     const items = RepairLog.all(), r = editId ? items.find(x => x.id === editId) : null;
+    if (pendPhotos === null) { origPhotos = r ? (r.photos || []).slice() : []; pendPhotos = origPhotos.slice(); }
     const v = k => esc(r ? r[k] : (k === 'model' ? State.model : ''));
     const mOpts = Object.keys(DATA.models).map(id => `<option value="${id}" ${(r ? r.model : State.model) === id ? 'selected' : ''}>${esc(DATA.models[id].short)}</option>`).join('');
     return `<p class="lead">יומן לכל כלי שמגיע לתיקון. נשמר רק בדפדפן הזה – ייצאו JSON לגיבוי או להעברה למכשיר אחר.</p>
@@ -18516,6 +18568,12 @@ const Tools = (() => {
         <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
         <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
         <div class="field"><label for="lgNotes">הערות</label><textarea class="input" id="lgNotes" rows="2" maxlength="4000">${v('notes')}</textarea></div>
+        <div class="tool-grid">
+          <div class="field"><label for="lgVeh">כרטיס כלי</label><select class="input" id="lgVeh"><option value="">בלי כרטיס</option>${Vehicles.all().map(x => `<option value="${esc(x.id)}" ${(r ? r.vehicleId : (prefill && prefill.vehicleId)) === x.id ? 'selected' : ''}>${esc(Vehicles.label(x))}</option>`).join('')}</select></div>
+          <div class="field"><label for="lgKm">ק״מ בכניסה</label><input class="input num" id="lgKm" type="number" inputmode="numeric" min="0" max="1000000" value="${esc(r && typeof r.km === 'number' ? r.km : (prefill && prefill.km) || '')}"></div>
+          <div class="field"><label for="lgPrice">מחיר התיקון (₪)</label><input class="input num" id="lgPrice" type="number" inputmode="decimal" min="0" max="10000000" value="${esc(r && typeof r.price === 'number' ? r.price : '')}"></div></div>
+        <div class="field"><label for="lgPhotos">תמונות (עד ${Photos.MAX_PER}, נדחסות במכשיר, בלי מיקום)</label><input class="input" id="lgPhotos" type="file" accept="image/*" capture="environment" multiple>
+          <div class="thumbs" id="lgThumbs">${Photos.thumbs(pendPhotos || [], true)}</div></div>
         <div class="row"><button type="submit" class="btn primary">${r ? 'שמור שינויים' : 'שמור ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
       </form>
       <div class="stack"><div class="spread"><h3>רשומות (${items.length})</h3>
@@ -18529,7 +18587,7 @@ const Tools = (() => {
         ${items.length ? items.map(x => `<div class="card log-item">
           <div class="spread"><b>${esc(x.anon ? 'לקוח אנונימי' : (x.customer || 'ללא שם'))} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
-          ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
+          ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}${x.photos && x.photos.length ? `<div class="thumbs">${Photos.thumbs(x.photos)}</div>` : ''}
           <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">ערוך</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">הפק דו״ח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחץ שוב למחיקה' : 'מחק'}</button></div>
         </div>`).join('') : '<p class="lead">אין רשומות עדיין. אפשר גם לשמור תוצאת אבחון ישירות מלשונית האבחון.</p>'}
       </div>
@@ -18552,14 +18610,23 @@ const Tools = (() => {
   function bindLog() {
     if (!$('#logForm')) return;
     const an = $('#lgAnon');
+    const ph = $('#lgPhotos');
+    ph.addEventListener('change', async () => {
+      const room = Photos.MAX_PER - pendPhotos.length; if (room <= 0) { UI.toast('עד ' + Photos.MAX_PER + ' תמונות לרשומה'); ph.value = ''; return; }
+      const ids = await Photos.add([...ph.files].slice(0, room)); pendPhotos.push(...ids); ph.value = '';
+      const t = $('#lgThumbs'); if (t) { t.innerHTML = Photos.thumbs(pendPhotos, true); Photos.fill(t); }
+      if (ids.length) UI.toast(`נוספו ${ids.length} תמונות`);
+    });
     an.addEventListener('change', () => { ['#lgCust', '#lgPhone'].forEach(s => { const e = $(s); e.disabled = an.checked; if (an.checked) e.value = ''; }); });
     $('#logForm').addEventListener('submit', e => {
       e.preventDefault();
       const anon = $('#lgAnon').checked, phone = anon ? '' : Sec.str($('#lgPhone').value.trim(), 30);
       if (phone && !/^[0-9+()\- ]{6,30}$/.test(phone)) { Sec.fieldMsg($('#lgPhone'), 'ספרות, רווח, + ( ) - בלבד'); $('#lgPhone').focus(); return; }
       const rec = { anon, phone, customer: anon ? '' : Sec.str($('#lgCust').value.trim(), 120), model: $('#lgModel').value, modelName: (DATA.models[$('#lgModel').value] || {}).name, serial: $('#lgSerial').value.trim(), status: $('#lgStatus').value, symptoms: $('#lgSym').value.trim(), measurements: $('#lgMeas').value.trim(), replaced: $('#lgRep').value.trim(), notes: $('#lgNotes').value.trim() };
-      if (editId) { RepairLog.update(editId, rec); UI.toast('הרשומה עודכנה'); } else { RepairLog.add(rec); UI.toast('נוסף ליומן'); }
-      editId = null; render();
+      const vid = $('#lgVeh').value; rec.vehicleId = Sec.isId(vid) ? vid : ''; rec.km = Sec.num($('#lgKm').value, 0, 1e6); rec.price = Sec.num($('#lgPrice').value, 0, 1e7); rec.photos = (pendPhotos || []).slice();
+      if (rec.km === null) delete rec.km; if (rec.price === null) delete rec.price;
+      if (editId) { RepairLog.update(editId, rec); UI.toast('הרשומה עודכנה'); } else { RepairLog.add(rec); UI.toast('נשמר ליומן'); }
+      editId = null; prefill = null; pendPhotos = null; render();
     });
     const file = $('#lgFile');
     if (file) file.addEventListener('change', () => {
@@ -18623,6 +18690,10 @@ const Tools = (() => {
     return `<div class="card stack"><h3>מצב סדנה</h3>
       <p class="lead">טקסט וכפתורים גדולים, כפתורי ״הקודם/הבא״ נצמדים לתחתית – נוח לעבודה ביד אחת, עם כפפות, ומטר מהמסך.</p>
       <button type="button" class="btn ${on ? '' : 'primary'} block" data-action="tl-shop">${on ? 'כיבוי מצב סדנה' : 'הפעלת מצב סדנה'}</button></div>
+      <div class="card stack"><h3>ידיים עסוקות</h3>
+        <p class="lead">במצב סדנה מופיע סרגל קבוע למטה: <b>הקרא</b> מקריא את השלב, <b>הבא</b> מתקדם (רק אחרי אימות), ו<b>פקודה קולית</b> מאפשרת לומר ״הבא״, ״הקודם״, ״שוב״ או ״עצור״.</p>
+        <div class="row">${Voice.canSpeak() ? '<button type="button" class="btn" data-action="vc-read">הקרא את השלב הנוכחי</button>' : '<span class="foot">הדפדפן לא תומך בהקראה.</span>'}${Voice.canListen() ? `<button type="button" class="btn" data-action="vc-mic" aria-pressed="${Voice.listening()}">${Voice.listening() ? 'כבה פקודות קוליות' : 'הפעל פקודות קוליות'}</button>` : '<span class="foot">הדפדפן לא תומך בזיהוי דיבור.</span>'}</div>
+        <p class="foot">זיהוי דיבור בחלק מהדפדפנים עובר דרך שרת של ספק הדפדפן. כבוי כברירת מחדל.</p></div>
       <div class="card stack"><h3>טיפים לעבודה ביד אחת</h3><ul class="bul">
         <li>במובייל: משכו את הפאנל למעלה (חצי מסך) – המודל נשאר גלוי.</li>
         <li>באשף: כל שלב נפתח רק אחרי בדיקת אימות. הזינו קריאה והמשיכו.</li>
@@ -18632,19 +18703,26 @@ const Tools = (() => {
 
   function render() {
     if (sub === null) { sub = ProStore.get('toolsSub', 'calc'); if (!SUBS.some(s => s[0] === sub)) sub = 'calc'; }
-    const body = sub === 'data' ? DataUI.html() : sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
+    const body = sub === 'vehicles' ? Vehicles.html() : sub === 'quote' ? Quote.html() : sub === 'data' ? DataUI.html() : sub === 'calc' ? calcHTML() : sub === 'log' ? logHTML() : sub === 'cmp' ? cmpHTML() : sub === 'spec' ? specHTML() : sub === 'sim' ? MeterSim.html() : shopHTML();
     if (sub !== 'sim') MeterSim.detach();
     $('#modeView').innerHTML = `<div><p class="eyebrow">${ICON.tech} כלים · <bdi>${esc(M().short)}</bdi></p><h2>ארגז הכלים של הטכנאי</h2></div>${subtabs()}<div class="stack">${body}</div>`;
     if (sub === 'calc') { $$('#modeView input, #modeView select').forEach(i => i.addEventListener('input', updCalc)); updCalc(); }
     if (sub === 'log') bindLog();
     if (sub === 'data') DataUI.bind();
+    if (sub === 'vehicles') Vehicles.bind();
+    if (sub === 'quote') Quote.bind();
+    if (sub === 'log' || sub === 'vehicles') Photos.fill($('#modeView'));
     if (sub === 'sim') MeterSim.bind(); else { Scene.select(null); Scene.highlightBundle(null); }
     if (printId) { const r = $('#lgReport'); if (r) r.scrollIntoView({ block: 'nearest' }); }
   }
-  UI.on('tl-sub', el => { sub = el.dataset.sub; ProStore.set('toolsSub', sub); editId = null; printId = null; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('tl-sub', el => { if (el.dataset.sub !== sub) dropPending(); sub = el.dataset.sub; ProStore.set('toolsSub', sub); editId = null; printId = null; render(); $('#panelScroll').scrollTop = 0; });
+  UI.on('vc-read', () => Voice.speak());
+  UI.on('vc-mic', async () => { await Voice.toggleListening(); if (sub === 'shop') render(); });
   UI.on('tl-shop', () => { Level.setWorkshop(!Level.workshop()); render(); });
-  UI.on('lg-edit', el => { editId = el.dataset.id; printId = null; render(); $('#panelScroll').scrollTop = 0; });
-  UI.on('lg-cancel', () => { editId = null; render(); });
+  UI.on('ph-del', el => { const id = el.dataset.id; pendPhotos = (pendPhotos || []).filter(x => x !== id); if (!origPhotos.includes(id)) Photos.remove([id]); const t = $('#lgThumbs'); if (t) { t.innerHTML = Photos.thumbs(pendPhotos, true); Photos.fill(t); } });
+  UI.on('lg-edit', el => { dropPending(); editId = el.dataset.id; printId = null; render(); $('#panelScroll').scrollTop = 0; });
+  function dropPending() { if (pendPhotos) Photos.remove(pendPhotos.filter(x => !origPhotos.includes(x))); pendPhotos = null; }
+  UI.on('lg-cancel', () => { dropPending(); editId = null; prefill = null; render(); });
   UI.on('lg-del', el => { if (delArm === el.dataset.id) { RepairLog.remove(el.dataset.id); delArm = null; UI.toast('נמחק'); } else { delArm = el.dataset.id; setTimeout(() => { if (delArm === el.dataset.id) { delArm = null; if (State.mode === 'tools' && sub === 'log') render(); } }, 4000); } render(); });
   UI.on('lg-export', () => { const t = JSON.stringify({ app: 'wiring-lab', type: 'repair-log', version: 1, exported: new Date().toISOString(), items: RepairLog.all() }, null, 1); const box = $('#lgBox'); offerFile('wiring-lab-repair-log.json', t, box); });
   UI.on('lg-import', () => { const b = $('#lgImportBox'); b.hidden = !b.hidden; });
@@ -18665,8 +18743,9 @@ const Tools = (() => {
     try { window.print(); } catch (e) { done(); }
     setTimeout(done, 3000);
   });
-  function go(s) { sub = s; ProStore.set('toolsSub', s); editId = null; printId = null; if (State.mode === 'tools') { render(); $('#panelScroll').scrollTop = 0; } else UI.setMode('tools'); }
-  return { render, go, restore() {}, onVehicle() { editId = null; } };
+  function newLogFor(v) { dropPending(); editId = null; prefill = { vehicleId: v.id, km: Vehicles.kmOf(v) }; go('log'); setTimeout(() => { const m = $('#lgModel'); if (m && Sec.own(DATA.models, v.model)) m.value = v.model; }, 0); }
+  function go(s) { if (s !== 'log') dropPending(); sub = s; ProStore.set('toolsSub', s); editId = null; printId = null; if (State.mode === 'tools') { render(); $('#panelScroll').scrollTop = 0; } else UI.setMode('tools'); }
+  return { render, go, newLogFor, restore() {}, onVehicle() { editId = null; } };
 })();
 
 /* =====================================================================
@@ -19694,6 +19773,597 @@ const Builder = (() => {
   return { render, restore: highlight, onVehicle() {}, calc: () => calc(), checks: () => checks(), totals: () => totals(), guide: () => guide(), refreshCatalog, catalog: () => CAT, project: () => p, reset() { p = newProject(); step = 'goal'; gIdx = 0; } };
 })();
 (window.BootHooks = window.BootHooks || []).push(() => Builder.refreshCatalog());
+
+/* =====================================================================
+   p19 · Search + Ask – חיפוש גלובלי ו״שאל את המערכת״
+   · שדה אחד בראש המסך (קיצור: /). מחפש סימפטומים, סיבות, קודי שגיאה, מונחים,
+     נקודות בדיקה, רכיבים, תרחישי אשף, דגמים וכלים – ומוביל ישר למסך הנכון.
+     ״לא טוען״ ← אבחון עם הסימפטום ״לא נטען״ מסומן.
+   · בלי תוצאה (או ״לא מצאתי״): הסלמה – סיכום מסודר לטכנאי (דגם, סימפטומים,
+     מדידות, שאלה) להעתקה/שיתוף, נשמר ב-Persist('escalations').
+   ===================================================================== */
+const Search = (() => {
+  const NIQQUD = /[֑-ׇ]/g;
+  const norm = s => String(s || '').toLowerCase().replace(NIQQUD, '').replace(/[״"'׳`.,:;!?()[\]{}\/\\|–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const PREFIX = /^(ו|ה|ב|ל|מ|ש|כ|וה|וב|ול|שה|שב|של|מה|כש)(?=[א-ת]{3,})/;
+  const stem = t => t.replace(PREFIX, '');
+  // מילים נרדפות – שפת רחוב ← מונחי המעבדה
+  const SYN = {
+    'טוען': ['נטען', 'טעינה', 'מטען'], 'טעינה': ['נטען', 'מטען'], 'נדלק': ['דולק', 'הדלקה'], 'דולק': ['נדלק'], 'מת': ['נדלק', 'פרוקה'],
+    'נוסע': ['הנעה', 'מניע'], 'זז': ['הנעה', 'מניע'], 'מושך': ['הנעה', 'מניע'], 'נכבה': ['ניתוק', 'נדלק'], 'נופל': ['ניתוק'], 'קופץ': ['ניתוק', 'לסירוגין'],
+    'מתחמם': ['חום'], 'שרוף': ['ריח', 'חום'], 'נשרף': ['ריח', 'חום'], 'מריח': ['ריח', 'חום'], 'מסריח': ['ריח', 'חום'], 'חם': ['חום'], 'שורף': ['ריח', 'חום'], 'ריח': ['חום'], 'עשן': ['חום', 'ריח'],
+    'מגמגם': ['רועד', 'מגמגם'], 'רועד': ['מגמגם'], 'רעש': ['מגמגם', 'רועד'], 'קוד': ['שגיאה'], 'error': ['שגיאה', 'קוד'], 'err': ['שגיאה', 'קוד'],
+    'טווח': ['טווח'], 'קילומטרים': ['טווח'], 'מחזיק': ['טווח'], 'בטריה': ['סוללה'], 'בטרייה': ['סוללה'], 'מצבר': ['סוללה'],
+    'גז': ['מצערת'], 'ברקס': ['בלם', 'בלמים'], 'מסך': ['צג'], 'תצוגה': ['צג'], 'פנס': ['תאורה'], 'אור': ['תאורה'],
+    'לפעמים': ['לסירוגין'], 'מדי': ['לסירוגין'], 'גלגל': ['גלגל', 'מנוע'], 'מנוע': ['מנוע']
+  };
+  let index = null;
+  function tokensOf(s) { return norm(s).split(' ').filter(Boolean).map(stem); }
+  function add(list, type, title, sub, text, go, pri) { list.push({ type, title, sub, hay: ' ' + tokensOf(title + ' ' + (text || '')).join(' ') + ' ', go, pri }); }
+  function build() {
+    const L = [], has = c => vehicleComps().includes(c);
+    DATA.pro.bayesSymptoms.forEach(s => add(L, 'תקלה', s.name, 'אבחון לפי מדידות', `${s.pro} ${s.id}`, () => goSymptom(s.id), 10));
+    DATA.pro.causes.filter(c => !c.requires || c.requires.every(has)).forEach(c => add(L, 'סיבה', c.name, c.pro, (c.comps || []).join(' '), () => goCause(c.id), 6));
+    DATA.errorCodes.codes.forEach(c => add(L, 'קוד', `${c.c} – ${c.t}`, (DATA.errorCodes.brands.find(b => b.id === c.b) || { name: c.b }).name, `${c.c} ${c.d} ${c.b} קוד שגיאה error`, () => goCode(c.c), 8));
+    DATA.pro.glossary.forEach(g => add(L, 'מונח', g.t.join(' · '), g.beg.slice(0, 70), g.beg, () => goTerm(g.t[0]), 4));
+    (M().testPoints || []).forEach(tp => add(L, 'נקודת בדיקה', tp.name, tp.expect, `${tp.comp} ${tp.mode} מדידה`, () => goTP(tp.id), 5));
+    vehicleComps().forEach(id => { const c = DATA.components[id]; if (c) add(L, 'רכיב', c.name, 'פתח במודל', `${id} ${c.short || ''}`, () => UI.showComp(id), 5); });
+    Object.entries(DATA.wizard.scenarios).forEach(([id, s]) => add(L, 'אשף', s.name, 'אשף התקנה', `התקנה החלפה ${id}`, () => goWizard(id), 4));
+    Object.entries(DATA.models).forEach(([id, m]) => add(L, 'דגם', m.name, `${m.voltage}V`, `${m.short} ${m.brand || ''}`, () => UI.setModel(id), 3));
+    [['calc', 'מחשבונים: טווח, טעינה, צניחה, הספק', 'חישוב מחשבון טווח טעינה'], ['log', 'יומן תיקונים', 'יומן לקוח תיקון רשומה'], ['vehicles', 'כרטיסי כלי ותזכורות תחזוקה', 'כרטיס כלי לקוח תחזוקה תזכורת בריאות סוללה'], ['quote', 'הצעת מחיר לתיקון', 'מחיר הצעה תעריף עלות'], ['data', 'גיבוי, שחזור ופרטיות', 'גיבוי שחזור מחיקה פרטיות PIN נעילה'], ['shop', 'מצב סדנה וקריינות', 'סדנה קול הקראה ידיים']]
+      .forEach(([s, t, k]) => add(L, 'כלי', t, 'כלים', k, () => Tools.go(s), 3));
+    add(L, 'כלי', 'בנה בעצמך – ערכת המרה', 'תכנון, חישוב, חיווט, הרכבה', 'בנייה המרה ערכה סוללה בניית XsYp', () => UI.setMode('build'), 3);
+    add(L, 'כלי', 'כרטיסיות חזרה', 'לימוד', 'כרטיסיות חזרה שינון מבחן', () => { UI.setMode('learn'); const b = $('[data-action="learn-sub"][data-sub="cards"]'); if (b) b.click(); }, 3);
+    return L;
+  }
+  function query(q) {
+    if (!index || index.model !== State.model) { index = build(); index.model = State.model; }
+    const raw = norm(q).split(' ').filter(t => t.length > 1 || /\d/.test(t));
+    if (!raw.length) return [];
+    const qt = raw.map(r => ({ r, s: stem(r) }));
+    const scored = [];
+    for (const it of index) {
+      let score = 0, hits = 0;
+      for (const { r, s: t } of qt) {
+        const num = (r.match(/^(?:e|er|err|error)?0*(\d{1,4})$/) || [])[1];
+        const alts = [...new Set([r, t].concat(SYN[r] || [], SYN[t] || [], num ? [num, '0' + num] : []))];
+        const exact = alts.some(a => it.hay.includes(' ' + a + ' ')), part = exact || alts.some(a => a.length > 1 && it.hay.includes(a));
+        if (exact) { score += 3; hits++; } else if (part) { score += 1.5; hits++; }
+        else if (r === 'לא') score += 0; else score -= 1;
+      }
+      const need = qt.filter(x => x.r !== 'לא').length;
+      if (hits >= Math.max(1, need - (need >= 3 ? 1 : 0))) scored.push({ it, s: score + it.pri * 0.15 });
+    }
+    return scored.sort((a, b) => b.s - a.s).slice(0, 8).map(x => x.it);
+  }
+
+  /* ---------- ניווט ---------- */
+  function goSymptom(id) { DiagPro.selectSymptom(id); UI.setMode('diag'); const b = $('[data-action="dg-sub"][data-sub="adv"]'); if (b) b.click(); $('#panelScroll').scrollTop = 0; }
+  function goCause(id) {
+    const lik = DATA.pro.symptomLik || {};
+    let best = null, bv = 0;
+    Object.keys(lik).forEach(s => { const v = lik[s][id] || 0; if (v > bv) { bv = v; best = s; } });
+    if (best) goSymptom(best); else { UI.setMode('diag'); }
+    setTimeout(() => { const el = $(`[data-action="dp-cause"][data-c="${id}"]`); if (el) { el.scrollIntoView({ block: 'center' }); el.click(); } }, 50);
+  }
+  function goCode(code) {
+    UI.setMode('diag'); const b = $('[data-action="dg-sub"][data-sub="codes"]'); if (b) b.click();
+    const i = $('#codeSearch'); if (i) { i.value = code; i.dispatchEvent(new Event('input')); }
+  }
+  function goTerm(t) { ProStore.set('gq', t); UI.setMode('learn'); const b = $('[data-action="learn-sub"][data-sub="glossary"]'); if (b) b.click(); }
+  function goTP(id) { UI.setMode('diag'); const b = $('[data-action="dg-sub"][data-sub="tp"]'); if (b) b.click(); DiagPro.openTP(id); }
+  function goWizard(id) { UI.setMode('wizard'); const r = $(`input[name="wzS"][value="${id}"]`); if (r) { r.checked = true; r.dispatchEvent(new Event('change')); r.scrollIntoView({ block: 'center' }); } else UI.toast('התרחיש לא זמין לדגם הזה'); }
+
+  /* ---------- ממשק ---------- */
+  let results = [], active = -1;
+  function render(q) {
+    const box = $('#gsList'), inp = $('#gSearch');
+    results = q.trim() ? query(q) : [];
+    active = results.length ? 0 : -1;
+    if (!q.trim()) { box.hidden = true; inp.setAttribute('aria-expanded', 'false'); return; }
+    box.innerHTML = results.map((r, i) => `<li role="option" id="gs-${i}" data-i="${i}" aria-selected="${i === active}"><span class="gs-type">${esc(r.type)}</span><span class="gs-t">${esc(r.title)}</span>${r.sub ? `<span class="gs-sub">${esc(r.sub)}</span>` : ''}</li>`).join('') +
+      `<li role="option" id="gs-ask" data-i="ask" class="gs-ask" aria-selected="${!results.length}"><span class="gs-type">שאל</span><span class="gs-t">${results.length ? 'לא מצאתי – הכן סיכום לטכנאי' : 'לא מצאתי. הכן סיכום לטכנאי'}</span><span class="gs-sub">״${esc(q.trim().slice(0, 60))}״</span></li>`;
+    box.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    inp.setAttribute('aria-activedescendant', results.length ? 'gs-0' : 'gs-ask');
+  }
+  function choose(i) {
+    const inp = $('#gSearch'), q = inp.value;
+    close();
+    if (i === 'ask' || i == null || !results[i]) { Ask.open(q); return; }
+    results[i].go();
+  }
+  function close() { const b = $('#gsList'); if (b) b.hidden = true; const i = $('#gSearch'); if (i) { i.setAttribute('aria-expanded', 'false'); i.removeAttribute('aria-activedescendant'); } }
+  function move(d) {
+    const n = results.length + 1; if (!n) return;
+    active = ((active < 0 ? (results.length ? 0 : n - 1) : active) + d + n) % n;
+    $$('#gsList [role="option"]').forEach((li, k) => li.setAttribute('aria-selected', String(k === active)));
+    const id = active === results.length ? 'gs-ask' : 'gs-' + active;
+    $('#gSearch').setAttribute('aria-activedescendant', id);
+    const el = document.getElementById(id); if (el) el.scrollIntoView({ block: 'nearest' });
+  }
+  function init() {
+    const inp = $('#gSearch'); if (!inp) return;
+    inp.addEventListener('input', () => render(inp.value));
+    inp.addEventListener('focus', () => { if (inp.value.trim()) render(inp.value); });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (inp.value.trim()) choose(active === results.length ? 'ask' : active); }
+      else if (e.key === 'Escape') { close(); }
+    });
+    $('#gsList').addEventListener('mousedown', e => { const li = e.target.closest('[data-i]'); if (li) { e.preventDefault(); choose(li.dataset.i === 'ask' ? 'ask' : Number(li.dataset.i)); } });
+    document.addEventListener('click', e => { if (!e.target.closest('.gsearch')) close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) { e.preventDefault(); inp.focus(); inp.select(); }
+    });
+    UI.on && document.addEventListener('change', e => { if (e.target && e.target.id === 'modelSelect') index = null; });
+  }
+  return { init, query, norm, goSymptom };
+})();
+
+/* ---------- ״לא מצאתי״ → סיכום לטכנאי ---------- */
+const Ask = (() => {
+  let lastText = '';
+  function summary(q, detail) {
+    const m = M(), e = DiagPro.evidence(), S = DATA.pro.bayesSymptoms, ms = DATA.pro.measurements;
+    const sym = e.sym.map(id => (S.find(x => x.id === id) || { name: id }).name);
+    const meas = Object.entries(e.meas).map(([id, v]) => `${(ms.find(x => x.id === id) || { name: id }).name}: ${Array.isArray(v) ? v.join(' / ') : v}`);
+    return `סיכום לטכנאי – מעבדת EV\nתאריך: ${new Date().toLocaleString('he-IL')}\nכלי: ${m.name} · ${m.voltage}V${m.controllerAmpsNum ? ` · בקר ${m.controllerAmpsNum}A` : ''}\n` +
+      `השאלה: ${q || '—'}\n${detail ? `פירוט: ${detail}\n` : ''}סימפטומים שסומנו: ${sym.join(', ') || 'לא סומנו'}\nמדידות שבוצעו: ${meas.join(' · ') || 'לא בוצעו'}\n` +
+      `הערה: החיפוש במערכת לא מצא תשובה – נדרשת בדיקה של טכנאי.\n${DATA.meta.disclaimer}`;
+  }
+  function open(q) {
+    const body = document.createElement('div'); body.className = 'stack';
+    body.innerHTML = `<p class="lead">לא מצאנו תשובה במערכת. נכין סיכום מסודר לטכנאי: הכלי, מה סימנת ומה מדדת.</p>
+      <div class="field"><label for="askQ">מה הבעיה?</label><input class="input" id="askQ" maxlength="200" value="${esc(q || '')}"></div>
+      <div class="field"><label for="askD">עוד פרטים (לא חובה)</label><textarea class="input" id="askD" rows="3" maxlength="1000" placeholder="מתי זה קורה, מה כבר ניסית, קולות, ריח"></textarea></div>
+      <pre class="ask-out" id="askOut" aria-live="polite"></pre>
+      <textarea class="input copybox" id="askBox" hidden rows="6" readonly aria-label="סיכום להעתקה"></textarea>`;
+    const foot = document.createElement('div'); foot.className = 'row';
+    const mk = (t, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + cls; b.textContent = t; b.addEventListener('click', fn); foot.appendChild(b); return b; };
+    const upd = () => { lastText = summary(Sec.str($('#askQ').value.trim(), 200), Sec.str($('#askD').value.trim(), 1000)); $('#askOut').textContent = lastText; };
+    mk('העתק סיכום', 'primary', () => { upd(); copyText(lastText, $('#askBox')); save(); });
+    if (navigator.share && !IN_FRAME) mk('שתף', '', async () => { upd(); try { await navigator.share({ title: 'סיכום לטכנאי', text: lastText }); save(); } catch (e) { /* בוטל */ } });
+    mk('עבור לאבחון', 'ghost', () => { Legal.close(); UI.setMode('diag'); });
+    Legal.open('שאל את המערכת', body, foot, false);
+    ['#askQ', '#askD'].forEach(s => $(s).addEventListener('input', upd)); upd();
+  }
+  function save() {
+    if (Persist.isLocked()) return;
+    const list = Persist.get('escalations');
+    list.unshift({ id: 'e' + Date.now().toString(36), at: new Date().toISOString(), model: State.model, text: lastText.slice(0, 4000) });
+    Persist.set('escalations', list.slice(0, 200));
+  }
+  return { open, summary };
+})();
+
+(window.BootHooks = window.BootHooks || []).push(() => {
+  Search.init();
+  // ״לא מצאתי״ באבחון מוביל גם הוא לסיכום לטכנאי
+  UI.on('ask-open', () => Ask.open(''));
+});
+
+/* =====================================================================
+   p20 · Workshop – ידיים עסוקות: הקראה, פקודה קולית ״הבא״, תמונות לתיקון
+   · הקראה: Web Speech (speechSynthesis) – קול עברי מותקן במכשיר אם יש.
+   · פקודות קוליות (לא חובה, כבוי כברירת מחדל): ״הבא״, ״הקודם״, ״שוב״, ״עצור״.
+     בחלק מהדפדפנים הזיהוי נעשה בשרת של ספק הדפדפן – מוצג גילוי נאות לפני הפעלה.
+   · תמונות: נדחסות במכשיר (עד 1280px, JPEG), הקידוד מחדש מסיר EXIF/GPS,
+     נשמרות ב-IndexedDB (מוצפנות כשיש PIN).
+   ===================================================================== */
+const Voice = (() => {
+  const synth = window.speechSynthesis || null;
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  let rec = null, listening = false;
+  const canSpeak = () => !!synth, canListen = () => !!Rec;
+  function voice() {
+    if (!synth) return null;
+    const vs = synth.getVoices().filter(v => /^he|^iw/i.test(v.lang));
+    return vs.find(v => v.localService) || vs[0] || null;
+  }
+  /** הטקסט של השלב הנוכחי בפאנל */
+  function currentText() {
+    const mv = $('#modeView'); if (!mv) return '';
+    const title = (mv.querySelector('h2') || {}).textContent || '';
+    const step = mv.querySelector('#bgBox') ? mv.querySelector('#bgBox').closest('.card') : mv.querySelector('.verify-box') ? mv.querySelector('.verify-box').closest('.card, .stack') : mv.querySelector('.card');
+    const clean = el => { if (!el) return ''; const c = el.cloneNode(true); c.querySelectorAll('input, select, button, .sr-only, .vres, svg').forEach(x => x.remove()); return c.textContent; };
+    return (title + '. ' + clean(step)).replace(/\s+/g, ' ').trim().slice(0, 700);
+  }
+  function speak(text) {
+    if (!synth) { UI.toast('הדפדפן לא תומך בהקראה'); return false; }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text || currentText());
+    u.lang = 'he-IL'; const v = voice(); if (v) u.voice = v; u.rate = 0.95;
+    synth.speak(u); return true;
+  }
+  const stop = () => { if (synth) synth.cancel(); };
+  function next() {
+    const b = $('#bgNext:not([disabled])') || $('#modeView .navrow .btn.primary:not([disabled])') || $('.sticky-actions .btn.primary:not([disabled])');
+    if (b) { b.click(); setTimeout(() => speak(), 250); return true; }
+    speak('השלב לא אומת עדיין. מדוד והזן את הקריאה.'); return false;
+  }
+  function prev() { const b = $('#modeView .navrow .btn:not(.primary):not([disabled])'); if (b) { b.click(); setTimeout(() => speak(), 250); } }
+  /** פקודה מזוהה → פעולה. מחזיר את שם הפעולה */
+  function command(text) {
+    const t = Search.norm(text);
+    if (/(^| )(הבא|הלאה|קדימה|next)( |$)/.test(t)) { next(); return 'next'; }
+    if (/(^| )(הקודם|אחורה|back)( |$)/.test(t)) { prev(); return 'prev'; }
+    if (/(^| )(שוב|חזור|תקריא|הקרא|קרא)( |$)/.test(t)) { speak(); return 'repeat'; }
+    if (/(^| )(עצור|שקט|stop)( |$)/.test(t)) { stop(); return 'stop'; }
+    return '';
+  }
+  function startListening() {
+    if (!Rec) { UI.toast('הדפדפן לא תומך בזיהוי דיבור'); return; }
+    if (listening) return;
+    rec = new Rec(); rec.lang = 'he-IL'; rec.continuous = true; rec.interimResults = false;
+    rec.onresult = e => { const r = e.results[e.results.length - 1]; if (r && r.isFinal) { const a = command(r[0].transcript); if (a) UI.toast('פקודה: ' + r[0].transcript.trim()); } };
+    rec.onend = () => { if (listening) { try { rec.start(); } catch (x) { listening = false; sync(); } } };
+    rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { listening = false; sync(); UI.toast('אין הרשאה למיקרופון'); } };
+    try { rec.start(); listening = true; } catch (x) { listening = false; }
+    sync();
+  }
+  function stopListening() { listening = false; if (rec) { try { rec.stop(); } catch (x) { /* */ } } sync(); }
+  /** הפעלה עם גילוי נאות על פרטיות */
+  async function toggleListening() {
+    if (listening) { stopListening(); return; }
+    if (!ProStore.get('voiceAck', false)) {
+      const body = document.createElement('div'); body.className = 'stack';
+      body.innerHTML = `<p class="lead">פקודות קוליות: אמור ״הבא״, ״הקודם״, ״שוב״ או ״עצור״.</p>
+        <div class="note warn">${ICON.warn}<span><b>פרטיות:</b> בחלק מהדפדפנים (למשל Chrome) זיהוי הדיבור מתבצע בשרת של ספק הדפדפן – הקול נשלח אליו. המעבדה עצמה לא שומרת ולא שולחת הקלטות. אפשר לעבוד בלי פקודות קוליות: כפתור ״הבא״ הגדול עושה אותו דבר.</span></div>`;
+      const foot = document.createElement('div'); foot.className = 'row';
+      const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'btn primary'; ok.textContent = 'הפעל מיקרופון';
+      const no = document.createElement('button'); no.type = 'button'; no.className = 'btn ghost'; no.textContent = 'ביטול';
+      foot.append(ok, no);
+      const res = await new Promise(r => { ok.addEventListener('click', () => r(true)); no.addEventListener('click', () => r(false)); Legal.open('פקודות קוליות', body, foot, false); });
+      Legal.close();
+      if (!res) return;
+      ProStore.set('voiceAck', true);
+    }
+    startListening();
+  }
+  function sync() {
+    const m = $('#vbMic'); if (m) { m.setAttribute('aria-pressed', String(listening)); m.textContent = listening ? 'מקשיב…' : 'פקודה קולית'; m.hidden = !Rec; }
+    const bar = $('#voiceBar'); if (bar) bar.hidden = !Level.workshop();
+  }
+  function barInit() {
+    const bar = document.createElement('div'); bar.className = 'voice-bar'; bar.id = 'voiceBar'; bar.hidden = true;
+    bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', 'סרגל ידיים עסוקות');
+    bar.innerHTML = '<button type="button" class="btn" id="vbRead">הקרא</button><button type="button" class="btn" id="vbMic" aria-pressed="false">פקודה קולית</button><button type="button" class="btn primary" id="vbNext">הבא</button>';
+    $('#app').appendChild(bar);
+    $('#vbRead').addEventListener('click', () => speak());
+    $('#vbNext').addEventListener('click', next);
+    $('#vbMic').addEventListener('click', toggleListening);
+    if (!synth) $('#vbRead').hidden = true;
+    new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    sync();
+  }
+  return { speak, stop, next, prev, command, currentText, toggleListening, stopListening, canSpeak, canListen, listening: () => listening, barInit, sync };
+})();
+
+const Photos = (() => {
+  const MAX_SIDE = 1280, QUALITY = 0.72, MAX_PER = 12;
+  const urls = new Map();
+  /** דחיסה וקידוד מחדש (מסיר EXIF, כולל מיקום) */
+  async function compress(file) {
+    if (!/^image\//.test(file.type)) throw new Error('not-image');
+    if (file.size > 25 * 1048576) throw new Error('too-big');
+    let bmp;
+    try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+    catch (e) { bmp = await new Promise((res, rej) => { const i = new Image(); const u = URL.createObjectURL(file); i.onload = () => { URL.revokeObjectURL(u); res(i); }; i.onerror = rej; i.src = u; }); }
+    const k = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    return new Promise((res, rej) => c.toBlob(b => (b ? res(b) : rej(new Error('encode'))), 'image/jpeg', QUALITY));
+  }
+  async function add(files) {
+    const ids = [];
+    for (const f of [...files].slice(0, MAX_PER)) {
+      try { const b = await compress(f); const id = 'ph' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); await Persist.putBlob(id, b); ids.push(id); }
+      catch (e) { UI.toast(e.message === 'too-big' ? 'תמונה גדולה מ-25MB' : e.message === 'locked' ? 'פתח את הנעילה כדי להוסיף תמונות' : 'לא הצלחנו לקרוא את התמונה'); }
+    }
+    return ids;
+  }
+  async function url(id) {
+    if (urls.has(id)) return urls.get(id);
+    const b = await Persist.getBlob(id); if (!b) return null;
+    const u = URL.createObjectURL(b); urls.set(id, u); return u;
+  }
+  async function fill(root) {
+    for (const img of $$('img[data-photo]', root)) { const u = await url(img.dataset.photo); if (u) img.src = u; else img.alt = 'התמונה לא זמינה'; }
+  }
+  const remove = ids => (ids || []).forEach(id => { Persist.delBlob(id).catch(() => {}); const u = urls.get(id); if (u) { URL.revokeObjectURL(u); urls.delete(id); } });
+  const thumbs = (ids, removable) => (ids || []).filter(Sec.isId).map(id => `<figure class="thumb"><img data-photo="${esc(id)}" alt="תמונה מהתיקון" width="96" height="72">${removable ? `<button type="button" class="btn sm ghost" data-action="ph-del" data-id="${esc(id)}" aria-label="הסר תמונה">הסר</button>` : ''}</figure>`).join('');
+  return { compress, add, url, fill, remove, thumbs, MAX_PER };
+})();
+
+(window.BootHooks = window.BootHooks || []).push(() => { Voice.barInit(); if (Voice.canSpeak()) window.speechSynthesis.getVoices(); });
+
+/* =====================================================================
+   p21 · Vehicles + Reminders + Quote
+   · כרטיס כלי ללקוח: היסטוריית תיקונים, מדידות לאורך זמן, גרף בריאות סוללה
+     (צניחת מתח תחת עומס – Sag), תזכורות תחזוקה לפי ק״מ או זמן.
+   · הצעת מחיר: תעריף הטכנאי × שעות עבודה + חלקים (מחיר שהטכנאי מזין – אין מחירים מומצאים).
+   הכול ב-Persist (vehicles, reminders, quotes) – מוצפן כשיש PIN.
+   ===================================================================== */
+const Vehicles = (() => {
+  let openId = null;
+  const PRESETS = [['בדיקת בלמים ורפידות', 1000, 90], ['לחץ אוויר בצמיגים', 0, 14], ['ניקוי ושימון שרשרת', 300, 30], ['בדיקת מחברים וחיווט', 2000, 180], ['בדיקת בריאות סוללה (Sag)', 1500, 180], ['הידוק ברגים במומנט', 1000, 180]];
+  const all = () => Persist.get('vehicles');
+  const byId = id => all().find(v => v.id === id) || null;
+  const today = () => new Date().toISOString().slice(0, 10);
+  const days = (a, b) => Math.floor((new Date(b) - new Date(a)) / 864e5);
+  const label = v => v.label || (DATA.models[v.model] || {}).name || 'כלי';
+  function kmOf(v) {
+    const logKm = RepairLog.all().filter(x => x.vehicleId === v.id && typeof x.km === 'number').map(x => x.km);
+    const sagKm = (v.sag || []).filter(x => typeof x.km === 'number').map(x => x.km);
+    return Math.max(0, Number(v.km) || 0, ...logKm, ...sagKm);
+  }
+  function save(list) { return Persist.set('vehicles', list); }
+  function upsert(v) { const list = all().filter(x => x.id !== v.id); list.unshift(v); save(list); }
+  const sagPct = s => (s.rest > 0 ? Math.round((s.rest - s.load) / s.rest * 1000) / 10 : null);
+  const mOhm = s => (s.amps > 0 ? Math.round((s.rest - s.load) / s.amps * 1000) : null);
+
+  /* ---------- תזכורות ---------- */
+  const rem = () => Persist.get('reminders');
+  function dueOf(r, v) {
+    const km = kmOf(v), out = [];
+    if (r.everyKm > 0) { const left = (r.lastKm || 0) + r.everyKm - km; out.push({ kind: 'km', left, due: left <= 0, soon: left > 0 && left <= r.everyKm * 0.1 }); }
+    if (r.everyDays > 0) { const left = r.everyDays - days(r.lastDate || v.created.slice(0, 10), today()); out.push({ kind: 'd', left, due: left <= 0, soon: left > 0 && left <= 7 }); }
+    return { due: out.some(x => x.due), soon: out.some(x => x.soon), parts: out };
+  }
+  function dueList() {
+    if (Persist.isLocked()) return [];
+    return rem().map(r => { const v = byId(r.vehicleId); return v ? { r, v, d: dueOf(r, v) } : null; }).filter(x => x && x.d.due);
+  }
+  function notify() {
+    const n = dueList().length;
+    if (n) DataUI.notice('nt-maint', `${n} תזכורות תחזוקה הגיעו למועד.`, [['הצג', () => Tools.go('vehicles'), 'primary']]);
+    else DataUI.dropNotice('nt-maint');
+  }
+
+  /* ---------- גרף בריאות סוללה (SVG) ---------- */
+  function graph(sag) {
+    const pts = sag.map(s => ({ d: s.date, y: sagPct(s) })).filter(p => p.y != null).sort((a, b) => (a.d < b.d ? -1 : 1));
+    if (pts.length < 2) return '<p class="foot">הגרף יופיע אחרי שתי מדידות לפחות.</p>';
+    const W = 360, H = 170, P = 30, ymax = Math.max(25, ...pts.map(p => p.y) ) * 1.1;
+    const t0 = new Date(pts[0].d).getTime(), t1 = Math.max(t0 + 864e5, new Date(pts[pts.length - 1].d).getTime());
+    const X = d => P + (new Date(d).getTime() - t0) / (t1 - t0) * (W - P * 1.5), Y = v => H - P + 4 - v / ymax * (H - P * 1.4);
+    const line = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.d).toFixed(1)} ${Y(p.y).toFixed(1)}`).join(' ');
+    const band = (v, cls, t) => `<line class="${cls}" x1="${P}" x2="${W - P / 2}" y1="${Y(v)}" y2="${Y(v)}"/><text class="gl" x="${W - P / 2}" y="${Y(v) - 3}" text-anchor="end">${t}</text>`;
+    return `<figure class="sag-graph"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="צניחת מתח לאורך זמן: ${pts.map(p => `${p.d} ${p.y}%`).join(', ')}">
+      ${band(10, 'g-ok', '10% – תקין')}${band(20, 'g-bad', '20% – לבדיקה')}
+      <line class="ax" x1="${P}" x2="${P}" y1="8" y2="${H - P + 4}"/><line class="ax" x1="${P}" x2="${W - P / 2}" y1="${H - P + 4}" y2="${H - P + 4}"/>
+      <path class="gline" d="${line}"/>${pts.map(p => `<circle cx="${X(p.d).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="4"/><text class="gv" x="${X(p.d).toFixed(1)}" y="${(Y(p.y) - 8).toFixed(1)}" text-anchor="middle">${p.y}%</text>`).join('')}
+      <text class="gl" x="${P}" y="${H - 6}">${esc(pts[0].d)}</text><text class="gl" x="${W - P / 2}" y="${H - 6}" text-anchor="end">${esc(pts[pts.length - 1].d)}</text></svg>
+      <figcaption class="foot">צניחת מתח (Sag) תחת עומס, באחוזים. עלייה לאורך זמן = הזדקנות סוללה או מחבר עם התנגדות. ספים טיפוסיים (״טיפוסי״).</figcaption></figure>`;
+  }
+
+  /* ---------- תצוגות ---------- */
+  function listHTML() {
+    const L = all(), mOpts = Object.keys(DATA.models).map(id => `<option value="${id}" ${id === State.model ? 'selected' : ''}>${esc(DATA.models[id].short)}</option>`).join('');
+    return `<p class="lead">כרטיס לכל כלי: היסטוריה, מדידות לאורך זמן ותזכורות תחזוקה. נשמר רק במכשיר.</p>
+      <form class="card stack" id="vhForm" autocomplete="off"><h3>כלי חדש</h3><div class="tool-grid">
+        <div class="field"><label for="vhLabel">כינוי (לא חובה)</label><input class="input" id="vhLabel" maxlength="80" placeholder="למשל: אופניים אדומים"></div>
+        <div class="field"><label for="vhModel">דגם</label><select class="input" id="vhModel">${mOpts}</select></div>
+        <div class="field"><label for="vhSerial">מספר סידורי (לא חובה)</label><input class="input" id="vhSerial" maxlength="60"></div>
+        <div class="field"><label for="vhKm">ק״מ נוכחי</label><input class="input num" id="vhKm" type="number" inputmode="decimal" min="0" max="1000000" value="0"></div></div>
+        <label class="check"><input type="checkbox" id="vhPresets" checked><span>הוסף תזכורות תחזוקה בסיסיות</span></label>
+        <button type="submit" class="btn primary">צור כרטיס</button></form>
+      ${L.length ? `<div class="stack">${L.map(v => { const due = rem().filter(r => r.vehicleId === v.id && dueOf(r, v).due).length, s = (v.sag || []).slice(-1)[0];
+        return `<div class="card veh-row"><div class="spread"><b>${esc(label(v))}</b>${due ? `<span class="due-tag">${due} לביצוע</span>` : ''}</div>
+          <span class="foot num"><bdi>${esc((DATA.models[v.model] || {}).short || '')}</bdi>${v.serial ? ' · מס״ד ' + esc(v.serial) : ''} · ${kmOf(v).toLocaleString('he-IL')} ק״מ${s ? ` · Sag אחרון ${sagPct(s)}%` : ''}</span>
+          <div class="row"><button type="button" class="btn sm" data-action="vh-open" data-id="${esc(v.id)}">פתח כרטיס</button></div></div>`; }).join('')}</div>` : ''}`;
+  }
+  function cardHTML(v) {
+    const logs = RepairLog.all().filter(x => x.vehicleId === v.id);
+    const R = rem().filter(r => r.vehicleId === v.id);
+    const sag = (v.sag || []).slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+    return `<button type="button" class="back linkbtn" data-action="vh-back">${ICON.prev} כל הכלים</button>
+      <div class="card stack"><div class="spread"><h3>${esc(label(v))}</h3><span class="num kmv">${kmOf(v).toLocaleString('he-IL')} ק״מ</span></div>
+        <span class="foot"><bdi>${esc((DATA.models[v.model] || {}).name || '')}</bdi>${v.serial ? ' · מס״ד ' + esc(v.serial) : ''} · נפתח ${esc(v.created.slice(0, 10))}</span>
+        <div class="row"><button type="button" class="btn sm primary" data-action="vh-newlog" data-id="${esc(v.id)}">תיקון חדש לכלי</button><button type="button" class="btn sm" data-action="vh-quote" data-id="${esc(v.id)}">הצעת מחיר</button><button type="button" class="btn sm ghost" data-action="vh-del" data-id="${esc(v.id)}">מחק כרטיס</button></div></div>
+      <div class="card stack"><h3>תזכורות תחזוקה</h3>
+        ${R.length ? `<ul class="clean rem-list">${R.map(r => { const d = dueOf(r, v); return `<li class="rem ${d.due ? 'due' : d.soon ? 'soon' : ''}"><span><b>${esc(r.task)}</b><br><span class="foot num">${d.parts.map(p => p.kind === 'km' ? (p.left <= 0 ? `עבר ב-${-p.left} ק״מ` : `בעוד ${p.left} ק״מ`) : (p.left <= 0 ? `עבר ב-${-p.left} ימים` : `בעוד ${p.left} ימים`)).join(' · ')}</span></span>
+          <span class="row"><button type="button" class="btn sm ${d.due ? 'primary' : ''}" data-action="rm-done" data-id="${esc(r.id)}">בוצע</button><button type="button" class="btn sm ghost" data-action="rm-del" data-id="${esc(r.id)}" aria-label="מחק תזכורת">מחק</button></span></li>`; }).join('')}</ul>` : '<p class="foot">אין תזכורות.</p>'}
+        <form class="tool-grid" id="rmForm" autocomplete="off">
+          <div class="field"><label for="rmTask">משימה</label><input class="input" id="rmTask" maxlength="80" list="rmPresets" required><datalist id="rmPresets">${PRESETS.map(p => `<option value="${esc(p[0])}">`).join('')}</datalist></div>
+          <div class="field"><label for="rmKm">כל (ק״מ)</label><input class="input num" id="rmKm" type="number" min="0" max="100000" inputmode="numeric"></div>
+          <div class="field"><label for="rmDays">או כל (ימים)</label><input class="input num" id="rmDays" type="number" min="0" max="3650" inputmode="numeric"></div>
+          <button type="submit" class="btn">הוסף תזכורת</button></form></div>
+      <div class="card stack"><h3>בריאות סוללה</h3>${graph(sag)}
+        ${sag.length ? `<div class="tbl-wrap"><table class="volt"><thead><tr><th scope="col">תאריך</th><th scope="col">ק״מ</th><th scope="col">מנוחה</th><th scope="col">עומס</th><th scope="col">Sag</th><th scope="col">התנגדות</th></tr></thead><tbody>${sag.slice().reverse().map(s => `<tr><td class="num">${esc(s.date)}</td><td class="num">${s.km ?? '—'}</td><td class="num">${s.rest}V</td><td class="num">${s.load}V</td><td class="num">${sagPct(s)}%</td><td class="num">${mOhm(s) != null ? mOhm(s) + 'mΩ' : '—'}</td></tr>`).join('')}</tbody></table></div>` : ''}
+        <form class="tool-grid" id="sgForm" autocomplete="off">
+          <div class="field"><label for="sgRest">מתח במנוחה (V)</label><input class="input num" id="sgRest" type="number" step="0.1" min="10" max="120" inputmode="decimal" required></div>
+          <div class="field"><label for="sgLoad">תחת עומס (V)</label><input class="input num" id="sgLoad" type="number" step="0.1" min="5" max="120" inputmode="decimal" required></div>
+          <div class="field"><label for="sgA">זרם (A, לא חובה)</label><input class="input num" id="sgA" type="number" step="0.5" min="0" max="200" inputmode="decimal"></div>
+          <div class="field"><label for="sgKm">ק״מ (לא חובה)</label><input class="input num" id="sgKm" type="number" min="0" max="1000000" inputmode="numeric"></div>
+          <button type="submit" class="btn">שמור מדידה</button></form></div>
+      <div class="card stack"><h3>היסטוריית תיקונים (${logs.length})</h3>
+        ${logs.length ? `<ol class="timeline">${logs.map(x => `<li><span class="num foot">${esc(x.date)}${typeof x.km === 'number' ? ` · ${x.km} ק״מ` : ''}</span><b>${esc(x.symptoms || 'תיקון')}</b>${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${typeof x.price === 'number' ? `<span class="num">₪${x.price.toLocaleString('he-IL')}</span>` : ''}<span class="status">${esc(x.status)}</span></li>`).join('')}</ol>` : '<p class="foot">עוד אין תיקונים לכלי הזה.</p>'}</div>`;
+  }
+  function html() {
+    if (Persist.isLocked()) return DataUI.lockedCard('כרטיסי הכלים');
+    const v = openId && byId(openId);
+    return v ? cardHTML(v) : listHTML();
+  }
+  function bind() {
+    const f = $('#vhForm');
+    if (f) f.addEventListener('submit', e => {
+      e.preventDefault();
+      const model = Sec.own(DATA.models, $('#vhModel').value) ? $('#vhModel').value : State.model;
+      const v = { id: 'v' + Date.now().toString(36), label: Sec.str($('#vhLabel').value.trim(), 80), model, serial: Sec.str($('#vhSerial').value.trim(), 60), km: Sec.num($('#vhKm').value, 0, 1e6) || 0, created: new Date().toISOString(), sag: [] };
+      upsert(v);
+      if ($('#vhPresets').checked) Persist.set('reminders', rem().concat(PRESETS.map(([task, km, d], i) => ({ id: 'r' + Date.now().toString(36) + i, vehicleId: v.id, task, everyKm: km, everyDays: d, lastKm: v.km, lastDate: today() }))));
+      openId = v.id; UI.toast('נוצר כרטיס'); rerender();
+    });
+    const rf = $('#rmForm');
+    if (rf) rf.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = byId(openId), km = Sec.num($('#rmKm').value, 0, 1e5) || 0, d = Sec.num($('#rmDays').value, 0, 3650) || 0;
+      if (!km && !d) { Sec.fieldMsg($('#rmKm'), 'הזן ק״מ או ימים'); return; }
+      Persist.set('reminders', rem().concat([{ id: 'r' + Date.now().toString(36), vehicleId: v.id, task: Sec.str($('#rmTask').value.trim(), 80) || 'תחזוקה', everyKm: km, everyDays: d, lastKm: kmOf(v), lastDate: today() }]));
+      rerender();
+    });
+    const sf = $('#sgForm');
+    if (sf) sf.addEventListener('submit', e => {
+      e.preventDefault();
+      const rest = Sec.num($('#sgRest').value, 10, 120), load = Sec.num($('#sgLoad').value, 5, 120);
+      if (rest === null || load === null || load > rest) { Sec.fieldMsg($('#sgLoad'), 'מתח בעומס חייב להיות נמוך מהמתח במנוחה'); return; }
+      const v = byId(openId); const s = { date: today(), rest, load, amps: Sec.num($('#sgA').value, 0.1, 200), km: Sec.num($('#sgKm').value, 0, 1e6) };
+      v.sag = (v.sag || []).concat([s]).slice(-200); upsert(v);
+      const pct = sagPct(s); UI.toast(`Sag ${pct}% – ${pct < 10 ? 'תקין' : pct < 20 ? 'גבוה, עקוב' : 'חמור – בדוק סוללה ומחברים'}`); rerender();
+    });
+  }
+  function rerender() { if (State.mode === 'tools') UI.Modes().tools.render(); notify(); }
+  UI.on('vh-open', el => { openId = el.dataset.id; rerender(); $('#panelScroll').scrollTop = 0; });
+  UI.on('vh-back', () => { openId = null; rerender(); });
+  UI.on('vh-del', el => {
+    if (el.dataset.arm !== '1') { el.dataset.arm = '1'; el.textContent = 'לחץ שוב למחיקה'; setTimeout(() => { el.dataset.arm = ''; el.textContent = 'מחק כרטיס'; }, 4000); return; }
+    save(all().filter(v => v.id !== el.dataset.id)); Persist.set('reminders', rem().filter(r => r.vehicleId !== el.dataset.id)); openId = null; UI.toast('הכרטיס נמחק (התיקונים נשארו ביומן)'); rerender();
+  });
+  UI.on('rm-done', el => { const list = rem(), r = list.find(x => x.id === el.dataset.id); if (!r) return; const v = byId(r.vehicleId); r.lastKm = v ? kmOf(v) : r.lastKm; r.lastDate = today(); Persist.set('reminders', list); UI.toast('סומן כבוצע'); rerender(); });
+  UI.on('rm-del', el => { Persist.set('reminders', rem().filter(x => x.id !== el.dataset.id)); rerender(); });
+  UI.on('vh-newlog', el => { const v = byId(el.dataset.id); if (v) Tools.newLogFor(v); });
+  UI.on('vh-quote', el => { Quote.forVehicle(el.dataset.id); });
+  return { html, bind, all, byId, kmOf, dueList, notify, sagPct, label, open: id => { openId = id; } };
+})();
+
+const Quote = (() => {
+  const HOURS = { 1: 0.5, 2: 1, 3: 1.5, 4: 2.5, 5: 4 };
+  let q = null;
+  const fresh = () => ({ id: 'q' + Date.now().toString(36), vehicleId: '', model: State.model, cause: DiagPro.topCause ? (DiagPro.topCause() || '') : '', hours: null, lines: [], vat: true, note: '' });
+  const cause = () => DATA.pro.causes.find(c => c.id === q.cause) || null;
+  const rate = () => Sec.num(ProStore.get('rate', ''), 0, 10000);
+  const VAT = 0.18;
+  function setCause(id) {
+    q.cause = id; const c = cause();
+    q.hours = c ? HOURS[c.diff] || 1 : null;
+    q.lines = c ? (c.parts || []).map(p => ({ t: Sec.str(p, 120), price: null })) : [];
+  }
+  function totals() {
+    const r = rate() || 0, labor = (q.hours || 0) * r, parts = q.lines.reduce((s, l) => s + (l.price || 0), 0), net = labor + parts;
+    return { r, labor, parts, net, vat: q.vat ? net * VAT : 0, total: net * (q.vat ? 1 + VAT : 1), missing: q.lines.filter(l => l.price == null).length };
+  }
+  const money = n => '₪' + (Math.round(n * 100) / 100).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  function html() {
+    if (Persist.isLocked()) return DataUI.lockedCard('הצעות המחיר');
+    if (!q) { q = fresh(); if (q.cause) setCause(q.cause); }
+    const t = totals(), c = cause(), veh = Vehicles.all();
+    const causes = DATA.pro.causes.filter(x => !x.requires || x.requires.every(k => vehicleComps().includes(k)));
+    return `<p class="lead">הצעת מחיר לפי התעריף שלך. שעות העבודה הן הערכה לפי רמת הקושי – ערוך לפי הניסיון שלך. מחירי חלקים – אתה מזין.</p>
+      <div class="card stack"><div class="tool-grid">
+        <div class="field"><label for="qtRate">תעריף לשעה (₪)</label><input class="input num" id="qtRate" type="number" min="0" max="10000" inputmode="decimal" value="${esc(rate() ?? '')}"></div>
+        <div class="field"><label for="qtVeh">כלי (לא חובה)</label><select class="input" id="qtVeh"><option value="">בלי כרטיס</option>${veh.map(v => `<option value="${esc(v.id)}" ${q.vehicleId === v.id ? 'selected' : ''}>${esc(Vehicles.label(v))}</option>`).join('')}</select></div></div>
+        <div class="field"><label for="qtCause">תיקון</label><select class="input" id="qtCause"><option value="">בחר תקלה</option>${causes.map(x => `<option value="${x.id}" ${q.cause === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
+        ${c ? `<p class="foot">קושי ${c.diff}/5 · ${c.tech ? 'דורש טכנאי' : 'אפשר לבד'} · זמן: ${esc(c.time)}</p>` : ''}
+        <div class="field"><label for="qtHours">שעות עבודה ${Conf.badge('typ')}</label><input class="input num" id="qtHours" type="number" step="0.25" min="0" max="100" inputmode="decimal" value="${q.hours ?? ''}"></div>
+        <fieldset class="stack plain"><legend class="lbl">חלקים</legend>
+          ${q.lines.map((l, i) => `<div class="qt-line"><input class="input" data-qt="t" data-i="${i}" maxlength="120" value="${esc(l.t)}" aria-label="חלק ${i + 1}"><input class="input num" data-qt="p" data-i="${i}" type="number" min="0" max="100000" inputmode="decimal" placeholder="מחיר ₪" value="${l.price ?? ''}" aria-label="מחיר חלק ${i + 1}"><button type="button" class="btn sm ghost" data-action="qt-rm" data-i="${i}" aria-label="הסר שורה">הסר</button></div>`).join('')}
+          <button type="button" class="btn sm" data-action="qt-add">הוסף חלק</button></fieldset>
+        <label class="check"><input type="checkbox" id="qtVat" ${q.vat ? 'checked' : ''}><span>כולל מע״מ 18% <span class="verify-law">לאמת את השיעור העדכני</span></span></label>
+        <div class="field"><label for="qtNote">הערה ללקוח</label><textarea class="input" id="qtNote" rows="2" maxlength="600">${esc(q.note)}</textarea></div></div>
+      <div class="card stack print-area" id="qtOut"><h3>הצעת מחיר</h3>
+        <dl class="specs"><dt>עבודה</dt><dd class="num">${q.hours ?? 0} ש׳ × ${money(t.r)} = ${money(t.labor)}</dd><dt>חלקים</dt><dd class="num">${money(t.parts)}${t.missing ? ` <span class="foot">(${t.missing} ללא מחיר)</span>` : ''}</dd>
+        ${q.vat ? `<dt>מע״מ</dt><dd class="num">${money(t.vat)}</dd>` : ''}<dt>סה״כ</dt><dd class="num total">${money(t.total)}</dd></dl>
+        ${!t.r ? `<div class="note warn">${ICON.warn}<span>הזן תעריף לשעה.</span></div>` : ''}</div>
+      <div class="row"><button type="button" class="btn primary" data-action="qt-save">שמור הצעה</button><button type="button" class="btn" data-action="qt-copy">העתק</button>${IN_FRAME ? '' : '<button type="button" class="btn ghost" data-action="qt-print">הדפס</button>'}<button type="button" class="btn ghost" data-action="qt-new">הצעה חדשה</button></div>
+      <textarea class="input copybox" id="qtBox" hidden rows="6" readonly aria-label="הצעת מחיר להעתקה"></textarea>`;
+  }
+  function text() {
+    const t = totals(), c = cause(), v = q.vehicleId && Vehicles.byId(q.vehicleId);
+    return `הצעת מחיר – ${new Date().toLocaleDateString('he-IL')}\n${v ? 'כלי: ' + Vehicles.label(v) + '\n' : ''}תיקון: ${c ? c.name : '—'}\nעבודה: ${q.hours ?? 0} ש׳ × ${money(t.r)} = ${money(t.labor)}\n` +
+      q.lines.map(l => `חלק: ${l.t} – ${l.price != null ? money(l.price) : 'לפי מחיר ספק'}`).join('\n') + `\n${q.vat ? `מע״מ: ${money(t.vat)}\n` : ''}סה״כ: ${money(t.total)}\n${q.note ? q.note + '\n' : ''}ההצעה בתוקף 14 יום. המחיר הסופי לפי ממצאי הבדיקה.`;
+  }
+  function bind() {
+    const on = (s, ev, fn) => { const e = $(s); if (e) e.addEventListener(ev, fn); };
+    on('#qtRate', 'change', e => { const n = Sec.num(e.target.value, 0, 10000); ProStore.set('rate', n == null ? '' : n); rerender(); });
+    on('#qtVeh', 'change', e => { q.vehicleId = Sec.isId(e.target.value) ? e.target.value : ''; });
+    on('#qtCause', 'change', e => { setCause(e.target.value); rerender(); });
+    on('#qtHours', 'change', e => { q.hours = Sec.num(e.target.value, 0, 100); rerender(); });
+    on('#qtVat', 'change', e => { q.vat = e.target.checked; rerender(); });
+    on('#qtNote', 'change', e => { q.note = Sec.str(e.target.value, 600); });
+    $$('[data-qt]').forEach(i => i.addEventListener('change', () => { const l = q.lines[Number(i.dataset.i)]; if (!l) return; if (i.dataset.qt === 't') l.t = Sec.str(i.value, 120); else { l.price = Sec.num(i.value, 0, 1e5); rerender(); } }));
+  }
+  function rerender() { if (State.mode === 'tools') UI.Modes().tools.render(); }
+  UI.on('qt-add', () => { q.lines.push({ t: '', price: null }); rerender(); });
+  UI.on('qt-rm', el => { q.lines.splice(Number(el.dataset.i), 1); rerender(); });
+  UI.on('qt-new', () => { q = fresh(); if (q.cause) setCause(q.cause); rerender(); });
+  UI.on('qt-copy', () => copyText(text(), $('#qtBox')));
+  UI.on('qt-save', () => {
+    if (Persist.isLocked()) return;
+    const t = totals(), list = Persist.get('quotes').filter(x => x.id !== q.id);
+    list.unshift({ id: q.id, at: new Date().toISOString(), vehicleId: q.vehicleId, cause: q.cause, hours: q.hours, lines: q.lines, vat: q.vat, total: Math.round(t.total * 100) / 100, text: text() });
+    Persist.set('quotes', list.slice(0, 500)); UI.toast('ההצעה נשמרה');
+  });
+  UI.on('qt-print', () => { document.body.classList.add('printing'); const done = () => { document.body.classList.remove('printing'); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); try { window.print(); } catch (e) { done(); } setTimeout(done, 3000); });
+  function forVehicle(id) { q = fresh(); q.vehicleId = id; const v = Vehicles.byId(id); if (v) q.model = v.model; if (q.cause) setCause(q.cause); Tools.go('quote'); }
+  return { html, bind, forVehicle, totals: () => totals(), text: () => text(), setCause: id => { if (!q) q = fresh(); setCause(id); } };
+})();
+
+(window.BootHooks = window.BootHooks || []).push(() => { Vehicles.notify(); let lk = null; Persist.onChange(s => { if (s.locked !== lk) { lk = s.locked; Vehicles.notify(); } }); });
+
+/* =====================================================================
+   p22 · Cards – כרטיסיות חזרה מרווחת (Leitner)
+   מקורות: מונחי המילון + שאלות הבוחנים באקדמיה. ״ידעתי״ מעלה קופסה (מרווח ארוך
+   יותר), ״לא ידעתי״ מחזיר לקופסה 1. המצב נשמר ב-Persist('cards').
+   ===================================================================== */
+const Cards = (() => {
+  const GAP = [0, 1, 2, 4, 8, 16, 32];          // ימים לפי קופסה
+  const NEW_PER_DAY = 10;
+  let deck = null, cur = null, shown = false, session = { right: 0, wrong: 0 };
+  const today = () => new Date().toISOString().slice(0, 10);
+  const addDays = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+  function build() {
+    const D = [];
+    DATA.pro.glossary.forEach((g, i) => D.push({ id: 'g' + i, kind: 'מונח', front: g.t.join(' · '), back: g.beg }));
+    try {
+      const A = JSON.parse(document.getElementById('academy-data').textContent);
+      A.modules.forEach(m => (m.quiz || []).forEach((q, k) => D.push({ id: `q-${m.id}-${k}`, kind: m.title, front: q.q, back: `${q.opts[q.a]}. ${q.why}` })));
+    } catch (e) { /* בלי אקדמיה – רק מונחים */ }
+    return D;
+  }
+  const state = () => Persist.get('cards');
+  function queue() {
+    if (!deck) deck = build();
+    const st = state(), t = today();
+    const due = deck.filter(c => st[c.id] && st[c.id].due <= t);
+    const introduced = Object.values(st).filter(x => x.first === t).length;
+    const fresh = deck.filter(c => !st[c.id]).slice(0, Math.max(0, NEW_PER_DAY - introduced));
+    return due.concat(fresh);
+  }
+  function grade(ok) {
+    if (!cur) return;
+    const st = Object.assign({}, state()), t = today(), prev = st[cur.id] || { box: 0, first: t, seen: 0, right: 0 };
+    const box = ok ? Math.min(GAP.length - 1, prev.box + 1) : 1;
+    st[cur.id] = { box, due: addDays(t, GAP[box]), first: prev.first || t, seen: prev.seen + 1, right: prev.right + (ok ? 1 : 0) };
+    Persist.set('cards', st);
+    session[ok ? 'right' : 'wrong']++;
+    cur = null; shown = false;
+  }
+  function stats() {
+    const st = state(), boxes = [0, 0, 0, 0, 0, 0, 0];
+    Object.values(st).forEach(x => { boxes[x.box] = (boxes[x.box] || 0) + 1; });
+    return { total: (deck || build()).length, learned: Object.keys(st).length, boxes, mastered: boxes[5] + boxes[6] };
+  }
+  function html() {
+    if (!deck) deck = build();
+    const q = queue(), s = stats();
+    if (!cur && q.length) cur = q[0];
+    const box = cur && state()[cur.id] ? state()[cur.id].box : 0;
+    return `<p class="lead">חזרה מרווחת: מה שאתה יודע חוזר בעוד ימים, מה שלא – מחר. כמה דקות ביום מספיקות.</p>
+      <div class="kv-grid"><div class="kv"><span>לחזרה עכשיו</span><b>${q.length}</b></div><div class="kv"><span>נלמדו</span><b>${s.learned}/${s.total}</b></div><div class="kv"><span>שולטים</span><b>${s.mastered}</b></div><div class="kv"><span>בסשן</span><b>${session.right}/${session.right + session.wrong}</b></div></div>
+      ${cur ? `<div class="card stack flash" aria-live="polite"><div class="spread"><span class="eyebrow">${esc(cur.kind)}</span><span class="foot num">קופסה ${box}</span></div>
+        <p class="flash-front">${esc(cur.front)}</p>
+        ${shown ? `<p class="flash-back">${esc(cur.back)}</p><div class="row"><button type="button" class="btn" data-action="fc-no">לא ידעתי</button><button type="button" class="btn primary" data-action="fc-yes">ידעתי</button></div>`
+          : '<button type="button" class="btn primary" data-action="fc-show">הצג תשובה</button>'}</div>`
+        : `<div class="card stack"><h3>סיימת להיום</h3><p class="lead">הכרטיסיות הבאות יחזרו לפי הלוח. ${s.learned < s.total ? 'מחר יתווספו עוד כרטיסיות חדשות.' : ''}</p></div>`}`;
+  }
+  const rerender = () => { if (State.mode === 'learn') UI.Modes().learn.render(); const f = $('.flash button'); if (f) f.focus(); };
+  UI.on('fc-show', () => { shown = true; rerender(); });
+  UI.on('fc-yes', () => { grade(true); rerender(); });
+  UI.on('fc-no', () => { grade(false); rerender(); });
+  return { html, bind() {}, queue: () => queue(), stats, reset() { deck = null; cur = null; shown = false; } };
+})();
 
 /* =====================================================================
    p14 · Boot Pro – טוען את האחסון המקומי, מאתחל את שכבת ה-Pro ואז את האתחול המקורי

@@ -1718,7 +1718,7 @@ const UI = (() => {
 /* ===================== Learn (מצב לימוד) ===================== */
 const Learn = (() => {
   let sub = 'model', step = -1;
-  const SUBS = [['model', 'הדגם'], ['academy', 'אקדמיה'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים'], ['glossary', 'מילון']];
+  const SUBS = [['model', 'הדגם'], ['academy', 'אקדמיה'], ['compare', 'השוואה'], ['tour', 'סיור'], ['concepts', 'מושגים'], ['volts', 'מתחים'], ['comps', 'רכיבים'], ['glossary', 'מילון'], ['cards', 'כרטיסיות']];
   const steps = () => DATA.tour.filter(s => vehicleComps().includes(s.comp) && (!s.bundle || bundleById(s.bundle)));
 
   function subtabs() {
@@ -1864,7 +1864,7 @@ const Learn = (() => {
     } else { Scene.select(null); Scene.highlightBundle(null); }
   }
   function render() {
-    const body = sub === 'academy' ? Academy.html() : sub === 'glossary' ? Glossary.html() : sub === 'model' ? modelHTML() : sub === 'compare' ? compareHTML() : sub === 'tour' ? tourHTML() : sub === 'concepts' ? conceptsHTML() : sub === 'volts' ? voltsHTML() : compsHTML();
+    const body = sub === 'academy' ? Academy.html() : sub === 'glossary' ? Glossary.html() : sub === 'cards' ? Cards.html() : sub === 'model' ? modelHTML() : sub === 'compare' ? compareHTML() : sub === 'tour' ? tourHTML() : sub === 'concepts' ? conceptsHTML() : sub === 'volts' ? voltsHTML() : compsHTML();
     $('#modeView').innerHTML = `
       <div><p class="eyebrow">${ICON.bolt} מצב לימוד · <bdi>${esc(M().short)}</bdi></p><h2>איך הכול מחובר?</h2></div>
       ${subtabs()}<div class="stack">${body}</div>

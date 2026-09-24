@@ -865,3 +865,47 @@ dl.specs dd.num,dl.specs dd .num{font-size:15px}
 .chk-list li:first-child{border-top:0}
 .subtabs button .num{font-size:12px;color:var(--faint);margin-inline-end:2px}
 
+/* ---------- חיפוש גלובלי ---------- */
+.gsearch{position:relative;flex:1 1 240px;max-width:420px}
+.gsearch .input{width:100%;min-height:40px}
+.gs-list{position:absolute;z-index:40;top:calc(100% + 4px);inset-inline:0;margin:0;padding:4px;list-style:none;background:var(--bg2);border:var(--bw) solid var(--line2);border-radius:var(--radius);max-height:min(60vh,440px);overflow:auto}
+.gs-list li{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;min-height:44px;align-items:center}
+.gs-list li[aria-selected="true"],.gs-list li:hover{background:var(--accent-soft)}
+.gs-type{grid-row:span 2;font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line2);border-radius:var(--radius-sm);padding:2px 6px;align-self:start;white-space:nowrap}
+.gs-t{font-weight:600}.gs-sub{font-size:13px;color:var(--muted);grid-column:2}
+.gs-ask{border-top:var(--bw) solid var(--line)}
+.ask-out{white-space:pre-wrap;font:inherit;font-size:13.5px;background:var(--surface2);border:var(--bw) solid var(--line);border-radius:var(--radius-sm);padding:10px;margin:0;color:var(--text)}
+
+/* ---------- סדנה: סרגל ידיים עסוקות, תמונות ---------- */
+.voice-bar{position:fixed;z-index:30;bottom:calc(12px + env(safe-area-inset-bottom,0px));inset-inline-start:12px;display:flex;gap:8px;background:var(--bg2);border:var(--bw) solid var(--line2);border-radius:var(--radius);padding:8px}
+.voice-bar .btn{min-height:56px;min-width:88px;font-size:17px}
+.voice-bar #vbMic[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumb{margin:0;display:grid;gap:4px;justify-items:center}
+.thumb img{width:96px;height:72px;object-fit:cover;border-radius:var(--radius-sm);border:var(--bw) solid var(--line);background:var(--surface3)}
+
+/* ---------- כרטיסי כלי, תזכורות, גרף ---------- */
+.due-tag{font-size:12.5px;font-weight:700;color:var(--action-ink);background:var(--action);border-radius:var(--radius-sm);padding:2px 8px}
+.kmv{font-size:20px;font-weight:600}
+.rem-list li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:var(--bw) solid var(--line)}
+.rem-list li:first-child{border-top:0}
+.rem.due{border-inline-start:4px solid var(--action);padding-inline-start:8px}
+.rem.soon{border-inline-start:4px solid var(--accent);padding-inline-start:8px}
+.sag-graph{margin:0}
+.sag-graph svg{width:100%;height:auto;display:block;direction:ltr}
+.sag-graph .ax{stroke:var(--line2);stroke-width:1}
+.sag-graph .g-ok{stroke:var(--ok);stroke-dasharray:4 4}.sag-graph .g-bad{stroke:var(--danger);stroke-dasharray:4 4}
+.sag-graph .gline{fill:none;stroke:var(--accent);stroke-width:2.5}
+.sag-graph circle{fill:var(--accent)}
+.sag-graph text{font-family:var(--mono);font-size:11px;fill:var(--muted)}.sag-graph .gv{fill:var(--text);font-weight:600}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:10px;border-inline-start:2px solid var(--line2);padding-inline-start:12px}
+.timeline li{display:grid;gap:2px}
+.qt-line{display:grid;grid-template-columns:1fr 120px auto;gap:6px;align-items:center}
+dd.total{font-size:22px;font-weight:700}
+
+/* ---------- כרטיסיות ---------- */
+.flash{border-inline-start:4px solid var(--accent)}
+.flash-front{font-size:19px;font-weight:600;line-height:1.45}
+.flash-back{font-size:16px;line-height:1.55;border-top:var(--bw) solid var(--line);padding-top:10px}
+@media (max-width: 900px){.gsearch{order:5;flex-basis:100%;max-width:none}}
+
