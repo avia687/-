@@ -44,7 +44,7 @@ const WizardPlus = (() => {
     return `${cap ? `<div class="note warn">${ICON.warn}<span>לפני מגע בבקר או במחברי ההספק: המתינו 2 דקות אחרי ניתוק ובדקו שיש 0V (הקבלים שומרים מתח).</span></div>` : ''}
       <div class="verify-box" id="wvBox"><b>בדיקת אימות לפני המשך</b>
         ${v.hint ? `<span class="foot">${T(v.hint)}${range ? ' · ' + esc(range) : ''}</span>` : (range ? `<span class="foot">${esc(range)}</span>` : '')}
-        ${input}<span class="vres" id="wvRes" aria-live="polite">${ok ? '✅ אומת' : ''}</span></div>`;
+        ${input}<span class="vres" id="wvRes" aria-live="polite">${ok ? MK.ok + 'אומת' : ''}</span></div>`;
   }
   function bindStep(scenario, idx, s) {
     const v = spec(s), k = key(scenario, idx);
@@ -53,7 +53,7 @@ const WizardPlus = (() => {
     const set = (ok, msg, fail) => {
       passed[k] = !!ok;
       if (next) next.disabled = !ok;
-      if (res) res.innerHTML = msg || '';
+      if (res) res.innerHTML = msg ? (ok ? MK.ok : fail ? MK.bad : '') + msg : '';
       if (box) box.classList.toggle('fail', !!fail);
     };
     if (next) next.disabled = !passed[k];
@@ -62,31 +62,31 @@ const WizardPlus = (() => {
       const inp = $('#wvIn');
       inp.addEventListener('input', () => {
         const n = parse(inp); if (n == null) { set(false, ''); return; }
-        if (v.kind === 'numFree') { set(true, `✅ נרשם: ${n}${v.unit}. השוו למתח שכתוב על הפנס לפני חיבור.`); return; }
+        if (v.kind === 'numFree') { set(true, `נרשם: ${n}${v.unit}. השוו למתח שכתוב על הפנס לפני חיבור.`); return; }
         const lo = nT(v.min), hi = nT(v.max);
-        if (n < 0 && lo >= 0) { set(false, '⛔ ערך שלילי: החודים הפוכים – או קוטביות הפוכה במחבר. לא מחברים! בדקו שוב.', true); return; }
-        if (n >= lo && n <= hi) set(true, `✅ ${n}${v.unit} בטווח (${lo}–${hi}${v.unit})`);
-        else set(false, `⛔ ${n}${v.unit} מחוץ לטווח ${lo}–${hi}${v.unit}. לא ממשיכים – חזרו על השלב או <button type="button" class="linkbtn" data-action="goto-diag">עברו לאבחון</button>.`, true);
+        if (n < 0 && lo >= 0) { set(false, 'ערך שלילי: החודים הפוכים – או קוטביות הפוכה במחבר. לא מחברים! בדקו שוב.', true); return; }
+        if (n >= lo && n <= hi) set(true, `${n}${v.unit} בטווח (${lo}–${hi}${v.unit})`);
+        else set(false, `${n}${v.unit} מחוץ לטווח ${lo}–${hi}${v.unit}. לא ממשיכים – חזרו על השלב או <button type="button" class="linkbtn" data-action="goto-diag">עברו לאבחון</button>.`, true);
       });
     } else if (v.kind === 'num2') {
       const a = $('#wvIn'), b = $('#wvIn2');
       const chk = () => {
         const x = parse(a), y = parse(b); if (x == null || y == null) { set(false, ''); return; }
         const ok1 = x >= v.ranges[0][0] && x <= v.ranges[0][1], ok2 = y >= v.ranges[1][0] && y <= v.ranges[1][1];
-        if (ok1 && ok2) set(true, '✅ אות המצערת תקין');
-        else set(false, `⛔ ${!ok1 ? (x > v.ranges[0][1] ? 'אות גבוה במנוחה – סכנת האצה! נתקו ובדקו.' : 'אות נמוך במנוחה – בדקו 5V וחיבור.') : 'אות לא מגיע לפתיחה מלאה – מצערת או חיווט.'}`, true);
+        if (ok1 && ok2) set(true, 'אות המצערת תקין');
+        else set(false, `${!ok1 ? (x > v.ranges[0][1] ? 'אות גבוה במנוחה – סכנת האצה! נתקו ובדקו.' : 'אות נמוך במנוחה – בדקו 5V וחיבור.') : 'אות לא מגיע לפתיחה מלאה – מצערת או חיווט.'}`, true);
       };
       a.addEventListener('input', chk); b.addEventListener('input', chk);
     } else if (v.kind === 'choice') {
       $$('#wvBox [data-wv]').forEach(btn => btn.addEventListener('click', () => {
         $$('#wvBox [data-wv]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
         const i = Number(btn.dataset.wv);
-        if (i === v.pass) set(true, '✅ אומת');
-        else set(false, '⛔ לא עובר אימות. אל תמשיכו – תקנו או <button type="button" class="linkbtn" data-action="goto-diag">עברו לאבחון</button>.', true);
+        if (i === v.pass) set(true, 'אומת');
+        else set(false, 'לא עובר אימות. אל תמשיכו – תקנו או <button type="button" class="linkbtn" data-action="goto-diag">עברו לאבחון</button>.', true);
       }));
     } else {
       const c = $('#wvChk');
-      c.addEventListener('change', () => set(c.checked, c.checked ? '✅ אומת' : ''));
+      c.addEventListener('change', () => set(c.checked, c.checked ? 'אומת' : ''));
     }
   }
   function reset() { Object.keys(passed).forEach(k => delete passed[k]); }

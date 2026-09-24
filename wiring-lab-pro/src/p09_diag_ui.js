@@ -35,7 +35,7 @@ const DiagPro = (() => {
     const top = post.slice(0, n);
     return `<ol class="probs" aria-label="סיבות אפשריות לפי הסתברות">${top.map((x, i) => `<li>
       <button type="button" class="prob ${i === 0 && x.p >= 0.5 ? 'lead-cause' : ''}" data-action="dp-cause" data-c="${x.c.id}" aria-label="${esc(x.c.name)} – ${pct(x.p)} אחוז">
-        <span class="pname">${esc(x.c.name)}${x.c.stop === 'battery' ? ' <span class="tag-stop" title="דורש מומחה סוללות">🔋</span>' : x.c.stop === 'noride' ? ' <span class="tag-stop" title="לא לרכוב עד תיקון">⛔</span>' : ''}<small class="pro-only">${esc(x.c.pro)}</small></span>
+        <span class="pname">${esc(x.c.name)}${x.c.stop === 'battery' ? ' <span class="tag-stop" title="דורש מומחה סוללות">${ICON.batt}<span class="sr-only">דורש מומחה סוללות</span></span>' : x.c.stop === 'noride' ? ' <span class="tag-stop" title="לא לרכוב עד תיקון">${ICON.stop}<span class="sr-only">לא לרכוב עד תיקון</span></span>' : ''}<small class="pro-only">${esc(x.c.pro)}</small></span>
         <span class="pp num">${pct(x.p)}%</span>
         <span class="pbar" aria-hidden="true"><i style="width:${Math.max(2, x.p * 100)}%"></i></span>
       </button></li>`).join('')}</ol>
@@ -45,7 +45,7 @@ const DiagPro = (() => {
     const s = E.suggest(ev, post);
     if (!s.length) return evCount() ? '<p class="lead">אין מדידה נוספת שתשנה משמעותית את התמונה. אפשר לעבור לסיכום.</p>' : '';
     return `<div class="next-list">${s.map((x, i) => `<button type="button" class="next-m" data-action="dp-open" data-m="${x.m.id}">
-      <span class="nm">${i === 0 ? '⭐ ' : ''}${esc(x.m.name)}</span>${x.m.live ? Safety.liveBadge() : ''}
+      <span class="nm">${i === 0 ? '<span class="best-tag">הכי כדאי</span>' : ''}${esc(x.m.name)}</span>${x.m.live ? Safety.liveBadge() : ''}
       <small><span class="pro-only num">ערך מידע ${x.g.toFixed(2)} ביט · </span>${esc(x.m.mode)}</small></button>`).join('')}</div>`;
   }
 
@@ -93,7 +93,7 @@ const DiagPro = (() => {
     const post = E.posterior(ev);
     const heat = ev.sym.has('heat') || ev.res.m_hot === 'conn';
     return `
-      <div class="note info beg-only">${ICON.info}<span>בחרו מה קורה (אפשר כמה סימפטומים), והזינו מדידות. המערכת משווה לערכים התקינים של <bdi>${esc(M().short)}</bdi> ומעדכנת את הסבירות של כל סיבה בזמן אמת. ⭐ = המדידה שהכי כדאי לעשות עכשיו.</span></div>
+      <div class="note info beg-only">${ICON.info}<span>בחרו מה קורה (אפשר כמה סימפטומים), והזינו מדידות. המערכת משווה לערכים התקינים של <bdi>${esc(M().short)}</bdi> ומעדכנת את הסבירות של כל סיבה בזמן אמת. ״הכי כדאי״ = המדידה שהכי כדאי לעשות עכשיו.</span></div>
       ${hvBanner()}
       <div class="stack"><h3>מה קורה? <small class="lead">(אפשר לבחור כמה)</small></h3>
         <div class="sym-chips" role="group" aria-label="סימפטומים">${E.symptoms().map(s => `<button type="button" class="chip symchip" data-action="dp-sym" data-s="${s.id}" aria-pressed="${ev.sym.has(s.id)}" style="--c:#00e5ff"><span aria-hidden="true">${esc(s.glyph)}</span> ${esc(s.name)}<small class="pro-only">&nbsp;· ${esc(s.pro)}</small></button>`).join('')}</div></div>
@@ -195,7 +195,7 @@ const DiagPro = (() => {
         <div class="kv"><span>מלאה ${Conf.badge('ok')}</span><b class="num">${b.full.toFixed(1)}V</b></div>
         <div class="kv"><span>ריקה ≈ ${Conf.badge('ok')}</span><b class="num">${b.empty.toFixed(1)}V</b></div>
         <div class="kv"><span>אספקת חיישנים ${Conf.badge('typ')}</span><b class="num">4.8–5.2V</b></div>
-        <div class="kv"><span>זרם בקר ${Conf.badge(ex.controllerAmps ? ex.controllerAmps.conf : 'unk')}</span><b class="num">${ex.controllerAmps && ex.controllerAmps.v ? ex.controllerAmps.v + 'A' : '❓'}</b></div>
+        <div class="kv"><span>זרם בקר ${Conf.badge(ex.controllerAmps ? ex.controllerAmps.conf : 'unk')}</span><b class="num">${ex.controllerAmps && ex.controllerAmps.v ? ex.controllerAmps.v + 'A' : 'לא ידוע'}</b></div>
       </div>
       <div class="stack">${tps.map(tp => `<div class="card tp-card ${tpSel === tp.id ? 'sel' : ''}" id="tp-${tp.id}">
         <div class="spread"><h3>${esc(tp.name)}</h3><span>${tp.live ? Safety.liveBadge() : ''} ${Conf.badge(tp.conf)}</span></div>
@@ -353,7 +353,7 @@ const DiagPro = (() => {
     const fams = ec.families || [];
     return `<div class="card stack model-card"><div class="spread"><h3>קודים לדגם <bdi>${esc(M().short)}</bdi></h3>${Conf.badge(ec.conf)}</div>
       <p class="lead" style="font-size:14px">${T(ec.note)}</p>
-      ${fams.length ? `<div class="row">${fams.map(f => { const b = DATA.errorCodes.brands.find(x => x.id === f); return `<button type="button" class="btn sm" data-action="dg-brand" data-b="${f}">הצג קודי ${esc(b ? b.name : f)}</button>`; }).join('')}</div>` : '<p class="foot">❓ אין קודים מאומתים לדגם הזה במאגר. לא ממציאים קודים – בדקו במדריך הצג.</p>'}</div>`;
+      ${fams.length ? `<div class="row">${fams.map(f => { const b = DATA.errorCodes.brands.find(x => x.id === f); return `<button type="button" class="btn sm" data-action="dg-brand" data-b="${f}">הצג קודי ${esc(b ? b.name : f)}</button>`; }).join('')}</div>` : '<p class="foot">אין קודים מאומתים לדגם הזה במאגר. לא ממציאים קודים – בדקו במדריך הצג.</p>'}</div>`;
   }
   function codeConf(c) { return Conf.badge((DATA.pro.codeConfidence || {})[c.b] || 'unk'); }
 

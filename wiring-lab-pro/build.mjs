@@ -110,7 +110,7 @@ function expectedValues(id, m) {
   if (comps.includes('pas')) ev.pas = { v: 'פולסים 0/5V', conf: 'typ' };
   return ev;
 }
-const HALL120 = { type: '120°', states: ['101', '100', '110', '010', '011', '001'], conf: 'typ', note: 'רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – ⚠️ טיפוסי.' };
+const HALL120 = { type: '120°', states: ['101', '100', '110', '010', '011', '001'], conf: 'typ', note: 'רוב מנועי ה-Hub עובדים בזווית 120°: בכל צעד משתנה חוט אחד, ואף פעם לא כל השלושה 0 או 5V. 000 או 111 מעידים על חיישן תקול, או על מנוע 60° (נדיר). היצרן לא פרסם – טיפוסי.' };
 function torque(m, e) {
   const t = m.cat === 'ebike' ? ['tq_caliper', 'tq_rotor', 'tq_lever', 'tq_stem', 'tq_crank', 'tq_axle'] : ['tq_lever', 'tq_bar', 'tq_axle'];
   if (m.cat === 'scooter' && /דיסק/.test(m.brakes)) t.unshift('tq_caliper', 'tq_rotor');
@@ -136,6 +136,9 @@ for (const id of Object.keys(DATA.models)) {
 }
 if (specIssues.length) console.log('spec issues:', specIssues);
 
+// עיצוב: בלי אימוג׳י/סמלים בכפתורי סימפטומים
+DATA.diagnostics.symptoms.forEach(x => { x.glyph = ''; });
+DATA.pro.bayesSymptoms.forEach(x => { x.glyph = ''; });
 const dataJSON = JSON.stringify(DATA, null, 1).replace(/<\/script/gi, '<\\/script');
 html = html.slice(0, i0 + OPEN.length) + '\n' + dataJSON + '\n' + html.slice(i1);
 
@@ -234,6 +237,19 @@ patch("    camera.position.copy(h.pos); controls.target.copy(h.target); camera.l
 patch("  function setModel(id) {\n    if (!DATA.models[id] || id === State.model) return;", "  function setModel(id) {\n    if (!DATA.models[id] || id === State.model) return;\n    if (!ModelData.ready(id)) { toast('טוען את נתוני הדגם…'); ModelData.ensure(id).then(() => setModel(id), () => toast('נתוני הדגם לא נטענו – בדקו חיבור')); return; }", 'setModel lazy');
 patch('<div class="stage-tools">', '<div class="stage-tools">\n        <button type="button" class="icon-btn" id="saverBtn" aria-pressed="false" aria-label="חיסכון סוללה – כיבוי התלת-ממד" title="חיסכון סוללה – כיבוי התלת-ממד"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="16" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 10v4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>', 'saver btn');
 
+// עיצוב (שלב D): לוגו, שם, סמל סכנה, בורר ערכת תצוגה, צבעי תלת-ממד
+patch('<button class="hazard-chip" id="hazardChip" type="button" hidden>⛔ סומן מצב סיכון</button>', '<button class="hazard-chip" id="hazardChip" type="button" hidden>סומן מצב סיכון</button>', 'hazard chip');
+{
+  const b0 = html.indexOf('<svg class="logo" viewBox="0 0 40 40" aria-hidden="true">'), b1 = html.indexOf('</svg>', b0);
+  if (b0 < 0) throw new Error('logo not found');
+  html = html.slice(0, b0) + '<svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="104" fill="#1b1e22"/><rect x="118" y="118" width="276" height="136" rx="20" fill="#0d2238" stroke="#3d8bff" stroke-width="12"/><path d="M146 200h46l22-46 34 88 24-42h94" fill="none" stroke="#ff7a1a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><circle cx="206" cy="356" r="30" fill="#ff7a1a"/><circle cx="306" cy="356" r="30" fill="none" stroke="#e8eaed" stroke-width="12"/>' + html.slice(b1);
+}
+patch('        <h1>מעבדת החיווט</h1>\n        <p class="sub">חשמל לאופניים ולקורקינטים – לומדים, מתקינים, מאבחנים</p>', '        <h1>מעבדת EV</h1>\n        <p class="sub">חשמל לאופניים ולקורקינטים: מדוד, אבחן, תקן</p>', 'brand');
+patch('      <span class="save-state" id="saveState" role="status" aria-live="polite"></span>', '      <label class="sr-only" for="themeSel">ערכת תצוגה</label><select id="themeSel" class="input theme-sel"><option value="auto">תצוגה: לפי המכשיר</option><option value="dark">כהה</option><option value="light">בהירה</option><option value="day">אור יום (שמש)</option></select>\n      <span class="save-state" id="saveState" role="status" aria-live="polite"></span>', 'theme select');
+patch("scene.background = col('#0b0f14');", "scene.background = col('#16191c');", 'scene bg');
+patch("scene.fog = new THREE.Fog(col('#0b0f14'), 4.5, 11);", "scene.fog = new THREE.Fog(col('#16191c'), 4.5, 11);", 'scene fog');
+patch("color: 0x0d141b, side: THREE.BackSide", "color: 0x15181b, side: THREE.BackSide", 'env box');
+patch("new THREE.GridHelper(6, 30, 0x0f4652, 0x15232e)", "new THREE.GridHelper(6, 30, 0x2f3740, 0x21262b)", 'grid');
 /* ---------- 4. מודולים חדשים ---------- */
 const MODS = [
   ['p06_sec.js', 1], ['p06b_storage.js', 1], ['p07_core_pro.js', 1], ['p08_diag_engine.js', 2], ['p09_diag_ui.js', 2], ['p10_academy.js', 3], ['p11_meter_sim.js', 3],
@@ -270,12 +286,47 @@ const sxRules = [];
 }
 patch('</style>\n<div id="app">', '</style>\n<style>\n/* generated from inline styles */\n' + sxRules.join('\n') + '\n</style>\n<div id="app">', 'sx css');
 
+// מיקרו-קופי: פעלים קצרים בגוף שני
+const COPY = [['שמירה ליומן', 'שמור ליומן'], ['העתקת דו״ח לטכנאי', 'העתק דו״ח לטכנאי'], ['העתקת דו״ח', 'העתק דו״ח'], ['למדידה', 'מדוד'], ['ניקוי', 'נקה'], ['דווחו על סכנה', 'דווח על סכנה'],
+  ['העתקת תבנית יומן', 'העתק תבנית יומן'], ['הזנת קריאה לאבחון', 'הזן קריאה לאבחון'], ['לבדיקות לסירוגין', 'בדוק תקלה לסירוגין'], ['ניסיון נוסף', 'נסה שוב'], ['הגשה', 'הגש'],
+  ['הדפסה / שמירה כ-PDF', 'הדפס או שמור PDF'], ['העתקת טקסט התעודה', 'העתק את התעודה'], ['החלפת נתיך במד', 'החלף נתיך במד'], ['סיום תרגיל', 'סיים תרגיל'], ['ייצוא JSON', 'ייצא JSON'],
+  ['ייבוא', 'ייבא'], ['עריכה', 'ערוך'], ['דו״ח ללקוח', 'הפק דו״ח'], ['הדפסה', 'הדפס'], ['העתקת הדו״ח', 'העתק דו״ח'], ['סגירה', 'סגור'], ['עברו לאבחון', 'עבור לאבחון'],
+  ['התקנה כאפליקציה', 'התקן כאפליקציה'], ['ייצוא כל הנתונים שלי', 'ייצא את כל הנתונים שלי'], ['פתיחה עם PIN', 'פתח עם PIN'], ['אין סימני סכנה – חזרה', 'אין סימני סכנה – חזור'],
+  ['הבנתי – סגירה', 'הבנתי – סגור'], ['התחלת הסיור', 'התחל סיור'], ['יציאה מהאשף', 'צא מהאשף'], ['מעבר לאבחון', 'עבור לאבחון'], ['פתיחת מאגר קודי השגיאה', 'פתח מאגר קודים'], ['חזרה', 'חזור'],
+  ['התקנה נוספת', 'התקנה חדשה']];
+for (const [a, b] of COPY) {
+  const re = new RegExp('(<button[^>]*>)' + a.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&') + '(</button>)', 'g');
+  if (!re.test(html)) throw new Error('copy not found: ' + a);
+  html = html.replace(re, (_, o, c) => o + b + c);
+}
+
+/* ---------- 5b. ערכת עיצוב + גופנים (מקומיים, בלי CDN) ---------- */
+const FONTS = [['Plex Hebrew', 'plex-he-hebrew', [400, 600, 700], 'U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F'],
+  ['Plex Hebrew', 'plex-he-latin', [400, 600, 700], 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD'],
+  ['Plex Mono', 'plex-mono', [500, 600], 'U+0000-00FF,U+2000-206F,U+2212']];
+const fontFaces = urlOf => FONTS.flatMap(([fam, file, ws, range]) => ws.map(w => `@font-face{font-family:'${fam}';font-style:normal;font-weight:${w === 500 && fam === 'Plex Mono' ? '400 500' : w};font-display:swap;src:url(${urlOf(file.startsWith('plex-mono') ? `${file}-${w}` : `${file}-${w}`)}) format('woff2');unicode-range:${range}}`)).join('\n');
+const fontFile = n => path.join(ROOT, 'src', 'fonts', n + '.woff2');
+const themeCSS = read('theme.css');
+patch('<div id="app">', '<style>\n' + themeCSS.replace('/*@FONTS@*/', '/*@FONTFACES@*/') + '\n</style>\n<div id="app">', 'theme css');
+// צבע הדגשה חדש (כחול מולטימטר) במקום הציאן הישן – גם ב-SVG ובתלת-ממד
+html = html.split('#00e5ff').join('#5aa2ff').split('rgba(0,229,255,').join('rgba(90,162,255,').split('0x00e5ff').join('0x5aa2ff').split('#7af3ff').join('#8fc0ff');
+// אין אימוג׳י בממשק
+{
+  const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}\u{2705}\u{274C}\u{2753}\u{2757}\u{2B50}\u{2713}\u{2717}\u{2715}\u{FE0F}]/gu;
+  const scan = html.replace(/<template id="tpl-(terms|privacy)">[\s\S]*?<\/template>/g, '');
+  const found = scan.match(EMOJI);
+  if (found) { const i = scan.search(EMOJI); throw new Error('emoji in UI: ' + [...new Set(found)].join(' ') + ' near: ' + scan.slice(Math.max(0, i - 60), i + 10)); }
+}
+// גופנים ב-Artifact: מוטמעים (data URI) – אין בקשה חיצונית
+const htmlArtifact = html.replace('/*@FONTFACES@*/', fontFaces(n => `data:font/woff2;base64,${fs.readFileSync(fontFile(n)).toString('base64')}`));
+html = html.replace('/*@FONTFACES@*/', fontFaces(n => `fonts/${n}.woff2`));
+
 /* ---------- 6. פלט ---------- */
 const DIST = path.join(ROOT, 'dist');
 fs.mkdirSync(DIST, { recursive: true });
-fs.writeFileSync(path.join(DIST, 'artifact.html'), html);
+fs.writeFileSync(path.join(DIST, 'artifact.html'), htmlArtifact);
 fs.writeFileSync(path.join(DIST, 'index.html'),
-  `<!DOCTYPE html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n${html}\n</body>\n</html>\n`);
+  `<!DOCTYPE html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<title>מעבדת EV</title>\n</head>\n<body>\n${htmlArtifact}\n</body>\n</html>\n`);
 /* ---------- גרסת Web (PWA) – CSP קשיח: default-src 'self', בלי קוד inline ---------- */
 {
   const WEB = path.join(DIST, 'web');
@@ -316,6 +367,8 @@ fs.writeFileSync(path.join(DIST, 'index.html'),
   fs.writeFileSync(path.join(WEB, 'app.js'), scripts[0]);
   fs.writeFileSync(path.join(WEB, 'pro.js'), scripts[1]);
   fs.copyFileSync(THREE_LOCAL, path.join(WEB, 'vendor', 'three.min.js'));
+  fs.mkdirSync(path.join(WEB, 'fonts'), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, 'src', 'fonts'))) fs.copyFileSync(path.join(ROOT, 'src', 'fonts', f), path.join(WEB, 'fonts', f));
   w = w.replace(threeCfg(THREE_SRC), threeCfg('vendor/three.min.js'));
   if (!w.includes('"src":"vendor/three.min.js"')) throw new Error('three cfg not replaced');
   w = w.replace('@@SCRIPT0@@', `<script src="app.js" integrity="${sri(scripts[0])}"></script>\n`).replace('@@SCRIPT1@@', `<script src="pro.js" integrity="${sri(scripts[1])}"></script>\n`);
@@ -335,6 +388,8 @@ fs.writeFileSync(path.join(DIST, 'index.html'),
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-180.png">
+<link rel="preload" href="fonts/plex-he-hebrew-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/plex-he-hebrew-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="app.css" integrity="${sri(css.join('\n'))}">
 </head>
 <body>
@@ -398,5 +453,5 @@ self.addEventListener('message', e => { if (e.data && e.data.type === 'skipWaiti
   Cross-Origin-Opener-Policy: same-origin
 `);
 }
-fs.writeFileSync(path.join(DIST, 'models.json'), JSON.stringify({ _doc: 'מעבדת החיווט – 12 הדגמים עם שדות מורחבים. conf: ok=✅ מאומת, typ=⚠️ טיפוסי/משוער, unk=❓ לא ידוע.', confLegend: pro.confLegend, torqueRef: pro.torqueRef, models: DATA.models }, null, 1));
+fs.writeFileSync(path.join(DIST, 'models.json'), JSON.stringify({ _doc: 'מעבדת החיווט – 12 הדגמים עם שדות מורחבים. conf: ok=מאומת, typ=טיפוסי/משוער, unk=לא ידוע.', confLegend: pro.confLegend, torqueRef: pro.torqueRef, models: DATA.models }, null, 1));
 console.log(`built stage ${STAGE}: ${(html.length / 1024).toFixed(0)} KB, models: ${Object.keys(DATA.models).length}`);

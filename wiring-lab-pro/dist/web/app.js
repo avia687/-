@@ -305,7 +305,7 @@ const Scene = Object.assign({}, SceneStub, { wake() {}, loaded: false });
 function makeScene() { return (() => {
   const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
   const col = hex => new THREE.Color(hex).convertSRGBToLinear();
-  const ACCENT = col('#00e5ff');
+  const ACCENT = col('#5aa2ff');
   const HOME = {
     ebike: { target: V3(0.0, 0.6, 0), dir: V3(0.38, 0.3, 1).normalize(), fitW: 1.85, fitH: 1.3 },
     scooter: { target: V3(0.0, 0.64, 0), dir: V3(0.42, 0.3, 1).normalize(), fitW: 1.35, fitH: 1.42 }
@@ -604,7 +604,7 @@ function makeScene() { return (() => {
       const cl = add(Br, cylZ(0.02, 0.032, resM, 14)); cl.position.set(0.33, 1.13, 0.26 * s);
       const res = add(Br, box(0.035, 0.022, 0.03, resM)); res.position.set(0.345, 1.155, 0.26 * s);
       const blade = add(Br, box(0.014, 0.012, 0.12, lm)); blade.position.set(0.375, 1.125, 0.32 * s); blade.rotation.y = -0.18 * s;
-      const sen = add(Br, box(0.012, 0.012, 0.018, mat('#0b3d45', { emissive: '#00e5ff', emissiveIntensity: 0.25 }))); sen.position.set(0.36, 1.115, 0.243 * s);
+      const sen = add(Br, box(0.012, 0.012, 0.018, mat('#0b3d45', { emissive: '#5aa2ff', emissiveIntensity: 0.25 }))); sen.position.set(0.36, 1.115, 0.243 * s);
       add(Br, tube(V3(0.34, 1.12, 0.26 * s), V3(0.36, 1.0, 0.1 * s), 0.004, mat('#111'), 6));
     });
     anc('brLOut', 'brakes', V3(0.348, 1.112, -0.24));
@@ -744,7 +744,7 @@ function makeScene() { return (() => {
       const cl = add(Br, cylZ(0.019, 0.03, resM, 12)); cl.position.set(0.305, 1.26, 0.225 * s);
       const res = add(Br, box(0.032, 0.02, 0.028, resM)); res.position.set(0.32, 1.283, 0.225 * s);
       const blade = add(Br, box(0.013, 0.011, 0.11, lm)); blade.position.set(0.345, 1.255, 0.275 * s); blade.rotation.y = -0.2 * s;
-      const sen = add(Br, box(0.012, 0.012, 0.016, mat('#0b3d45', { emissive: '#00e5ff', emissiveIntensity: 0.25 }))); sen.position.set(0.33, 1.247, 0.205 * s);
+      const sen = add(Br, box(0.012, 0.012, 0.016, mat('#0b3d45', { emissive: '#5aa2ff', emissiveIntensity: 0.25 }))); sen.position.set(0.33, 1.247, 0.205 * s);
     });
     anc('brLOut', 'brakes', V3(0.318, 1.245, -0.2));
     anc('brROut', 'brakes', V3(0.318, 1.245, 0.215));
@@ -865,7 +865,7 @@ function makeScene() { return (() => {
     [1, -1].forEach(s => {
       const cl = add(Br, cylZ(0.018, 0.026, lm, 12)); cl.position.set(hb.x, hb.y, 0.165 * s);
       const blade = add(Br, box(0.013, 0.011, 0.1, lm)); blade.position.set(hb.x + 0.037, hb.y - 0.005, 0.212 * s); blade.rotation.y = -0.2 * s;
-      const sen = add(Br, box(0.012, 0.012, 0.016, mat('#0b3d45', { emissive: '#00e5ff', emissiveIntensity: 0.25 }))); sen.position.set(hb.x + 0.017, hb.y - 0.015, 0.15 * s);
+      const sen = add(Br, box(0.012, 0.012, 0.016, mat('#0b3d45', { emissive: '#5aa2ff', emissiveIntensity: 0.25 }))); sen.position.set(hb.x + 0.017, hb.y - 0.015, 0.15 * s);
     });
     anc('brLOut', 'brakes', V3(hb.x + 0.012, hb.y - 0.017, -0.15));
     anc('brROut', 'brakes', V3(hb.x + 0.012, hb.y - 0.017, 0.15));
@@ -1273,14 +1273,14 @@ function makeScene() { return (() => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputEncoding = THREE.sRGBEncoding;
     scene = new THREE.Scene();
-    scene.background = col('#0b0f14');
-    scene.fog = new THREE.Fog(col('#0b0f14'), 4.5, 11);
+    scene.background = col('#16191c');
+    scene.fog = new THREE.Fog(col('#16191c'), 4.5, 11);
     camera = new THREE.PerspectiveCamera(40, 1, 0.02, 40);
     spriteTex = makeSprite();
 
     const pm = new THREE.PMREMGenerator(renderer);
     const envScene = new THREE.Scene();
-    envScene.add(new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x0d141b, side: THREE.BackSide })));
+    envScene.add(new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x15181b, side: THREE.BackSide })));
     const panel = (c, p, w, hh) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ color: c, side: THREE.DoubleSide })); m.position.copy(p); m.lookAt(0, 0, 0); envScene.add(m); };
     panel(new THREE.Color(2.6, 2.6, 2.6), V3(0, 4.6, 0), 5, 5);
     panel(new THREE.Color(0, 1.4, 1.8), V3(-4.6, 1, -2), 3, 3);
@@ -1290,7 +1290,7 @@ function makeScene() { return (() => {
 
     scene.add(new THREE.HemisphereLight(0xcfe8ff, 0x0b0f14, 0.5));
     const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(2.5, 4, 3); scene.add(key);
-    const rim = new THREE.DirectionalLight(0x00e5ff, 0.5); rim.position.set(-3, 2, -2.5); scene.add(rim);
+    const rim = new THREE.DirectionalLight(0x5aa2ff, 0.5); rim.position.set(-3, 2, -2.5); scene.add(rim);
     const fill = new THREE.DirectionalLight(0xffe2c0, 0.3); fill.position.set(-2, 1, 3); scene.add(fill);
 
     const floorTex = canvasTex(512, 512, (g, w) => {
@@ -1300,7 +1300,7 @@ function makeScene() { return (() => {
     });
     const floor = new THREE.Mesh(new THREE.CircleGeometry(3, 64), new THREE.MeshBasicMaterial({ map: floorTex, transparent: true, depthWrite: false }));
     floor.rotation.x = -Math.PI / 2; scene.add(floor);
-    const grid = new THREE.GridHelper(6, 30, 0x0f4652, 0x15232e);
+    const grid = new THREE.GridHelper(6, 30, 0x2f3740, 0x21262b);
     grid.material.transparent = true; grid.material.opacity = 0.42; grid.material.depthWrite = false; grid.position.y = 0.001; scene.add(grid);
     const shTex = canvasTex(128, 128, (g, w) => {
       const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
@@ -1543,7 +1543,7 @@ const UI = (() => {
       <div class="row">
         <button type="button" class="btn sm" data-action="focus-comp" data-comp="${id}">מקד מצלמה</button>
         <button type="button" class="btn sm ghost" data-action="goto-diag">אבחון תקלה</button>
-        <button type="button" class="btn sm ghost" data-action="close-comp">חזרה</button>
+        <button type="button" class="btn sm ghost" data-action="close-comp">חזור</button>
       </div>`;
   }
   function showComp(id) {
@@ -1731,7 +1731,7 @@ const Learn = (() => {
       return `<div class="card stack">
         <h3>סיור לפי זרימת החשמל</h3>
         <p class="lead">${S.length} צעדים: מהשקע, דרך הסוללה והבקר, ועד המנוע, החיישנים והתאורה. בכל צעד הרכיב והכבל מודגשים במודל.</p>
-        <button type="button" class="btn primary block" data-action="tour-go" data-i="0">התחלת הסיור</button>
+        <button type="button" class="btn primary block" data-action="tour-go" data-i="0">התחל סיור</button>
       </div>
       <div class="note info">${ICON.info}<span>אפשר גם ללחוץ על כל רכיב במודל, או לרחף מעל כבל כדי לראות את צבעי החוטים.</span></div>`;
     }
@@ -1926,7 +1926,7 @@ const Wizard = (() => {
     const b = s.bundle && s.bundle !== 'all' ? bundleById(s.bundle) : null;
     const vnote = s.vnote && s.vnote[State.vehicle];
     return `
-      <div class="spread"><p class="eyebrow">${esc(sc.name)} · <bdi>${esc(M().short)}</bdi> · ${State.voltage}V</p><button type="button" class="linkbtn" data-action="wz-exit">יציאה מהאשף</button></div>
+      <div class="spread"><p class="eyebrow">${esc(sc.name)} · <bdi>${esc(M().short)}</bdi> · ${State.voltage}V</p><button type="button" class="linkbtn" data-action="wz-exit">צא מהאשף</button></div>
       <div class="stack">
         <div class="spread"><span data-sx="s17" class="num">שלב ${idx + 1} מתוך ${S.length}</span><span data-sx="s17" class="num">${Math.round(((idx + 1) / S.length) * 100)}%</span></div>
         <div class="progress" role="progressbar" aria-label="התקדמות באשף" aria-valuemin="1" aria-valuemax="${S.length}" aria-valuenow="${idx + 1}"><i data-sw="${((idx + 1) / S.length) * 100}"></i></div>
@@ -1959,7 +1959,7 @@ const Wizard = (() => {
         <li>כל המחברים נעולים ומבודדים</li><li>הכבלים מסודרים ולא נמתחים בסיבוב הכידון</li>
         <li>שתי ידיות הבלם מנתקות את ההנעה</li><li>אין קוד שגיאה בצג, והבקר לא מתחמם בסרק</li></ul></div>
       <div class="note warn">${ICON.warn}<span>${T(DATA.meta.legalNote)}</span></div>
-      <div class="navrow"><button type="button" class="btn" data-action="wz-exit">התקנה נוספת</button><button type="button" class="btn primary" data-action="goto-diag">מעבר לאבחון</button></div>`;
+      <div class="navrow"><button type="button" class="btn" data-action="wz-exit">התקנה חדשה</button><button type="button" class="btn primary" data-action="goto-diag">עבור לאבחון</button></div>`;
   }
   function highlight(focus = true) {
     if (phase === 'steps') {
@@ -2075,7 +2075,7 @@ const Diagnostics = (() => {
         <div class="spread"><h3>לפנות לטכנאי?</h3><span class="live${tech ? '' : ' live-ok'}">${tech ? ICON.tech + ' כן, מומלץ' : ICON.ok + ' לא חובה'}</span></div>
         <p class="lead" data-sx="s0">${tech ? 'התיקון דורש ציוד, ניסיון או פתיחת רכיב. טכנאי יחסוך זמן ויגן עליכם.' : 'אפשר לטפל לבד בזהירות, עם הסוללה מנותקת בזמן העבודה.'}</p>
       </div>
-      ${L.codes ? `<button type="button" class="btn block" data-action="dg-sub" data-sub="codes">פתיחת מאגר קודי השגיאה</button>` : ''}
+      ${L.codes ? `<button type="button" class="btn block" data-action="dg-sub" data-sub="codes">פתח מאגר קודים</button>` : ''}
       ${jump ? `<button type="button" class="btn block" data-action="dg-start" data-sym="${jump.id}">המשך לעץ: ${esc(jump.name)} ${ICON.next}</button>` : ''}
       ${trailHTML()}
       <div class="navrow"><button type="button" class="btn" data-action="dg-back">${ICON.prev} צעד אחורה</button><button type="button" class="btn primary" data-action="dg-reset">אבחון חדש</button></div>

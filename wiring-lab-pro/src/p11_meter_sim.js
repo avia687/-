@@ -77,11 +77,11 @@ const MeterSim = (() => {
     const a = pt(st.red), b = pt(st.black), m = st.mode;
     const src = n => n === 'bat+' || n === 'ctrl+' || (st.on && pot(n) != null && Math.abs(pot(n)) > 0.5);
     if (m === 'amp') {
-      if (st.blown) return { lcd: 'FUSE', unit: '', msg: '💥 קצר! מד במצב זרם הוא כמעט חוט – חיבור במקביל למקור מתח שורף את הנתיך. מודדים זרם רק בטור, ולזרם הנעה משתמשים במד צבת. במציאות מחליפים נתיך באותו דירוג.', cls: 'bad' };
+      if (st.blown) return { lcd: 'FUSE', unit: '', msg: 'קצר! מד במצב זרם הוא כמעט חוט – חיבור במקביל למקור מתח שורף את הנתיך. מודדים זרם רק בטור, ולזרם הנעה משתמשים במד צבת. במציאות מחליפים נתיך באותו דירוג.', cls: 'bad' };
       const va = pot(a.net), vb = pot(b.net);
       if ((va != null && vb != null && Math.abs(va - vb) > 0.5) || src(a.net) || src(b.net)) {
         st.blown = true;
-        return { lcd: 'FUSE', unit: '', msg: '💥 קצר! מד במצב זרם הוא כמעט חוט. חיבור במקביל למקור מתח = קצר, נתיך שרוף וסכנת כוויה. מודדים זרם רק בטור – ולזרם הנעה משתמשים במד צבת.', cls: 'bad' };
+        return { lcd: 'FUSE', unit: '', msg: 'קצר! מד במצב זרם הוא כמעט חוט. חיבור במקביל למקור מתח = קצר, נתיך שרוף וסכנת כוויה. מודדים זרם רק בטור – ולזרם הנעה משתמשים במד צבת.', cls: 'bad' };
       }
       return { lcd: '0.00', unit: 'A', msg: 'אין זרם במסלול הזה.', cls: '' };
     }
@@ -89,7 +89,7 @@ const MeterSim = (() => {
       if ((a.net === 'bat+' || b.net === 'bat+') && (a.net !== b.net)) return { lcd: 'Err', unit: '', msg: 'מדידת התנגדות על מקור מתח (הסוללה) נותנת תוצאה שגויה ועלולה להזיק למד. Ω ורציפות – רק על מעגל מנותק ובלי מתח.', cls: 'bad' };
       if (st.on && (src(a.net) || src(b.net))) return { lcd: '----', unit: '', msg: 'המערכת דולקת! מודדים התנגדות ורציפות רק כשהסוללה מנותקת. כבו את ״הפעלה״.', cls: 'bad' };
       const r = ohm(a.net, b.net);
-      if (m === 'cont') return r < 20 ? { lcd: r < 1 ? r.toFixed(2) : r.toFixed(1), unit: 'Ω 🔊', msg: 'צפצוף – יש רציפות.', cls: 'ok', beep: true } : { lcd: 'OL', unit: '', msg: 'אין רציפות.', cls: '' };
+      if (m === 'cont') return r < 20 ? { lcd: r < 1 ? r.toFixed(2) : r.toFixed(1), unit: 'Ω', msg: 'צפצוף – יש רציפות.', cls: 'ok', beep: true } : { lcd: 'OL', unit: '', msg: 'אין רציפות.', cls: '' };
       return { lcd: r === Infinity ? 'OL' : r.toFixed(2), unit: r === Infinity ? '' : 'Ω', msg: r === Infinity ? 'OL = אין חיבור (התנגדות גבוהה מהטווח).' : '', cls: '' };
     }
     const va = pot(a.net), vb = pot(b.net);
@@ -97,7 +97,7 @@ const MeterSim = (() => {
     const v = va - vb, lim = m === 'v20' ? 20 : 200;
     if (Math.abs(v) >= lim) return { lcd: 'OL', unit: '', msg: `המתח גבוה מהטווח (${lim}V). העבירו לטווח גבוה יותר.`, cls: 'warn' };
     const s = Math.abs(v) < 20 ? v.toFixed(2) : v.toFixed(1);
-    return { lcd: s, unit: 'V', msg: v < -0.5 ? 'ערך שלילי = החודים הפוכים. זה לא מזיק במדידת מתח.' : (Math.abs(v) >= DATA.pro.hvThreshold ? '⚠️ מתח מעל 60V – מסוכן במגע.' : ''), cls: v < -0.5 ? 'warn' : '' };
+    return { lcd: s, unit: 'V', msg: v < -0.5 ? 'ערך שלילי = החודים הפוכים. זה לא מזיק במדידת מתח.' : (Math.abs(v) >= DATA.pro.hvThreshold ? 'מתח מעל 60V – מסוכן במגע.' : ''), cls: v < -0.5 ? 'warn' : '' };
   }
   function lcdHTML() {
     const r = read();
@@ -111,13 +111,13 @@ const MeterSim = (() => {
     const opts = sel => P.map(p => `<option value="${p.id}" ${p.id === sel ? 'selected' : ''}>${esc(p.label)}</option>`).join('');
     const faults = FAULTS.filter(f => f.needs.every(has));
     return `<div class="card sim" id="simBox" aria-label="סימולטור מולטימטר">
-      <div class="spread"><h3>🔧 סימולטור מולטימטר · <bdi>${esc(M().short)}</bdi></h3><span class="foot num">${BR().nominal}V</span></div>
+      <div class="spread"><h3>סימולטור מולטימטר · <bdi>${esc(M().short)}</bdi></h3><span class="foot num">${BR().nominal}V</span></div>
       <div class="sim-dev">
         <div id="simLcd">${lcdHTML()}</div>
         <div class="sim-dial" role="radiogroup" aria-label="מצב המולטימטר">${MODES.map(([id, n]) => `<button type="button" role="radio" data-sim-mode="${id}" aria-checked="${st.mode === id}" aria-pressed="${st.mode === id}">${n}</button>`).join('')}</div>
         <div class="sim-probes">
-          <label class="field r"><span class="lbl">🔴 חוד אדום</span><select class="input" id="simRed">${opts(st.red)}</select></label>
-          <label class="field"><span class="lbl">⚫ חוד שחור</span><select class="input" id="simBlack">${opts(st.black)}</select></label>
+          <label class="field r"><span class="lbl"><i class="probe-dot red"></i>חוד אדום</span><select class="input" id="simRed">${opts(st.red)}</select></label>
+          <label class="field"><span class="lbl"><i class="probe-dot black"></i>חוד שחור</span><select class="input" id="simBlack">${opts(st.black)}</select></label>
         </div>
       </div>
       <div class="sim-state" role="group" aria-label="מצב הכלי">
@@ -179,7 +179,7 @@ const MeterSim = (() => {
     const g = $('#simGuess'); if (g) g.addEventListener('change', () => {
       if (!g.value) return;
       const ok = g.value === st.fault, f = FAULTS.find(x => x.id === st.fault);
-      $('#simGuessOut').innerHTML = ok ? `<span class="verify">✓ נכון! ${esc(f.name)}.</span>` : '<span class="mistake">✗ עדיין לא. המשיכו למדוד – השוו לערכים התקינים.</span>';
+      $('#simGuessOut').innerHTML = ok ? `<span class="verify">${MK.ok}נכון! ${esc(f.name)}.</span>` : '<span class="mistake"><span class="mk bad">' + ICON.cross + '</span>עדיין לא. המשיכו למדוד – השוו לערכים התקינים.</span>';
     });
     update();
   }

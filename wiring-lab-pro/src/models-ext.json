@@ -1,5 +1,5 @@
 {
-  "_doc": "הרחבות לכל דגם. שדות שמחושבים אוטומטית ב-build: testPoints, expectedValues, hallSequence, dataConfidence (לפי כללים + overrides כאן). conf: ok=✅ מאומת, typ=⚠️ טיפוסי/משוער, unk=❓ לא ידוע.",
+  "_doc": "הרחבות לכל דגם. שדות שמחושבים אוטומטית ב-build: testPoints, expectedValues, hallSequence, dataConfidence (לפי כללים + overrides כאן). conf: ok=מאומת, typ=טיפוסי/משוער, unk=לא ידוע.",
   "korshidi": {
     "controllerAmpsNum": 20,
     "displayProtocol": { "v": "לא פורסם (צג דיגיטלי גנרי)", "conf": "unk" },

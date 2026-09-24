@@ -58,13 +58,13 @@ const Tools = (() => {
     { const ah = num('cTAh'), a = num('cTA'), fr = num('cTFrom'), to = num('cTTo');
       if ([ah, a, fr, to].every(isFinite) && a > 0 && to > fr) {
         const ccTo = Math.min(to, 80), cc = ah * (ccTo - fr) / 100 / a / 0.92, cv = to > 80 ? (to - 80) / 20 * 1.2 : 0;
-        out('cTOut', `<span>זמן משוער: <b>${f1(cc + cv)} שעות</b></span><span class="foot">שלב זרם קבוע (CC) ${f1(cc)} ש׳ + שלב מתח קבוע (CV) ${f1(cv)} ש׳. מתח מטען: ${BR().full.toFixed(1)}V.</span>${a > ah * 0.5 ? '<span class="verdict warn">⚠️ זרם טעינה מעל 0.5C – ודאו שהסוללה והמטען מאושרים לכך.</span>' : ''}`);
+        out('cTOut', `<span>זמן משוער: <b>${f1(cc + cv)} שעות</b></span><span class="foot">שלב זרם קבוע (CC) ${f1(cc)} ש׳ + שלב מתח קבוע (CV) ${f1(cv)} ש׳. מתח מטען: ${BR().full.toFixed(1)}V.</span>${a > ah * 0.5 ? '<span class="verdict warn">' + MK.warn + 'זרם טעינה מעל 0.5C – ודאו שהסוללה והמטען מאושרים לכך.</span>' : ''}`);
       } }
     // צניחה
     { const r = num('cSRest'), l = num('cSLoad'), i = num('cSI');
       if (isFinite(r) && isFinite(l) && r > 0) {
         const d = (r - l) / r * 100, dv = r - l;
-        const v = d < 10 ? ['ok', '✅ צניחה תקינה'] : d < 20 ? ['warn', '⚠️ צניחה גבוהה – סוללה מזדקנת או מחבר עם התנגדות'] : ['bad', '⛔ צניחה חמורה – בדיקת סוללה במעבדה, אל תעקפו BMS'];
+        const v = d < 10 ? ['ok', 'צניחה תקינה'] : d < 20 ? ['warn', 'צניחה גבוהה – סוללה מזדקנת או מחבר עם התנגדות'] : ['bad', 'צניחה חמורה – בדיקת סוללה במעבדה, אל תעקפו BMS'];
         out('cSOut', `<span>צניחה: <b>${f1(d)}% (${f1(dv)}V)</b></span>${isFinite(i) && i > 0 ? `<span>התנגדות כוללת משוערת: <b>${Math.round(dv / i * 1000)} mΩ</b> · הפסד חום: <b>${Math.round(dv * i)}W</b></span>` : ''}<span class="verdict ${v[0]}">${v[1]}</span>`);
       } }
     // הספק
@@ -73,13 +73,13 @@ const Tools = (() => {
     // סוללה חלופית
     { const V = Number($('#cBV').value), ah = num('cBAh'), bms = num('cBA'), conn = $('#cBConn').value, ca = m.controllerAmpsNum;
       const rows = [];
-      rows.push(V === m.voltage ? ['ok', `✅ מתח ${V}V זהה לדגם`] : ['bad', `⛔ מתח ${V}V שונה מ-${m.voltage}V – לא תואם (סכנה לבקר, ועלול להיות לא חוקי)`]);
-      if (isFinite(bms)) rows.push(ca ? (bms >= ca ? ['ok', `✅ BMS ${bms}A ≥ בקר ${ca}A`] : ['bad', `⛔ BMS ${bms}A < בקר ${ca}A – ניתוקים תחת עומס`]) : ['warn', `⚠️ זרם הבקר בדגם לא פורסם ❓ – ודאו מול תווית הבקר שהוא ≤ ${bms}A`]);
-      rows.push(conn === 'same' ? ['ok', '✅ מחבר ומתקן זהים'] : conn === 'diff' ? ['bad', '⛔ מחבר/מתקן שונים – אין לאלתר מתאמים בקו ההספק'] : ['warn', '⚠️ מחבר לא ידוע – בדקו לפני קנייה']);
-      const cb = battRow(V); rows.push(cb ? ['ok', `ℹ️ מטען נדרש: ${cb.full.toFixed(1)}V${V !== m.voltage ? ' – המטען המקורי לא מתאים!' : ' – המטען המקורי מתאים'}`] : ['warn', 'מתח לא מוכר']);
-      if (isFinite(ah)) { const nwh = Math.round(V * ah); rows.push(['ok', `ℹ️ ${nwh}Wh (${nwh >= m.wh ? '+' : ''}${Math.round((nwh / m.wh - 1) * 100)}% מול המקורי ${m.wh}Wh)`]); }
+      rows.push(V === m.voltage ? ['ok', `מתח ${V}V זהה לדגם`] : ['bad', `מתח ${V}V שונה מ-${m.voltage}V – לא תואם (סכנה לבקר, ועלול להיות לא חוקי)`]);
+      if (isFinite(bms)) rows.push(ca ? (bms >= ca ? ['ok', `BMS ${bms}A ≥ בקר ${ca}A`] : ['bad', `BMS ${bms}A < בקר ${ca}A – ניתוקים תחת עומס`]) : ['warn', `זרם הבקר בדגם לא פורסם (לא ידוע) – ודאו מול תווית הבקר שהוא ≤ ${bms}A`]);
+      rows.push(conn === 'same' ? ['ok', 'מחבר ומתקן זהים'] : conn === 'diff' ? ['bad', 'מחבר/מתקן שונים – אין לאלתר מתאמים בקו ההספק'] : ['warn', 'מחבר לא ידוע – בדקו לפני קנייה']);
+      const cb = battRow(V); rows.push(cb ? ['info', `מטען נדרש: ${cb.full.toFixed(1)}V${V !== m.voltage ? ' – המטען המקורי לא מתאים!' : ' – המטען המקורי מתאים'}`] : ['warn', 'מתח לא מוכר']);
+      if (isFinite(ah)) { const nwh = Math.round(V * ah); rows.push(['info', `${nwh}Wh (${nwh >= m.wh ? '+' : ''}${Math.round((nwh / m.wh - 1) * 100)}% מול המקורי ${m.wh}Wh)`]); }
       const bad = rows.some(r => r[0] === 'bad'), warn = rows.some(r => r[0] === 'warn');
-      out('cBOut', rows.map(r => `<span class="verdict ${r[0]}">${esc(r[1])}</span>`).join('') + `<span><b>${bad ? '⛔ לא תואם' : warn ? '⚠️ דורש בדיקה' : '✅ תואם לפי הנתונים'}</b></span><span class="foot">${esc(DATA.meta.batteryNote)}</span>`); }
+      out('cBOut', rows.map(r => `<span class="verdict ${r[0]}">${r[0] === 'ok' ? MK.ok : r[0] === 'bad' ? MK.bad : r[0] === 'warn' ? MK.warn : '<span class="mk">' + ICON.info + '</span>'}${esc(r[1])}</span>`).join('') + `<span><b>${bad ? MK.bad + 'לא תואם' : warn ? MK.warn + 'דורש בדיקה' : MK.ok + 'תואם לפי הנתונים'}</b></span><span class="foot">${esc(DATA.meta.batteryNote)}</span>`); }
     // XsYp
     { const S = num('cXS'), Pp = num('cXP'), cv = num('cXV'), cah = num('cXAh'), ca = num('cXA');
       if ([S, Pp, cv, cah, ca].every(isFinite) && S > 0 && Pp > 0) {
@@ -108,7 +108,7 @@ const Tools = (() => {
         <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
         <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
         <div class="field"><label for="lgNotes">הערות</label><textarea class="input" id="lgNotes" rows="2" maxlength="4000">${v('notes')}</textarea></div>
-        <div class="row"><button type="submit" class="btn primary">${r ? 'שמירת שינויים' : 'הוספה ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
+        <div class="row"><button type="submit" class="btn primary">${r ? 'שמור שינויים' : 'שמור ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
       </form>
       <div class="stack"><div class="spread"><h3>רשומות (${items.length})</h3>
         <div class="row"><button type="button" class="btn sm" data-action="lg-export" ${items.length ? '' : 'disabled'}>ייצוא JSON</button><button type="button" class="btn sm ghost" data-action="lg-import">ייבוא</button></div></div>
@@ -122,7 +122,7 @@ const Tools = (() => {
           <div class="spread"><b>${esc(x.anon ? 'לקוח אנונימי' : (x.customer || 'ללא שם'))} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
           ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
-          <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחצו שוב למחיקה' : 'מחיקה'}</button></div>
+          <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחץ שוב למחיקה' : 'מחק'}</button></div>
         </div>`).join('') : '<p class="lead">אין רשומות עדיין. אפשר גם לשמור תוצאת אבחון ישירות מלשונית האבחון.</p>'}
       </div>
       ${printId ? reportHTML(items.find(x => x.id === printId)) : ''}`;
@@ -167,22 +167,22 @@ const Tools = (() => {
     ids.forEach(id => { const x = DATA.models[id], full = battRow(x.voltage).full.toFixed(1); (groups[full] = groups[full] || []).push(x.short); });
     const has = c => vehicleComps().includes(c);
     const alt = [
-      ['בקר', [`${m.voltage}V`, m.controllerAmpsNum ? `עד ${m.controllerAmpsNum}A (כמו המקורי)` : 'זרם לפי תווית הבקר המקורי ❓', `פרוטוקול צג: ${m.displayProtocol ? m.displayProtocol.v : '❓'}`, 'חיישני Hall (או Sensorless עם התנעה פחות חלקה)'], m.displayProtocol ? m.displayProtocol.conf : 'unk'],
-      ['מטען', [`${b.full.toFixed(1)}V בדיוק`, `מחבר: ${m.connectors && m.connectors.charge ? m.connectors.charge.v : '❓'}`, 'זרם 2–4A (עד 0.5C)'], m.connectors && m.connectors.charge ? m.connectors.charge.conf : 'unk'],
-      ['צג', [`אותו פרוטוקול: ${m.displayProtocol ? m.displayProtocol.v : '❓'}`, `טווח מתח כולל ${m.voltage}V`, `מחבר: ${m.connectors && m.connectors.display ? m.connectors.display.v : '❓'}`], m.displayProtocol ? m.displayProtocol.conf : 'unk']
+      ['בקר', [`${m.voltage}V`, m.controllerAmpsNum ? `עד ${m.controllerAmpsNum}A (כמו המקורי)` : 'זרם לפי תווית הבקר המקורי (לא ידוע)', `פרוטוקול צג: ${m.displayProtocol ? m.displayProtocol.v : 'לא ידוע'}`, 'חיישני Hall (או Sensorless עם התנעה פחות חלקה)'], m.displayProtocol ? m.displayProtocol.conf : 'unk'],
+      ['מטען', [`${b.full.toFixed(1)}V בדיוק`, `מחבר: ${m.connectors && m.connectors.charge ? m.connectors.charge.v : 'לא ידוע'}`, 'זרם 2–4A (עד 0.5C)'], m.connectors && m.connectors.charge ? m.connectors.charge.conf : 'unk'],
+      ['צג', [`אותו פרוטוקול: ${m.displayProtocol ? m.displayProtocol.v : 'לא ידוע'}`, `טווח מתח כולל ${m.voltage}V`, `מחבר: ${m.connectors && m.connectors.display ? m.connectors.display.v : 'לא ידוע'}`], m.displayProtocol ? m.displayProtocol.conf : 'unk']
     ];
     if (has('throttle')) alt.push(['מצערת', ['Hall ליניארי 5V, 3 חוטים', 'אות 0.8–4.2V', 'אותו מחבר'], 'typ']);
     if (has('brakes')) alt.push(['חיישני בלם', ['אותה לוגיקה (NO/NC) כמו הבקר', '2 חוטים (או 3 ל-Hall)', 'אותו מחבר'], 'typ']);
-    alt.push(['סוללה', [`${m.voltage}V (${b.s}S)`, m.controllerAmpsNum ? `BMS רציף ≥ ${m.controllerAmpsNum}A` : 'BMS רציף ≥ זרם הבקר ❓', 'אותו מחבר ומתקן', 'מארז שלם בלבד'], 'typ']);
+    alt.push(['סוללה', [`${m.voltage}V (${b.s}S)`, m.controllerAmpsNum ? `BMS רציף ≥ ${m.controllerAmpsNum}A` : 'BMS רציף ≥ זרם הבקר (לא ידוע)', 'אותו מחבר ומתקן', 'מארז שלם בלבד'], 'typ']);
     return `<div class="cmp-wrap"><table class="volt cmp"><caption class="sr-only">השוואת דגמים</caption>
       <thead><tr><th scope="col">דגם</th><th scope="col">מתח</th><th scope="col">Wh</th><th scope="col">מטען</th><th scope="col">בקר</th><th scope="col">מחבר טעינה</th><th scope="col">פרוטוקול צג</th></tr></thead>
       <tbody>${ids.map(id => { const x = DATA.models[id], br = battRow(x.voltage); return `<tr ${id === State.model ? 'aria-current="true"' : ''}>
         <td><button type="button" class="linkbtn" data-action="select-model" data-model="${id}"><bdi>${esc(x.short)}</bdi></button></td>
         <td class="nom">${x.voltage}V ${Conf.badge(x.dataConfidence.battery)}</td><td>${x.wh}</td><td>${br.full.toFixed(1)}V</td>
-        <td>${x.controllerAmpsNum ? x.controllerAmpsNum + 'A' : '❓'}${x.controller.count > 1 ? ' ×2' : ''}</td>
-        <td class="flagcell">${x.connectors && x.connectors.charge ? esc(x.connectors.charge.v) + ' ' + Conf.badge(x.connectors.charge.conf) : '❓'}</td>
-        <td class="flagcell">${x.displayProtocol ? esc(x.displayProtocol.v) + ' ' + Conf.badge(x.displayProtocol.conf) : '❓'}</td></tr>`; }).join('')}</tbody></table></div>
-      <div class="card stack"><h3>מטענים לפי מתח</h3><p class="lead" style="font-size:13.5px">מטען מתאים רק כשמתח המלאה <b>ומחבר הטעינה</b> זהים. מחברים שסומנו ⚠️/❓ – לאמת לפני שימוש.</p>
+        <td>${x.controllerAmpsNum ? x.controllerAmpsNum + 'A' : 'לא ידוע'}${x.controller.count > 1 ? ' ×2' : ''}</td>
+        <td class="flagcell">${x.connectors && x.connectors.charge ? esc(x.connectors.charge.v) + ' ' + Conf.badge(x.connectors.charge.conf) : 'לא ידוע'}</td>
+        <td class="flagcell">${x.displayProtocol ? esc(x.displayProtocol.v) + ' ' + Conf.badge(x.displayProtocol.conf) : 'לא ידוע'}</td></tr>`; }).join('')}</tbody></table></div>
+      <div class="card stack"><h3>מטענים לפי מתח</h3><p class="lead" style="font-size:13.5px">מטען מתאים רק כשמתח המלאה <b>ומחבר הטעינה</b> זהים. מחברים שסומנו ״טיפוסי״ או ״לא ידוע״ – לאמת לפני שימוש.</p>
         <dl class="specs">${Object.keys(groups).sort((a, c) => a - c).map(k => `<dt class="num">${k}V</dt><dd>${groups[k].map(esc).join(' · ')}</dd>`).join('')}</dl></div>
       <div class="card stack"><h3>רכיבים חלופיים תואמים ל-<bdi>${esc(m.short)}</bdi></h3>
         ${alt.map(([n, crit, c]) => `<div class="esc-row"><b>${n} ${Conf.badge(c)}</b><ul class="bul">${crit.map(x => `<li>${T(x)}</li>`).join('')}</ul></div>`).join('')}
@@ -199,13 +199,13 @@ const Tools = (() => {
       if (!br) issues.push(['bad', 'מתח לא תואם לטבלת תאים']);
       const km = kmOf(x.range); if (km) { const whkm = x.wh / km; issues.push([whkm < 8 ? 'warn' : whkm > 40 ? 'warn' : 'ok', `${f1(whkm)}Wh/ק״מ לפי הטווח המוצהר${whkm < 8 ? ' – אופטימי' : ''}`]); }
       const unk = Object.values(x.dataConfidence).filter(c => c === 'unk').length;
-      if (unk) issues.push(['warn', `${unk} שדות ❓ לא פורסמו`]);
+      if (unk) issues.push(['warn', `${unk} שדות ״לא ידוע״ – לא פורסמו`]);
       (x.specFlags || []).forEach(f => issues.push(['warn', `${f.field}: ${f.issue}`]));
       return { id, x, issues };
     });
     return `<p class="lead">בדיקה אוטומטית של כל 12 הדגמים: התאמת Wh ל-V×Ah, התאמת המתח למספר התאים, סבירות הטווח, ונתונים חסרים או סותרים.</p>
       <div class="stack">${rows.map(r => `<div class="card stack"><div class="spread"><b><bdi>${esc(r.x.short)}</bdi></b><span class="num foot">${r.x.voltage}V · ${r.x.ah}Ah · ${r.x.wh}Wh</span></div>
-        <ul class="clean">${r.issues.map(i => `<li class="verdict ${i[0]}"><span aria-hidden="true">${i[0] === 'ok' ? '✅' : i[0] === 'bad' ? '⛔' : '⚠️'}</span><span>${T(i[1])}</span></li>`).join('')}</ul></div>`).join('')}</div>
+        <ul class="clean">${r.issues.map(i => `<li class="verdict ${i[0]}">${i[0] === 'ok' ? MK.ok : i[0] === 'bad' ? MK.bad : MK.warn}<span>${T(i[1])}</span></li>`).join('')}</ul></div>`).join('')}</div>
       ${Conf.legendHTML()}`;
   }
 

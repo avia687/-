@@ -29,6 +29,12 @@ function tplM(s) {
   });
 }
 const TM = s => bidi(esc(tplM(s)));
+/** סימני מצב (SVG, בלי אימוג׳י) */
+ICON.stop = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 2h8l6 6v8l-6 6H8l-6-6V8l6-6Zm3 5v7h2V7h-2Zm0 9v2h2v-2h-2Z"/></svg>';
+ICON.batt = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="17" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+ICON.check = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="m4 12.5 5 5L20 6.5"/></svg>';
+ICON.cross = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>';
+const MK = { ok: `<span class="mk ok">${ICON.check}</span>`, warn: `<span class="mk warn">${ICON.warn}</span>`, bad: `<span class="mk bad">${ICON.stop}</span>` };
 function numT(x) { if (typeof x === 'number') return x; const n = Number(tplM(x)); return isFinite(n) ? n : null; }
 
 /* ---------- אמינות נתונים ---------- */
@@ -37,7 +43,7 @@ const Conf = (() => {
   const L = c => DATA.pro.confLegend[c] || DATA.pro.confLegend.unk;
   function badge(c) {
     const l = L(c);
-    return `<span class="conf conf-${c}" role="img" title="${esc(l.name + ' – ' + l.desc)}" aria-label="אמינות: ${esc(l.name)}">${l.icon}</span>`;
+    return `<span class="conf conf-${c}" title="${esc(l.name + ' – ' + l.desc)}">${esc(l.short || l.name)}</span>`;
   }
   function badgeFor(m, label) {
     const k = LABEL_KEYS[label], c = k && m.dataConfidence && m.dataConfidence[k];
@@ -50,10 +56,26 @@ const Conf = (() => {
   function modelExtraHTML(m) {
     const flags = m.specFlags || [];
     return `${flags.length ? `<div class="note warn">${ICON.warn}<span><b>נתונים שדורשים אימות:</b><br>${flags.map(f => `${badge(f.sev || 'typ')} <b>${esc(f.field)}:</b> ${T(f.issue)}`).join('<br>')}</span></div>` : ''}
-      <details class="concept"><summary>מה המשמעות של ✅ ⚠️ ❓?</summary><div class="body">${legendHTML()}</div></details>`;
+      <details class="concept"><summary>מה אומרים תגי האמינות?</summary><div class="body">${legendHTML()}</div></details>`;
   }
   return { badge, badgeFor, legendHTML, modelExtraHTML };
 })();
+
+/* ---------- ערכת תצוגה: לפי המכשיר / כהה / בהירה / אור יום ---------- */
+const Theme = (() => {
+  const KEY = 'ev-lab.theme', OK = ['auto', 'dark', 'light', 'day'];
+  const get = () => { let v = 'auto'; try { v = localStorage.getItem(KEY) || 'auto'; } catch (e) { /* */ } return OK.includes(v) ? v : 'auto'; };
+  function apply(v) {
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v);
+    const s = document.getElementById('themeSel'); if (s) s.value = v;
+    const mc = document.querySelector('meta[name="theme-color"]'); if (mc) mc.content = (getComputedStyle(document.documentElement).getPropertyValue('--bg2') || '').trim() || '#16181b';
+  }
+  function set(v) { if (!OK.includes(v)) return; try { localStorage.setItem(KEY, v); } catch (e) { /* */ } ProStore.set('theme', v); apply(v); }
+  function init() { const s = $('#themeSel'); if (s) s.addEventListener('change', () => { set(s.value); UI.toast(s.options[s.selectedIndex].text); }); apply(get()); }
+  apply(get());
+  return { init, set, get, OK };
+})();
+(window.BootHooks = window.BootHooks || []).push(() => Theme.init());
 
 /* ---------- רמת משתמש: מתחיל / מקצוען + מצב מהיר + מצב סדנה ---------- */
 const Level = (() => {
@@ -204,7 +226,7 @@ const ProUI = (() => {
     const an = DATA.pro.analogies[id];
     const tps = (M().testPoints || []).filter(tp => tp.comp === id);
     const cf = (M().commonFailures || []).filter(f => { const c = DATA.pro.causes.find(x => x.id === f.cause); return c && c.comps.includes(id); });
-    return `${an ? `<div class="note info beg-only">💡<span><b>במילים פשוטות:</b> ${esc(an)}</span></div>` : ''}
+    return `${an ? `<div class="note info beg-only">${ICON.info}<span><b>במילים פשוטות:</b> ${esc(an)}</span></div>` : ''}
       ${tps.length ? `<div class="card stack"><div class="spread"><h3>נקודות בדיקה ברכיב</h3><button type="button" class="btn sm ghost" data-action="tp-all">כל הנקודות</button></div>${tpRows(tps)}</div>` : ''}
       ${cf.length ? `<div class="card stack"><h3>תקלות נפוצות בדגם הזה</h3><ul class="clean">${cf.map(f => `<li class="cf-row"><span>${esc(f.t)}</span><span class="cf-w" aria-label="משקל ${Math.round(f.w * 100)}%"><i style="width:${Math.round(f.w * 100)}%"></i></span></li>`).join('')}</ul><p class="foot">המשקל משפיע על ההסתברות ההתחלתית במנוע האבחון.</p></div>` : ''}`;
   }

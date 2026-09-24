@@ -30,14 +30,14 @@ const Academy = (() => {
       <div class="progress" role="progressbar" aria-label="התקדמות באקדמיה" aria-valuemin="0" aria-valuemax="${mods.length}" aria-valuenow="${done}"><i style="width:${mods.length ? done / mods.length * 100 : 0}%"></i></div>
       <p class="foot num">${done} מתוך ${mods.length} תעודות</p></div>
       <div class="acad-mods">${mods.map((m, i) => { const s = modStatus(m); return `<button type="button" class="acad-mod ${s.cert ? 'done' : ''}" data-action="ac-mod" data-m="${m.id}">
-        <span class="n" aria-hidden="true">${s.cert ? '✓' : i + 1}</span><b>${esc(m.title)}</b><small>${esc(m.desc)}</small>
+        <span class="n" aria-hidden="true">${s.cert ? ICON.check : i + 1}</span><b>${esc(m.title)}</b><small>${esc(m.desc)}</small>
         <span class="st num">${s.read}/${s.total} שיעורים${s.score != null ? `<br>בוחן: ${s.score}%` : ''}</span></button>`; }).join('')}</div>`;
   }
   function modHTML() {
     const m = mod(), s = modStatus(m), p = prog();
     return `<button type="button" class="linkbtn" data-action="ac-list">${ICON.prev} כל המודולים</button>
       <div><p class="eyebrow">מודול ${load().modules.indexOf(m) + 1}</p><h2 id="acTitle" tabindex="-1">${esc(m.title)}</h2><p class="lead">${esc(m.desc)}</p></div>
-      <div class="lesson-list">${lessonsOf(m).map((l, i) => `<button type="button" data-action="ac-les" data-l="${l.id}" class="${p.read[m.id + '.' + l.id] ? 'read' : ''}"><span class="num">${i + 1}.</span> ${esc(l.title)}${l.sim ? ' · 🔧 סימולטור' : ''}</button>`).join('')}</div>
+      <div class="lesson-list">${lessonsOf(m).map((l, i) => `<button type="button" data-action="ac-les" data-l="${l.id}" class="${p.read[m.id + '.' + l.id] ? 'read' : ''}"><span class="num">${i + 1}.</span> ${esc(l.title)}${l.sim ? ' · סימולטור' : ''}</button>`).join('')}</div>
       <div class="card stack"><h3>בוחן המודול</h3><p class="lead" style="font-size:14px">${m.quiz.length} שאלות. ציון עובר: ${load().passScore}%. ${s.score != null ? `הציון האחרון: <b>${s.score}%</b>.` : ''}</p>
         <div class="row"><button type="button" class="btn primary" data-action="ac-quiz">${s.score != null ? 'לבוחן שוב' : 'לבוחן'}</button>${s.cert ? '<button type="button" class="btn" data-action="ac-cert">התעודה שלי</button>' : ''}</div></div>`;
   }
@@ -67,7 +67,7 @@ const Academy = (() => {
         <b>${i + 1}. ${T(q.q)}</b>
         ${q.opts.map((o, j) => { let cls = ''; if (submitted) { if (j === q.a) cls = 'right'; else if (answers[i] === j) cls = 'wrong'; }
           return `<button type="button" class="quiz-opt ${cls}" data-action="ac-opt" data-q="${i}" data-o="${j}" aria-pressed="${answers[i] === j}" ${submitted ? 'disabled' : ''}>${T(o)}</button>`; }).join('')}
-        ${submitted ? `<p class="${answers[i] === q.a ? 'verify' : 'mistake'}">${answers[i] === q.a ? '✓ נכון. ' : '✗ '}${T(q.why)}</p>` : ''}
+        ${submitted ? `<p class="${answers[i] === q.a ? 'verify' : 'mistake'}">${answers[i] === q.a ? MK.ok + 'נכון. ' : '<span class="mk bad">' + ICON.cross + '</span>'}${T(q.why)}</p>` : ''}
       </fieldset>`).join('')}
       ${submitted
         ? `<div class="note ${score >= pass ? 'ok' : 'warn'}">${score >= pass ? ICON.ok : ICON.warn}<span><b>ציון: ${score}%</b> ${score >= pass ? '– עברתם! התעודה מחכה.' : `– צריך ${pass}% כדי לעבור. חזרו לשיעורים ונסו שוב.`}</span></div>
@@ -81,7 +81,7 @@ const Academy = (() => {
     return `<button type="button" class="linkbtn" data-action="ac-mod" data-m="${m.id}">${ICON.prev} ${esc(m.title)}</button>
       <div class="field"><label for="certName">השם על התעודה</label><input class="input" id="certName" maxlength="60" value="${esc(name)}" autocomplete="name"></div>
       <div class="print-area"><div class="cert" id="certCard">
-        <div class="seal" aria-hidden="true">⚡</div>
+        <div class="seal" aria-hidden="true">${ICON.bolt}</div>
         <p class="eyebrow" style="justify-content:center">מעבדת החיווט · אקדמיה</p>
         <h3>תעודת סיום</h3>
         <p>מאשרת ש-</p><p class="who" id="certWho">${esc(name || 'שם המסיים/ת')}</p>

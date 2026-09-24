@@ -11,7 +11,7 @@ body.quick .mistake{font-size:13px}
 [tabindex="-1"]:focus:not(:focus-visible),h2[tabindex="-1"]:focus{outline:none}
 
 /* אמינות נתונים */
-.conf{display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:help;vertical-align:middle;margin-inline-start:2px}
+.conf{cursor:help;margin-inline-start:2px}
 .conf-legend{display:grid;gap:6px;font-size:13.5px}
 .conf-legend span{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .conf-legend small{color:var(--muted)}
@@ -104,7 +104,7 @@ details.meas .mbody{padding:0 12px 12px;display:grid;gap:10px}
 .acad-mod .st{grid-row:1/3;grid-column:3;font-size:12.5px;color:var(--muted);text-align:end}
 .lesson-list{display:grid;gap:6px}
 .lesson-list button{display:flex;gap:10px;align-items:center;text-align:start;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;min-height:44px;font-weight:600}
-.lesson-list button.read::after{content:"✓";margin-inline-start:auto;color:var(--ok);font-weight:800}
+.lesson-list button.read::after{content:"נקרא";font-size:12px;margin-inline-start:auto;color:var(--ok);font-weight:800}
 .lesson-body{display:grid;gap:10px;line-height:1.7}
 .lesson-body p{margin:0}
 .quiz-q{display:grid;gap:8px}
@@ -147,7 +147,7 @@ details.meas .mbody{padding:0 12px 12px;display:grid;gap:10px}
 .verify-box{border:1px solid rgba(61,220,132,.45);border-radius:12px;padding:12px;background:var(--ok-soft);display:grid;gap:8px}
 .verify-box.fail{border-color:rgba(255,77,77,.5);background:var(--danger-soft)}
 .verify-box .vres{font-weight:700}
-.donts li::marker{content:"✕  ";color:var(--danger)}
+.donts li::marker{content:"×  ";color:var(--danger)}
 
 /* נגישות מגע: יעדי לחיצה ≥44px במכשירי מגע */
 @media (pointer: coarse){

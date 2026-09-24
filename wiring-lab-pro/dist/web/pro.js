@@ -305,7 +305,10 @@ const Persist = (() => {
   }
   const touch = ns => set(ns, get(ns));
   function schedule() { clearTimeout(timer); state('saving'); timer = setTimeout(flush, 250); }
-  async function flush() {
+  // כתיבות בתור אחד: אין שתי כתיבות במקביל, והמחוון מראה ״נשמר״ רק כשאין שינוי ממתין
+  let chain = Promise.resolve();
+  function flush() { const r = chain.then(flushNow); chain = r.catch(() => false); return r; }
+  async function flushNow() {
     clearTimeout(timer); timer = null;
     if (!dirty.size) { state(failed ? 'error' : 'saved'); return true; }
     const ds = [...dirty]; dirty = new Set();
@@ -321,7 +324,7 @@ const Persist = (() => {
       }
       entries.push(['meta', clone(meta)]);
       await rawSetMany(entries);
-      failed = false; lastSaved = Date.now(); state('saved'); return true;
+      failed = false; lastSaved = Date.now(); state(dirty.size ? 'saving' : 'saved'); return true;
     } catch (e) {
       ds.forEach(ns => dirty.add(ns)); failed = true; state('error'); return false;
     }
@@ -550,6 +553,12 @@ function tplM(s) {
   });
 }
 const TM = s => bidi(esc(tplM(s)));
+/** סימני מצב (SVG, בלי אימוג׳י) */
+ICON.stop = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 2h8l6 6v8l-6 6H8l-6-6V8l6-6Zm3 5v7h2V7h-2Zm0 9v2h2v-2h-2Z"/></svg>';
+ICON.batt = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="17" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+ICON.check = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="m4 12.5 5 5L20 6.5"/></svg>';
+ICON.cross = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>';
+const MK = { ok: `<span class="mk ok">${ICON.check}</span>`, warn: `<span class="mk warn">${ICON.warn}</span>`, bad: `<span class="mk bad">${ICON.stop}</span>` };
 function numT(x) { if (typeof x === 'number') return x; const n = Number(tplM(x)); return isFinite(n) ? n : null; }
 
 /* ---------- אמינות נתונים ---------- */
@@ -558,7 +567,7 @@ const Conf = (() => {
   const L = c => DATA.pro.confLegend[c] || DATA.pro.confLegend.unk;
   function badge(c) {
     const l = L(c);
-    return `<span class="conf conf-${c}" role="img" title="${esc(l.name + ' – ' + l.desc)}" aria-label="אמינות: ${esc(l.name)}">${l.icon}</span>`;
+    return `<span class="conf conf-${c}" title="${esc(l.name + ' – ' + l.desc)}">${esc(l.short || l.name)}</span>`;
   }
   function badgeFor(m, label) {
     const k = LABEL_KEYS[label], c = k && m.dataConfidence && m.dataConfidence[k];
@@ -571,10 +580,26 @@ const Conf = (() => {
   function modelExtraHTML(m) {
     const flags = m.specFlags || [];
     return `${flags.length ? `<div class="note warn">${ICON.warn}<span><b>נתונים שדורשים אימות:</b><br>${flags.map(f => `${badge(f.sev || 'typ')} <b>${esc(f.field)}:</b> ${T(f.issue)}`).join('<br>')}</span></div>` : ''}
-      <details class="concept"><summary>מה המשמעות של ✅ ⚠️ ❓?</summary><div class="body">${legendHTML()}</div></details>`;
+      <details class="concept"><summary>מה אומרים תגי האמינות?</summary><div class="body">${legendHTML()}</div></details>`;
   }
   return { badge, badgeFor, legendHTML, modelExtraHTML };
 })();
+
+/* ---------- ערכת תצוגה: לפי המכשיר / כהה / בהירה / אור יום ---------- */
+const Theme = (() => {
+  const KEY = 'ev-lab.theme', OK = ['auto', 'dark', 'light', 'day'];
+  const get = () => { let v = 'auto'; try { v = localStorage.getItem(KEY) || 'auto'; } catch (e) { /* */ } return OK.includes(v) ? v : 'auto'; };
+  function apply(v) {
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v);
+    const s = document.getElementById('themeSel'); if (s) s.value = v;
+    const mc = document.querySelector('meta[name="theme-color"]'); if (mc) mc.content = (getComputedStyle(document.documentElement).getPropertyValue('--bg2') || '').trim() || '#16181b';
+  }
+  function set(v) { if (!OK.includes(v)) return; try { localStorage.setItem(KEY, v); } catch (e) { /* */ } ProStore.set('theme', v); apply(v); }
+  function init() { const s = $('#themeSel'); if (s) s.addEventListener('change', () => { set(s.value); UI.toast(s.options[s.selectedIndex].text); }); apply(get()); }
+  apply(get());
+  return { init, set, get, OK };
+})();
+(window.BootHooks = window.BootHooks || []).push(() => Theme.init());
 
 /* ---------- רמת משתמש: מתחיל / מקצוען + מצב מהיר + מצב סדנה ---------- */
 const Level = (() => {
@@ -725,7 +750,7 @@ const ProUI = (() => {
     const an = DATA.pro.analogies[id];
     const tps = (M().testPoints || []).filter(tp => tp.comp === id);
     const cf = (M().commonFailures || []).filter(f => { const c = DATA.pro.causes.find(x => x.id === f.cause); return c && c.comps.includes(id); });
-    return `${an ? `<div class="note info beg-only">💡<span><b>במילים פשוטות:</b> ${esc(an)}</span></div>` : ''}
+    return `${an ? `<div class="note info beg-only">${ICON.info}<span><b>במילים פשוטות:</b> ${esc(an)}</span></div>` : ''}
       ${tps.length ? `<div class="card stack"><div class="spread"><h3>נקודות בדיקה ברכיב</h3><button type="button" class="btn sm ghost" data-action="tp-all">כל הנקודות</button></div>${tpRows(tps)}</div>` : ''}
       ${cf.length ? `<div class="card stack"><h3>תקלות נפוצות בדגם הזה</h3><ul class="clean">${cf.map(f => `<li class="cf-row"><span>${esc(f.t)}</span><span class="cf-w" aria-label="משקל ${Math.round(f.w * 100)}%"><i data-sw="${Math.round(f.w * 100)}"></i></span></li>`).join('')}</ul><p class="foot">המשקל משפיע על ההסתברות ההתחלתית במנוע האבחון.</p></div>` : ''}`;
   }
@@ -971,7 +996,7 @@ const DiagPro = (() => {
     const top = post.slice(0, n);
     return `<ol class="probs" aria-label="סיבות אפשריות לפי הסתברות">${top.map((x, i) => `<li>
       <button type="button" class="prob ${i === 0 && x.p >= 0.5 ? 'lead-cause' : ''}" data-action="dp-cause" data-c="${x.c.id}" aria-label="${esc(x.c.name)} – ${pct(x.p)} אחוז">
-        <span class="pname">${esc(x.c.name)}${x.c.stop === 'battery' ? ' <span class="tag-stop" title="דורש מומחה סוללות">🔋</span>' : x.c.stop === 'noride' ? ' <span class="tag-stop" title="לא לרכוב עד תיקון">⛔</span>' : ''}<small class="pro-only">${esc(x.c.pro)}</small></span>
+        <span class="pname">${esc(x.c.name)}${x.c.stop === 'battery' ? ' <span class="tag-stop" title="דורש מומחה סוללות">${ICON.batt}<span class="sr-only">דורש מומחה סוללות</span></span>' : x.c.stop === 'noride' ? ' <span class="tag-stop" title="לא לרכוב עד תיקון">${ICON.stop}<span class="sr-only">לא לרכוב עד תיקון</span></span>' : ''}<small class="pro-only">${esc(x.c.pro)}</small></span>
         <span class="pp num">${pct(x.p)}%</span>
         <span class="pbar" aria-hidden="true"><i data-sw="${Math.max(2, x.p * 100)}"></i></span>
       </button></li>`).join('')}</ol>
@@ -981,7 +1006,7 @@ const DiagPro = (() => {
     const s = E.suggest(ev, post);
     if (!s.length) return evCount() ? '<p class="lead">אין מדידה נוספת שתשנה משמעותית את התמונה. אפשר לעבור לסיכום.</p>' : '';
     return `<div class="next-list">${s.map((x, i) => `<button type="button" class="next-m" data-action="dp-open" data-m="${x.m.id}">
-      <span class="nm">${i === 0 ? '⭐ ' : ''}${esc(x.m.name)}</span>${x.m.live ? Safety.liveBadge() : ''}
+      <span class="nm">${i === 0 ? '<span class="best-tag">הכי כדאי</span>' : ''}${esc(x.m.name)}</span>${x.m.live ? Safety.liveBadge() : ''}
       <small><span class="pro-only num">ערך מידע ${x.g.toFixed(2)} ביט · </span>${esc(x.m.mode)}</small></button>`).join('')}</div>`;
   }
 
@@ -1019,7 +1044,7 @@ const DiagPro = (() => {
         <p class="pro-only foot">${T(m.how)}</p>
         ${capNote(m)}
         ${inputHTML(m)}
-        <div class="row"><button type="button" class="btn sm ghost" data-action="dp-clear" data-m="${m.id}">ניקוי</button>
+        <div class="row"><button type="button" class="btn sm ghost" data-action="dp-clear" data-m="${m.id}">נקה</button>
           <button type="button" class="btn sm ghost" data-action="dp-show" data-m="${m.id}">הצג ב-3D</button></div>
       </div></details>`;
   }
@@ -1029,7 +1054,7 @@ const DiagPro = (() => {
     const post = E.posterior(ev);
     const heat = ev.sym.has('heat') || ev.res.m_hot === 'conn';
     return `
-      <div class="note info beg-only">${ICON.info}<span>בחרו מה קורה (אפשר כמה סימפטומים), והזינו מדידות. המערכת משווה לערכים התקינים של <bdi>${esc(M().short)}</bdi> ומעדכנת את הסבירות של כל סיבה בזמן אמת. ⭐ = המדידה שהכי כדאי לעשות עכשיו.</span></div>
+      <div class="note info beg-only">${ICON.info}<span>בחרו מה קורה (אפשר כמה סימפטומים), והזינו מדידות. המערכת משווה לערכים התקינים של <bdi>${esc(M().short)}</bdi> ומעדכנת את הסבירות של כל סיבה בזמן אמת. ״הכי כדאי״ = המדידה שהכי כדאי לעשות עכשיו.</span></div>
       ${hvBanner()}
       <div class="stack"><h3>מה קורה? <small class="lead">(אפשר לבחור כמה)</small></h3>
         <div class="sym-chips" role="group" aria-label="סימפטומים">${E.symptoms().map(s => `<button type="button" class="chip symchip" data-action="dp-sym" data-s="${s.id}" aria-pressed="${ev.sym.has(s.id)}" data-sx="s4"><span aria-hidden="true">${esc(s.glyph)}</span> ${esc(s.name)}<small class="pro-only">&nbsp;· ${esc(s.pro)}</small></button>`).join('')}</div></div>
@@ -1041,12 +1066,12 @@ const DiagPro = (() => {
         <button type="button" class="btn primary" data-action="dp-result">סיכום ${ICON.next}</button>
         <button type="button" class="btn" data-action="dp-notfound">לא מצאתי</button>
       </div>
-      <div class="row"><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button><button type="button" class="btn sm ghost" data-action="dp-save">שמירה ליומן</button><button type="button" class="btn sm ghost" data-action="dp-copy">העתקת דו״ח</button></div>
+      <div class="row"><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button><button type="button" class="btn sm ghost" data-action="dp-save">שמור ליומן</button><button type="button" class="btn sm ghost" data-action="dp-copy">העתק דו״ח</button></div>
       <textarea class="input copybox" id="dpCopyBox" hidden rows="6" aria-label="דו״ח להעתקה" readonly></textarea>
       <p class="foot">${esc(DATA.meta.disclaimer)}</p>`;
   }
   function stopBox(c) {
-    if (c.stop === 'battery') return `<div class="note danger">${ICON.warn}<span><b>עצרו – מומחה סוללות.</b> ${esc(DATA.meta.batteryNote)} אם יש חום, ריח, נפיחות או נזק – <button type="button" class="linkbtn" data-action="dp-hazard" data-h="swollen">דווחו על סכנה</button>.</span></div>`;
+    if (c.stop === 'battery') return `<div class="note danger">${ICON.warn}<span><b>עצרו – מומחה סוללות.</b> ${esc(DATA.meta.batteryNote)} אם יש חום, ריח, נפיחות או נזק – <button type="button" class="linkbtn" data-action="dp-hazard" data-h="swollen">דווח על סכנה</button>.</span></div>`;
     if (c.stop === 'noride') return `<div class="note danger">${ICON.warn}<span><b>לא לרכוב עד תיקון.</b> במצב הזה הבלימה לא מנתקת את המנוע.</span></div>`;
     if (c.tech || c.diff >= 4) return `<div class="note warn">${ICON.tech}<span><b>מומלץ טכנאי.</b> התיקון דורש ציוד, ניסיון או פתיחת רכיב.</span></div>`;
     return `<div class="note ok">${ICON.ok}<span>אפשר לטפל בעצמכם, בזהירות, עם סוללה מנותקת (חוץ משלבי המדידה החיה).</span></div>`;
@@ -1078,7 +1103,7 @@ const DiagPro = (() => {
       <div class="card stack" data-sx="s28"><h3>בדיקת אימות אחרי התיקון</h3><p class="verify">${TM(c.verify.text)}</p>
         ${vm ? `<button type="button" class="btn sm" data-action="dp-open" data-m="${vm.id}">פתיחת המדידה: ${esc(vm.name)}</button>` : ''}</div>
       ${post.length > 1 ? `<div class="card stack"><h3>חלופות</h3>${probsHTML(post.slice(1), 3)}</div>` : ''}
-      <div class="row"><button type="button" class="btn sm" data-action="dp-save">שמירה ליומן</button><button type="button" class="btn sm" data-action="dp-copy">העתקת דו״ח</button><button type="button" class="btn sm ghost" data-action="dp-show-cause" data-c="${c.id}">הצג ב-3D</button><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button></div>
+      <div class="row"><button type="button" class="btn sm" data-action="dp-save">שמור ליומן</button><button type="button" class="btn sm" data-action="dp-copy">העתק דו״ח</button><button type="button" class="btn sm ghost" data-action="dp-show-cause" data-c="${c.id}">הצג ב-3D</button><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button></div>
       <textarea class="input copybox" id="dpCopyBox" hidden rows="6" aria-label="דו״ח להעתקה" readonly></textarea>
       <p class="foot">${esc(DATA.meta.disclaimer)}</p>`;
   }
@@ -1088,12 +1113,12 @@ const DiagPro = (() => {
     return `
       <button type="button" class="back linkbtn" data-action="dp-back">${ICON.prev} חזרה למדידות</button>
       <div><p class="eyebrow">אסקלציה</p><h2 id="dpTitle" tabindex="-1">לא נמצאה סיבה ברורה</h2><p class="lead">זה קורה בעיקר בתקלות לסירוגין. אלה הצעדים הבאים, לפי כמה כל מדידה צפויה לעזור.</p></div>
-      <div class="card stack"><h3>מה עוד למדוד</h3>${s.length ? s.map(x => `<div class="esc-row"><b>${esc(x.m.name)}</b> ${x.m.live ? Safety.liveBadge() : ''}<p class="lead" data-sx="s29">${T(x.m.how)}</p><p class="num foot">צפוי: ${TM(x.m.expect)}</p><button type="button" class="btn sm" data-action="dp-open" data-m="${x.m.id}">למדידה</button></div>`).join('') : '<p class="lead">עשיתם את כל המדידות הזמינות. עברו ללשונית ״לסירוגין״ ל-Wiggle Test ולבדיקות עומס, חום ולחות.</p>'}</div>
+      <div class="card stack"><h3>מה עוד למדוד</h3>${s.length ? s.map(x => `<div class="esc-row"><b>${esc(x.m.name)}</b> ${x.m.live ? Safety.liveBadge() : ''}<p class="lead" data-sx="s29">${T(x.m.how)}</p><p class="num foot">צפוי: ${TM(x.m.expect)}</p><button type="button" class="btn sm" data-action="dp-open" data-m="${x.m.id}">מדוד</button></div>`).join('') : '<p class="lead">עשיתם את כל המדידות הזמינות. עברו ללשונית ״לסירוגין״ ל-Wiggle Test ולבדיקות עומס, חום ולחות.</p>'}</div>
       <div class="card stack"><h3>איך לתעד לטכנאי</h3><ul class="bul">
         <li>דגם, מספר סידורי ותאריך קנייה</li><li>מה קורה, מתי, וכמה פעמים (יומן אירועים)</li>
         <li>כל המדידות – עם נקודות המדידה המדויקות</li><li>קודי שגיאה ותמונה של הצג בזמן התקלה</li>
         <li>תמונות של מחברים, בעיקר אם יש השחרה או ירוקת</li><li>מה כבר הוחלף או נבדק</li></ul>
-        <div class="row"><button type="button" class="btn sm primary" data-action="dp-copy">העתקת דו״ח לטכנאי</button><button type="button" class="btn sm" data-action="dp-save">שמירה ליומן</button><button type="button" class="btn sm ghost" data-action="dg-sub" data-sub="inter">לבדיקות לסירוגין</button><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button></div>
+        <div class="row"><button type="button" class="btn sm primary" data-action="dp-copy">העתק דו״ח לטכנאי</button><button type="button" class="btn sm" data-action="dp-save">שמור ליומן</button><button type="button" class="btn sm ghost" data-action="dg-sub" data-sub="inter">בדוק תקלה לסירוגין</button><button type="button" class="btn sm ghost" data-action="dp-reset">אבחון חדש</button></div>
         <textarea class="input copybox" id="dpCopyBox" hidden rows="6" aria-label="דו״ח להעתקה" readonly></textarea></div>
       <div class="card stack"><h3>הסיבות שנשארו פתוחות</h3>${probsHTML(post, 5)}</div>`;
   }
@@ -1111,12 +1136,12 @@ const DiagPro = (() => {
           <button type="button" class="linkbtn" data-action="dp-wfocus" data-b="${b.id}"><span class="sw" data-sc="${c ? c.color : '#888'}"></span> ${esc(b.label)}</button>
           <span class="row" role="group" aria-label="${esc(b.label)}"><button type="button" class="btn sm choice" data-action="dp-wig" data-b="${b.id}" data-r="ok" aria-pressed="${r === 'ok'}">יציב</button><button type="button" class="btn sm choice bad" data-action="dp-wig" data-b="${b.id}" data-r="cut" aria-pressed="${r === 'cut'}">גורם לניתוק</button></span></li>`; }).join('')}</ul></div>
       <div class="card stack"><h3>בדיקות נוספות</h3>
-        <div class="esc-row"><b>בדיקת עומס</b><p class="lead" data-sx="s29">מדידת צניחת מתח בהאצה – חושפת סוללה חלשה ומחבר עם התנגדות.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_sag">למדידה</button></div>
-        <div class="esc-row"><b>בדיקת חום</b><p class="lead" data-sx="s29">אחרי 10–15 דקות נסיעה: איפה מורגש חום? מחבר חם = התנגדות מגע.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_hot">למדידה</button></div>
+        <div class="esc-row"><b>בדיקת עומס</b><p class="lead" data-sx="s29">מדידת צניחת מתח בהאצה – חושפת סוללה חלשה ומחבר עם התנגדות.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_sag">מדוד</button></div>
+        <div class="esc-row"><b>בדיקת חום</b><p class="lead" data-sx="s29">אחרי 10–15 דקות נסיעה: איפה מורגש חום? מחבר חם = התנגדות מגע.</p><button type="button" class="btn sm" data-action="dp-open" data-m="m_hot">מדוד</button></div>
         <div class="esc-row"><b>בדיקת לחות</b><p class="lead" data-sx="s29">ייבוש 24 שעות במקום חם ויבש, ואז ניסיון חוזר. אם זה עזר – סמנו את התנאי ״ייבוש פתר זמנית״ למעלה.</p></div>
       </div>
       <div class="card stack"><h3>יומן אירועים</h3><p class="lead" data-sx="s29">כל פעם שזה קורה – רשמו: תאריך, שעה, טמפרטורה, מצב סוללה, מה עשיתם באותו רגע, ומה הצג הראה.</p>
-        <button type="button" class="btn sm" data-action="dp-diary">העתקת תבנית יומן</button>
+        <button type="button" class="btn sm" data-action="dp-diary">העתק תבנית יומן</button>
         <textarea class="input copybox" id="dpCopyBox" hidden rows="6" aria-label="תבנית להעתקה" readonly></textarea></div>
       <div class="card stack"><h3>ההערכה כרגע</h3><div id="dpProbs">${probsHTML(post, 4)}</div>
         <button type="button" class="btn primary block" data-action="dg-sub" data-sub="adv">למסך האבחון המלא ${ICON.next}</button></div>`;
@@ -1131,7 +1156,7 @@ const DiagPro = (() => {
         <div class="kv"><span>מלאה ${Conf.badge('ok')}</span><b class="num">${b.full.toFixed(1)}V</b></div>
         <div class="kv"><span>ריקה ≈ ${Conf.badge('ok')}</span><b class="num">${b.empty.toFixed(1)}V</b></div>
         <div class="kv"><span>אספקת חיישנים ${Conf.badge('typ')}</span><b class="num">4.8–5.2V</b></div>
-        <div class="kv"><span>זרם בקר ${Conf.badge(ex.controllerAmps ? ex.controllerAmps.conf : 'unk')}</span><b class="num">${ex.controllerAmps && ex.controllerAmps.v ? ex.controllerAmps.v + 'A' : '❓'}</b></div>
+        <div class="kv"><span>זרם בקר ${Conf.badge(ex.controllerAmps ? ex.controllerAmps.conf : 'unk')}</span><b class="num">${ex.controllerAmps && ex.controllerAmps.v ? ex.controllerAmps.v + 'A' : 'לא ידוע'}</b></div>
       </div>
       <div class="stack">${tps.map(tp => `<div class="card tp-card ${tpSel === tp.id ? 'sel' : ''}" id="tp-${tp.id}">
         <div class="spread"><h3>${esc(tp.name)}</h3><span>${tp.live ? Safety.liveBadge() : ''} ${Conf.badge(tp.conf)}</span></div>
@@ -1139,7 +1164,7 @@ const DiagPro = (() => {
         <p class="beg-only">חוד אדום: ${esc(tp.red)} · חוד שחור: ${esc(tp.black)}</p>
         <div class="lcd num">${TM(tp.expect)}</div>
         ${tp.bad ? `<p class="lead" data-sx="s29"><b>ערך חריג:</b> ${T(tp.bad)}</p>` : ''}
-        <div class="row"><button type="button" class="btn sm" data-action="tp-show" data-tp="${tp.id}">הצג ב-3D</button>${tp.meas && E.measById(tp.meas) && E.measOK(E.measById(tp.meas)) ? `<button type="button" class="btn sm ghost" data-action="tp-meas" data-m="${tp.meas}">הזנת קריאה לאבחון</button>` : ''}</div>
+        <div class="row"><button type="button" class="btn sm" data-action="tp-show" data-tp="${tp.id}">הצג ב-3D</button>${tp.meas && E.measById(tp.meas) && E.measOK(E.measById(tp.meas)) ? `<button type="button" class="btn sm ghost" data-action="tp-meas" data-m="${tp.meas}">הזן קריאה לאבחון</button>` : ''}</div>
       </div>`).join('')}</div>
       ${m.hallSequence ? `<div class="card stack"><div class="spread"><h3>רצף Hall תקין</h3>${Conf.badge(m.hallSequence.conf)}</div>
         <p class="lead" data-sx="s29">${esc(m.hallSequence.note)}</p>
@@ -1289,7 +1314,7 @@ const DiagPro = (() => {
     const fams = ec.families || [];
     return `<div class="card stack model-card"><div class="spread"><h3>קודים לדגם <bdi>${esc(M().short)}</bdi></h3>${Conf.badge(ec.conf)}</div>
       <p class="lead" data-sx="s0">${T(ec.note)}</p>
-      ${fams.length ? `<div class="row">${fams.map(f => { const b = DATA.errorCodes.brands.find(x => x.id === f); return `<button type="button" class="btn sm" data-action="dg-brand" data-b="${f}">הצג קודי ${esc(b ? b.name : f)}</button>`; }).join('')}</div>` : '<p class="foot">❓ אין קודים מאומתים לדגם הזה במאגר. לא ממציאים קודים – בדקו במדריך הצג.</p>'}</div>`;
+      ${fams.length ? `<div class="row">${fams.map(f => { const b = DATA.errorCodes.brands.find(x => x.id === f); return `<button type="button" class="btn sm" data-action="dg-brand" data-b="${f}">הצג קודי ${esc(b ? b.name : f)}</button>`; }).join('')}</div>` : '<p class="foot">אין קודים מאומתים לדגם הזה במאגר. לא ממציאים קודים – בדקו במדריך הצג.</p>'}</div>`;
   }
   function codeConf(c) { return Conf.badge((DATA.pro.codeConfidence || {})[c.b] || 'unk'); }
 
@@ -1328,14 +1353,14 @@ const Academy = (() => {
       <div class="progress" role="progressbar" aria-label="התקדמות באקדמיה" aria-valuemin="0" aria-valuemax="${mods.length}" aria-valuenow="${done}"><i data-sw="${mods.length ? done / mods.length * 100 : 0}"></i></div>
       <p class="foot num">${done} מתוך ${mods.length} תעודות</p></div>
       <div class="acad-mods">${mods.map((m, i) => { const s = modStatus(m); return `<button type="button" class="acad-mod ${s.cert ? 'done' : ''}" data-action="ac-mod" data-m="${m.id}">
-        <span class="n" aria-hidden="true">${s.cert ? '✓' : i + 1}</span><b>${esc(m.title)}</b><small>${esc(m.desc)}</small>
+        <span class="n" aria-hidden="true">${s.cert ? ICON.check : i + 1}</span><b>${esc(m.title)}</b><small>${esc(m.desc)}</small>
         <span class="st num">${s.read}/${s.total} שיעורים${s.score != null ? `<br>בוחן: ${s.score}%` : ''}</span></button>`; }).join('')}</div>`;
   }
   function modHTML() {
     const m = mod(), s = modStatus(m), p = prog();
     return `<button type="button" class="linkbtn" data-action="ac-list">${ICON.prev} כל המודולים</button>
       <div><p class="eyebrow">מודול ${load().modules.indexOf(m) + 1}</p><h2 id="acTitle" tabindex="-1">${esc(m.title)}</h2><p class="lead">${esc(m.desc)}</p></div>
-      <div class="lesson-list">${lessonsOf(m).map((l, i) => `<button type="button" data-action="ac-les" data-l="${l.id}" class="${p.read[m.id + '.' + l.id] ? 'read' : ''}"><span class="num">${i + 1}.</span> ${esc(l.title)}${l.sim ? ' · 🔧 סימולטור' : ''}</button>`).join('')}</div>
+      <div class="lesson-list">${lessonsOf(m).map((l, i) => `<button type="button" data-action="ac-les" data-l="${l.id}" class="${p.read[m.id + '.' + l.id] ? 'read' : ''}"><span class="num">${i + 1}.</span> ${esc(l.title)}${l.sim ? ' · סימולטור' : ''}</button>`).join('')}</div>
       <div class="card stack"><h3>בוחן המודול</h3><p class="lead" data-sx="s0">${m.quiz.length} שאלות. ציון עובר: ${load().passScore}%. ${s.score != null ? `הציון האחרון: <b>${s.score}%</b>.` : ''}</p>
         <div class="row"><button type="button" class="btn primary" data-action="ac-quiz">${s.score != null ? 'לבוחן שוב' : 'לבוחן'}</button>${s.cert ? '<button type="button" class="btn" data-action="ac-cert">התעודה שלי</button>' : ''}</div></div>`;
   }
@@ -1365,12 +1390,12 @@ const Academy = (() => {
         <b>${i + 1}. ${T(q.q)}</b>
         ${q.opts.map((o, j) => { let cls = ''; if (submitted) { if (j === q.a) cls = 'right'; else if (answers[i] === j) cls = 'wrong'; }
           return `<button type="button" class="quiz-opt ${cls}" data-action="ac-opt" data-q="${i}" data-o="${j}" aria-pressed="${answers[i] === j}" ${submitted ? 'disabled' : ''}>${T(o)}</button>`; }).join('')}
-        ${submitted ? `<p class="${answers[i] === q.a ? 'verify' : 'mistake'}">${answers[i] === q.a ? '✓ נכון. ' : '✗ '}${T(q.why)}</p>` : ''}
+        ${submitted ? `<p class="${answers[i] === q.a ? 'verify' : 'mistake'}">${answers[i] === q.a ? MK.ok + 'נכון. ' : '<span class="mk bad">' + ICON.cross + '</span>'}${T(q.why)}</p>` : ''}
       </fieldset>`).join('')}
       ${submitted
         ? `<div class="note ${score >= pass ? 'ok' : 'warn'}">${score >= pass ? ICON.ok : ICON.warn}<span><b>ציון: ${score}%</b> ${score >= pass ? '– עברתם! התעודה מחכה.' : `– צריך ${pass}% כדי לעבור. חזרו לשיעורים ונסו שוב.`}</span></div>
-           <div class="navrow">${score >= pass ? '<button type="button" class="btn primary" data-action="ac-cert">לתעודה</button>' : '<button type="button" class="btn primary" data-action="ac-quiz">ניסיון נוסף</button>'}<button type="button" class="btn" data-action="ac-list">כל המודולים</button></div>`
-        : `<button type="button" class="btn primary block" data-action="ac-submit" ${Object.keys(answers).length < m.quiz.length ? 'disabled' : ''}>הגשה</button>`}`;
+           <div class="navrow">${score >= pass ? '<button type="button" class="btn primary" data-action="ac-cert">לתעודה</button>' : '<button type="button" class="btn primary" data-action="ac-quiz">נסה שוב</button>'}<button type="button" class="btn" data-action="ac-list">כל המודולים</button></div>`
+        : `<button type="button" class="btn primary block" data-action="ac-submit" ${Object.keys(answers).length < m.quiz.length ? 'disabled' : ''}>הגש</button>`}`;
   }
   function certHTML() {
     const m = mod(), c = prog().certs[m.id];
@@ -1379,7 +1404,7 @@ const Academy = (() => {
     return `<button type="button" class="linkbtn" data-action="ac-mod" data-m="${m.id}">${ICON.prev} ${esc(m.title)}</button>
       <div class="field"><label for="certName">השם על התעודה</label><input class="input" id="certName" maxlength="60" value="${esc(name)}" autocomplete="name"></div>
       <div class="print-area"><div class="cert" id="certCard">
-        <div class="seal" aria-hidden="true">⚡</div>
+        <div class="seal" aria-hidden="true">${ICON.bolt}</div>
         <p class="eyebrow" data-sx="s32">מעבדת החיווט · אקדמיה</p>
         <h3>תעודת סיום</h3>
         <p>מאשרת ש-</p><p class="who" id="certWho">${esc(name || 'שם המסיים/ת')}</p>
@@ -1387,7 +1412,7 @@ const Academy = (() => {
         <p class="num">ציון: ${c.score}% · תאריך: ${esc(c.date)}</p>
         <p class="foot">${esc(DATA.meta.disclaimer)}</p>
       </div></div>
-      <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn primary" data-action="ac-print">הדפסה / שמירה כ-PDF</button>'}<button type="button" class="btn" data-action="ac-copycert">העתקת טקסט התעודה</button><button type="button" class="btn ghost" data-action="ac-list">כל המודולים</button></div>
+      <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn primary" data-action="ac-print">הדפס או שמור PDF</button>'}<button type="button" class="btn" data-action="ac-copycert">העתק את התעודה</button><button type="button" class="btn ghost" data-action="ac-list">כל המודולים</button></div>
       ${IN_FRAME ? '<p class="foot">הדפסה זמינה כשפותחים את הקובץ index.html ישירות בדפדפן.</p>' : ''}
       <textarea class="input copybox" id="acCopyBox" hidden rows="4" aria-label="טקסט להעתקה" readonly></textarea>`;
   }
@@ -1529,11 +1554,11 @@ const MeterSim = (() => {
     const a = pt(st.red), b = pt(st.black), m = st.mode;
     const src = n => n === 'bat+' || n === 'ctrl+' || (st.on && pot(n) != null && Math.abs(pot(n)) > 0.5);
     if (m === 'amp') {
-      if (st.blown) return { lcd: 'FUSE', unit: '', msg: '💥 קצר! מד במצב זרם הוא כמעט חוט – חיבור במקביל למקור מתח שורף את הנתיך. מודדים זרם רק בטור, ולזרם הנעה משתמשים במד צבת. במציאות מחליפים נתיך באותו דירוג.', cls: 'bad' };
+      if (st.blown) return { lcd: 'FUSE', unit: '', msg: 'קצר! מד במצב זרם הוא כמעט חוט – חיבור במקביל למקור מתח שורף את הנתיך. מודדים זרם רק בטור, ולזרם הנעה משתמשים במד צבת. במציאות מחליפים נתיך באותו דירוג.', cls: 'bad' };
       const va = pot(a.net), vb = pot(b.net);
       if ((va != null && vb != null && Math.abs(va - vb) > 0.5) || src(a.net) || src(b.net)) {
         st.blown = true;
-        return { lcd: 'FUSE', unit: '', msg: '💥 קצר! מד במצב זרם הוא כמעט חוט. חיבור במקביל למקור מתח = קצר, נתיך שרוף וסכנת כוויה. מודדים זרם רק בטור – ולזרם הנעה משתמשים במד צבת.', cls: 'bad' };
+        return { lcd: 'FUSE', unit: '', msg: 'קצר! מד במצב זרם הוא כמעט חוט. חיבור במקביל למקור מתח = קצר, נתיך שרוף וסכנת כוויה. מודדים זרם רק בטור – ולזרם הנעה משתמשים במד צבת.', cls: 'bad' };
       }
       return { lcd: '0.00', unit: 'A', msg: 'אין זרם במסלול הזה.', cls: '' };
     }
@@ -1541,7 +1566,7 @@ const MeterSim = (() => {
       if ((a.net === 'bat+' || b.net === 'bat+') && (a.net !== b.net)) return { lcd: 'Err', unit: '', msg: 'מדידת התנגדות על מקור מתח (הסוללה) נותנת תוצאה שגויה ועלולה להזיק למד. Ω ורציפות – רק על מעגל מנותק ובלי מתח.', cls: 'bad' };
       if (st.on && (src(a.net) || src(b.net))) return { lcd: '----', unit: '', msg: 'המערכת דולקת! מודדים התנגדות ורציפות רק כשהסוללה מנותקת. כבו את ״הפעלה״.', cls: 'bad' };
       const r = ohm(a.net, b.net);
-      if (m === 'cont') return r < 20 ? { lcd: r < 1 ? r.toFixed(2) : r.toFixed(1), unit: 'Ω 🔊', msg: 'צפצוף – יש רציפות.', cls: 'ok', beep: true } : { lcd: 'OL', unit: '', msg: 'אין רציפות.', cls: '' };
+      if (m === 'cont') return r < 20 ? { lcd: r < 1 ? r.toFixed(2) : r.toFixed(1), unit: 'Ω', msg: 'צפצוף – יש רציפות.', cls: 'ok', beep: true } : { lcd: 'OL', unit: '', msg: 'אין רציפות.', cls: '' };
       return { lcd: r === Infinity ? 'OL' : r.toFixed(2), unit: r === Infinity ? '' : 'Ω', msg: r === Infinity ? 'OL = אין חיבור (התנגדות גבוהה מהטווח).' : '', cls: '' };
     }
     const va = pot(a.net), vb = pot(b.net);
@@ -1549,7 +1574,7 @@ const MeterSim = (() => {
     const v = va - vb, lim = m === 'v20' ? 20 : 200;
     if (Math.abs(v) >= lim) return { lcd: 'OL', unit: '', msg: `המתח גבוה מהטווח (${lim}V). העבירו לטווח גבוה יותר.`, cls: 'warn' };
     const s = Math.abs(v) < 20 ? v.toFixed(2) : v.toFixed(1);
-    return { lcd: s, unit: 'V', msg: v < -0.5 ? 'ערך שלילי = החודים הפוכים. זה לא מזיק במדידת מתח.' : (Math.abs(v) >= DATA.pro.hvThreshold ? '⚠️ מתח מעל 60V – מסוכן במגע.' : ''), cls: v < -0.5 ? 'warn' : '' };
+    return { lcd: s, unit: 'V', msg: v < -0.5 ? 'ערך שלילי = החודים הפוכים. זה לא מזיק במדידת מתח.' : (Math.abs(v) >= DATA.pro.hvThreshold ? 'מתח מעל 60V – מסוכן במגע.' : ''), cls: v < -0.5 ? 'warn' : '' };
   }
   function lcdHTML() {
     const r = read();
@@ -1563,13 +1588,13 @@ const MeterSim = (() => {
     const opts = sel => P.map(p => `<option value="${p.id}" ${p.id === sel ? 'selected' : ''}>${esc(p.label)}</option>`).join('');
     const faults = FAULTS.filter(f => f.needs.every(has));
     return `<div class="card sim" id="simBox" aria-label="סימולטור מולטימטר">
-      <div class="spread"><h3>🔧 סימולטור מולטימטר · <bdi>${esc(M().short)}</bdi></h3><span class="foot num">${BR().nominal}V</span></div>
+      <div class="spread"><h3>סימולטור מולטימטר · <bdi>${esc(M().short)}</bdi></h3><span class="foot num">${BR().nominal}V</span></div>
       <div class="sim-dev">
         <div id="simLcd">${lcdHTML()}</div>
         <div class="sim-dial" role="radiogroup" aria-label="מצב המולטימטר">${MODES.map(([id, n]) => `<button type="button" role="radio" data-sim-mode="${id}" aria-checked="${st.mode === id}" aria-pressed="${st.mode === id}">${n}</button>`).join('')}</div>
         <div class="sim-probes">
-          <label class="field r"><span class="lbl">🔴 חוד אדום</span><select class="input" id="simRed">${opts(st.red)}</select></label>
-          <label class="field"><span class="lbl">⚫ חוד שחור</span><select class="input" id="simBlack">${opts(st.black)}</select></label>
+          <label class="field r"><span class="lbl"><i class="probe-dot red"></i>חוד אדום</span><select class="input" id="simRed">${opts(st.red)}</select></label>
+          <label class="field"><span class="lbl"><i class="probe-dot black"></i>חוד שחור</span><select class="input" id="simBlack">${opts(st.black)}</select></label>
         </div>
       </div>
       <div class="sim-state" role="group" aria-label="מצב הכלי">
@@ -1577,13 +1602,13 @@ const MeterSim = (() => {
         ${has('motor') ? '<button type="button" class="btn sm" data-sim="hall">סיבוב גלגל איטי ⟳</button>' : ''}
         ${has('brakes') ? `<button type="button" class="btn sm choice" data-sim="brake" aria-pressed="${st.brake}">ידית בלם לחוצה</button>` : ''}
         ${has('pas') ? '<button type="button" class="btn sm" data-sim="pedal">סיבוב פדל ⟳</button>' : ''}
-        ${st.blown ? '<button type="button" class="btn sm" data-sim="fuse">החלפת נתיך במד</button>' : ''}
+        ${st.blown ? '<button type="button" class="btn sm" data-sim="fuse">החלף נתיך במד</button>' : ''}
       </div>
       ${has('throttle') ? `<label class="field"><span class="lbl">מצערת: <b id="simThrV" class="num">${st.thr}%</b></span><input type="range" id="simThr" min="0" max="100" step="5" value="${st.thr}" aria-label="פתיחת מצערת באחוזים"></label>` : ''}
       <p class="foot beg-only">טיפ: לחצו על רכיב במודל התלת-ממדי כדי להניח עליו את החוד האדום.</p>
       <details class="concept" ${st.drill ? 'open' : ''}><summary>תרגיל: מצאו את התקלה הנסתרת</summary><div class="body">
         <p>המערכת תבחר תקלה אקראית. מדדו, והחליטו מה התקול.</p>
-        <div class="row"><button type="button" class="btn sm primary" data-sim="drill">${st.drill ? 'תקלה חדשה' : 'התחלת תרגיל'}</button>${st.drill ? '<button type="button" class="btn sm ghost" data-sim="undrill">סיום תרגיל</button>' : ''}</div>
+        <div class="row"><button type="button" class="btn sm primary" data-sim="drill">${st.drill ? 'תקלה חדשה' : 'התחלת תרגיל'}</button>${st.drill ? '<button type="button" class="btn sm ghost" data-sim="undrill">סיים תרגיל</button>' : ''}</div>
         ${st.drill ? `<label class="field"><span class="lbl">מה התקול?</span><select class="input" id="simGuess"><option value="">בחרו…</option>${faults.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label><p id="simGuessOut" class="foot" aria-live="polite"></p>` : ''}
       </div></details>
     </div>`;
@@ -1631,7 +1656,7 @@ const MeterSim = (() => {
     const g = $('#simGuess'); if (g) g.addEventListener('change', () => {
       if (!g.value) return;
       const ok = g.value === st.fault, f = FAULTS.find(x => x.id === st.fault);
-      $('#simGuessOut').innerHTML = ok ? `<span class="verify">✓ נכון! ${esc(f.name)}.</span>` : '<span class="mistake">✗ עדיין לא. המשיכו למדוד – השוו לערכים התקינים.</span>';
+      $('#simGuessOut').innerHTML = ok ? `<span class="verify">${MK.ok}נכון! ${esc(f.name)}.</span>` : '<span class="mistake"><span class="mk bad">' + ICON.cross + '</span>עדיין לא. המשיכו למדוד – השוו לערכים התקינים.</span>';
     });
     update();
   }
@@ -1699,13 +1724,13 @@ const Tools = (() => {
     { const ah = num('cTAh'), a = num('cTA'), fr = num('cTFrom'), to = num('cTTo');
       if ([ah, a, fr, to].every(isFinite) && a > 0 && to > fr) {
         const ccTo = Math.min(to, 80), cc = ah * (ccTo - fr) / 100 / a / 0.92, cv = to > 80 ? (to - 80) / 20 * 1.2 : 0;
-        out('cTOut', `<span>זמן משוער: <b>${f1(cc + cv)} שעות</b></span><span class="foot">שלב זרם קבוע (CC) ${f1(cc)} ש׳ + שלב מתח קבוע (CV) ${f1(cv)} ש׳. מתח מטען: ${BR().full.toFixed(1)}V.</span>${a > ah * 0.5 ? '<span class="verdict warn">⚠️ זרם טעינה מעל 0.5C – ודאו שהסוללה והמטען מאושרים לכך.</span>' : ''}`);
+        out('cTOut', `<span>זמן משוער: <b>${f1(cc + cv)} שעות</b></span><span class="foot">שלב זרם קבוע (CC) ${f1(cc)} ש׳ + שלב מתח קבוע (CV) ${f1(cv)} ש׳. מתח מטען: ${BR().full.toFixed(1)}V.</span>${a > ah * 0.5 ? '<span class="verdict warn">' + MK.warn + 'זרם טעינה מעל 0.5C – ודאו שהסוללה והמטען מאושרים לכך.</span>' : ''}`);
       } }
     // צניחה
     { const r = num('cSRest'), l = num('cSLoad'), i = num('cSI');
       if (isFinite(r) && isFinite(l) && r > 0) {
         const d = (r - l) / r * 100, dv = r - l;
-        const v = d < 10 ? ['ok', '✅ צניחה תקינה'] : d < 20 ? ['warn', '⚠️ צניחה גבוהה – סוללה מזדקנת או מחבר עם התנגדות'] : ['bad', '⛔ צניחה חמורה – בדיקת סוללה במעבדה, אל תעקפו BMS'];
+        const v = d < 10 ? ['ok', 'צניחה תקינה'] : d < 20 ? ['warn', 'צניחה גבוהה – סוללה מזדקנת או מחבר עם התנגדות'] : ['bad', 'צניחה חמורה – בדיקת סוללה במעבדה, אל תעקפו BMS'];
         out('cSOut', `<span>צניחה: <b>${f1(d)}% (${f1(dv)}V)</b></span>${isFinite(i) && i > 0 ? `<span>התנגדות כוללת משוערת: <b>${Math.round(dv / i * 1000)} mΩ</b> · הפסד חום: <b>${Math.round(dv * i)}W</b></span>` : ''}<span class="verdict ${v[0]}">${v[1]}</span>`);
       } }
     // הספק
@@ -1714,13 +1739,13 @@ const Tools = (() => {
     // סוללה חלופית
     { const V = Number($('#cBV').value), ah = num('cBAh'), bms = num('cBA'), conn = $('#cBConn').value, ca = m.controllerAmpsNum;
       const rows = [];
-      rows.push(V === m.voltage ? ['ok', `✅ מתח ${V}V זהה לדגם`] : ['bad', `⛔ מתח ${V}V שונה מ-${m.voltage}V – לא תואם (סכנה לבקר, ועלול להיות לא חוקי)`]);
-      if (isFinite(bms)) rows.push(ca ? (bms >= ca ? ['ok', `✅ BMS ${bms}A ≥ בקר ${ca}A`] : ['bad', `⛔ BMS ${bms}A < בקר ${ca}A – ניתוקים תחת עומס`]) : ['warn', `⚠️ זרם הבקר בדגם לא פורסם ❓ – ודאו מול תווית הבקר שהוא ≤ ${bms}A`]);
-      rows.push(conn === 'same' ? ['ok', '✅ מחבר ומתקן זהים'] : conn === 'diff' ? ['bad', '⛔ מחבר/מתקן שונים – אין לאלתר מתאמים בקו ההספק'] : ['warn', '⚠️ מחבר לא ידוע – בדקו לפני קנייה']);
-      const cb = battRow(V); rows.push(cb ? ['ok', `ℹ️ מטען נדרש: ${cb.full.toFixed(1)}V${V !== m.voltage ? ' – המטען המקורי לא מתאים!' : ' – המטען המקורי מתאים'}`] : ['warn', 'מתח לא מוכר']);
-      if (isFinite(ah)) { const nwh = Math.round(V * ah); rows.push(['ok', `ℹ️ ${nwh}Wh (${nwh >= m.wh ? '+' : ''}${Math.round((nwh / m.wh - 1) * 100)}% מול המקורי ${m.wh}Wh)`]); }
+      rows.push(V === m.voltage ? ['ok', `מתח ${V}V זהה לדגם`] : ['bad', `מתח ${V}V שונה מ-${m.voltage}V – לא תואם (סכנה לבקר, ועלול להיות לא חוקי)`]);
+      if (isFinite(bms)) rows.push(ca ? (bms >= ca ? ['ok', `BMS ${bms}A ≥ בקר ${ca}A`] : ['bad', `BMS ${bms}A < בקר ${ca}A – ניתוקים תחת עומס`]) : ['warn', `זרם הבקר בדגם לא פורסם (לא ידוע) – ודאו מול תווית הבקר שהוא ≤ ${bms}A`]);
+      rows.push(conn === 'same' ? ['ok', 'מחבר ומתקן זהים'] : conn === 'diff' ? ['bad', 'מחבר/מתקן שונים – אין לאלתר מתאמים בקו ההספק'] : ['warn', 'מחבר לא ידוע – בדקו לפני קנייה']);
+      const cb = battRow(V); rows.push(cb ? ['info', `מטען נדרש: ${cb.full.toFixed(1)}V${V !== m.voltage ? ' – המטען המקורי לא מתאים!' : ' – המטען המקורי מתאים'}`] : ['warn', 'מתח לא מוכר']);
+      if (isFinite(ah)) { const nwh = Math.round(V * ah); rows.push(['info', `${nwh}Wh (${nwh >= m.wh ? '+' : ''}${Math.round((nwh / m.wh - 1) * 100)}% מול המקורי ${m.wh}Wh)`]); }
       const bad = rows.some(r => r[0] === 'bad'), warn = rows.some(r => r[0] === 'warn');
-      out('cBOut', rows.map(r => `<span class="verdict ${r[0]}">${esc(r[1])}</span>`).join('') + `<span><b>${bad ? '⛔ לא תואם' : warn ? '⚠️ דורש בדיקה' : '✅ תואם לפי הנתונים'}</b></span><span class="foot">${esc(DATA.meta.batteryNote)}</span>`); }
+      out('cBOut', rows.map(r => `<span class="verdict ${r[0]}">${r[0] === 'ok' ? MK.ok : r[0] === 'bad' ? MK.bad : r[0] === 'warn' ? MK.warn : '<span class="mk">' + ICON.info + '</span>'}${esc(r[1])}</span>`).join('') + `<span><b>${bad ? MK.bad + 'לא תואם' : warn ? MK.warn + 'דורש בדיקה' : MK.ok + 'תואם לפי הנתונים'}</b></span><span class="foot">${esc(DATA.meta.batteryNote)}</span>`); }
     // XsYp
     { const S = num('cXS'), Pp = num('cXP'), cv = num('cXV'), cah = num('cXAh'), ca = num('cXA');
       if ([S, Pp, cv, cah, ca].every(isFinite) && S > 0 && Pp > 0) {
@@ -1749,21 +1774,21 @@ const Tools = (() => {
         <div class="field"><label for="lgMeas">מדידות</label><textarea class="input" id="lgMeas" rows="2" maxlength="4000" placeholder="למשל: סוללה 51.2V, 5V=4.98V, פאזות 0.3/0.3/0.31Ω">${v('measurements')}</textarea></div>
         <div class="field"><label for="lgRep">מה הוחלף</label><input class="input" id="lgRep" maxlength="1000" value="${v('replaced')}"></div>
         <div class="field"><label for="lgNotes">הערות</label><textarea class="input" id="lgNotes" rows="2" maxlength="4000">${v('notes')}</textarea></div>
-        <div class="row"><button type="submit" class="btn primary">${r ? 'שמירת שינויים' : 'הוספה ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
+        <div class="row"><button type="submit" class="btn primary">${r ? 'שמור שינויים' : 'שמור ליומן'}</button>${r ? '<button type="button" class="btn ghost" data-action="lg-cancel">ביטול</button>' : ''}</div>
       </form>
       <div class="stack"><div class="spread"><h3>רשומות (${items.length})</h3>
-        <div class="row"><button type="button" class="btn sm" data-action="lg-export" ${items.length ? '' : 'disabled'}>ייצוא JSON</button><button type="button" class="btn sm ghost" data-action="lg-import">ייבוא</button></div></div>
+        <div class="row"><button type="button" class="btn sm" data-action="lg-export" ${items.length ? '' : 'disabled'}>ייצא JSON</button><button type="button" class="btn sm ghost" data-action="lg-import">ייבא</button></div></div>
         <textarea class="input copybox" id="lgBox" hidden rows="8" aria-label="JSON להעתקה או להדבקה"></textarea>
         <div id="lgImportBox" hidden class="card stack"><div class="field"><label for="lgFile">קובץ JSON</label><input class="input" id="lgFile" type="file" accept="application/json,.json"></div>
           <div class="field"><label for="lgPaste">או הדביקו JSON</label><textarea class="input copybox" id="lgPaste" rows="5"></textarea></div>
           <label class="check" for="lgMerge" data-sx="s33"><input type="checkbox" id="lgMerge" checked data-sx="s34"><span>מיזוג עם הרשומות הקיימות (בלי למחוק)</span></label>
           <pre class="import-err" id="lgErr" hidden role="alert"></pre>
-          <button type="button" class="btn primary" data-action="lg-doimport">ייבוא</button></div>
+          <button type="button" class="btn primary" data-action="lg-doimport">ייבא</button></div>
         ${items.length ? items.map(x => `<div class="card log-item">
           <div class="spread"><b>${esc(x.anon ? 'לקוח אנונימי' : (x.customer || 'ללא שם'))} · <bdi>${esc((DATA.models[x.model] || {}).short || x.modelName)}</bdi></b><span class="status">${esc(x.status)}</span></div>
           <span class="meta num">${esc(x.date)}${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</span>
           ${x.symptoms ? `<span>${esc(x.symptoms)}</span>` : ''}${x.measurements ? `<span class="foot">${esc(x.measurements)}</span>` : ''}${x.replaced ? `<span>הוחלף: ${esc(x.replaced)}</span>` : ''}${x.notes ? `<span class="foot">${esc(x.notes)}</span>` : ''}
-          <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">עריכה</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">דו״ח ללקוח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחצו שוב למחיקה' : 'מחיקה'}</button></div>
+          <div class="row"><button type="button" class="btn sm" data-action="lg-edit" data-id="${esc(x.id)}">ערוך</button><button type="button" class="btn sm ghost" data-action="lg-report" data-id="${esc(x.id)}">הפק דו״ח</button><button type="button" class="btn sm ghost" data-action="lg-del" data-id="${esc(x.id)}">${delArm === x.id ? 'לחץ שוב למחיקה' : 'מחק'}</button></div>
         </div>`).join('') : '<p class="lead">אין רשומות עדיין. אפשר גם לשמור תוצאת אבחון ישירות מלשונית האבחון.</p>'}
       </div>
       ${printId ? reportHTML(items.find(x => x.id === printId)) : ''}`;
@@ -1779,7 +1804,7 @@ const Tools = (() => {
       <dl class="specs"><dt>תאריך</dt><dd class="num">${esc(x.date)}</dd><dt>לקוח</dt><dd>${esc(x.anon ? 'לקוח אנונימי' : x.customer)}${x.phone ? ' · <bdi>' + esc(x.phone) + '</bdi>' : ''}</dd><dt>כלי</dt><dd><bdi>${esc(mm.name || x.modelName)}</bdi>${x.serial ? ' · מס״ד ' + esc(x.serial) : ''}</dd>
       <dt>תלונה</dt><dd>${esc(x.symptoms)}</dd><dt>מדידות</dt><dd>${esc(x.measurements)}</dd><dt>הוחלף</dt><dd>${esc(x.replaced)}</dd><dt>הערות</dt><dd>${esc(x.notes)}</dd><dt>סטטוס</dt><dd>${esc(x.status)}</dd></dl>
       <p class="foot">${esc(DATA.meta.disclaimer)}</p>
-      <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn sm primary" data-action="lg-print">הדפסה</button>'}<button type="button" class="btn sm" data-action="lg-copyrep" data-id="${esc(x.id)}">העתקת הדו״ח</button><button type="button" class="btn sm ghost" data-action="lg-closerep">סגירה</button></div>
+      <div class="row">${IN_FRAME ? '' : '<button type="button" class="btn sm primary" data-action="lg-print">הדפס</button>'}<button type="button" class="btn sm" data-action="lg-copyrep" data-id="${esc(x.id)}">העתק דו״ח</button><button type="button" class="btn sm ghost" data-action="lg-closerep">סגור</button></div>
       <textarea class="input copybox" id="lgRepBox" hidden rows="6" readonly aria-label="דו״ח להעתקה"></textarea></div>`;
   }
   function bindLog() {
@@ -1808,22 +1833,22 @@ const Tools = (() => {
     ids.forEach(id => { const x = DATA.models[id], full = battRow(x.voltage).full.toFixed(1); (groups[full] = groups[full] || []).push(x.short); });
     const has = c => vehicleComps().includes(c);
     const alt = [
-      ['בקר', [`${m.voltage}V`, m.controllerAmpsNum ? `עד ${m.controllerAmpsNum}A (כמו המקורי)` : 'זרם לפי תווית הבקר המקורי ❓', `פרוטוקול צג: ${m.displayProtocol ? m.displayProtocol.v : '❓'}`, 'חיישני Hall (או Sensorless עם התנעה פחות חלקה)'], m.displayProtocol ? m.displayProtocol.conf : 'unk'],
-      ['מטען', [`${b.full.toFixed(1)}V בדיוק`, `מחבר: ${m.connectors && m.connectors.charge ? m.connectors.charge.v : '❓'}`, 'זרם 2–4A (עד 0.5C)'], m.connectors && m.connectors.charge ? m.connectors.charge.conf : 'unk'],
-      ['צג', [`אותו פרוטוקול: ${m.displayProtocol ? m.displayProtocol.v : '❓'}`, `טווח מתח כולל ${m.voltage}V`, `מחבר: ${m.connectors && m.connectors.display ? m.connectors.display.v : '❓'}`], m.displayProtocol ? m.displayProtocol.conf : 'unk']
+      ['בקר', [`${m.voltage}V`, m.controllerAmpsNum ? `עד ${m.controllerAmpsNum}A (כמו המקורי)` : 'זרם לפי תווית הבקר המקורי (לא ידוע)', `פרוטוקול צג: ${m.displayProtocol ? m.displayProtocol.v : 'לא ידוע'}`, 'חיישני Hall (או Sensorless עם התנעה פחות חלקה)'], m.displayProtocol ? m.displayProtocol.conf : 'unk'],
+      ['מטען', [`${b.full.toFixed(1)}V בדיוק`, `מחבר: ${m.connectors && m.connectors.charge ? m.connectors.charge.v : 'לא ידוע'}`, 'זרם 2–4A (עד 0.5C)'], m.connectors && m.connectors.charge ? m.connectors.charge.conf : 'unk'],
+      ['צג', [`אותו פרוטוקול: ${m.displayProtocol ? m.displayProtocol.v : 'לא ידוע'}`, `טווח מתח כולל ${m.voltage}V`, `מחבר: ${m.connectors && m.connectors.display ? m.connectors.display.v : 'לא ידוע'}`], m.displayProtocol ? m.displayProtocol.conf : 'unk']
     ];
     if (has('throttle')) alt.push(['מצערת', ['Hall ליניארי 5V, 3 חוטים', 'אות 0.8–4.2V', 'אותו מחבר'], 'typ']);
     if (has('brakes')) alt.push(['חיישני בלם', ['אותה לוגיקה (NO/NC) כמו הבקר', '2 חוטים (או 3 ל-Hall)', 'אותו מחבר'], 'typ']);
-    alt.push(['סוללה', [`${m.voltage}V (${b.s}S)`, m.controllerAmpsNum ? `BMS רציף ≥ ${m.controllerAmpsNum}A` : 'BMS רציף ≥ זרם הבקר ❓', 'אותו מחבר ומתקן', 'מארז שלם בלבד'], 'typ']);
+    alt.push(['סוללה', [`${m.voltage}V (${b.s}S)`, m.controllerAmpsNum ? `BMS רציף ≥ ${m.controllerAmpsNum}A` : 'BMS רציף ≥ זרם הבקר (לא ידוע)', 'אותו מחבר ומתקן', 'מארז שלם בלבד'], 'typ']);
     return `<div class="cmp-wrap"><table class="volt cmp"><caption class="sr-only">השוואת דגמים</caption>
       <thead><tr><th scope="col">דגם</th><th scope="col">מתח</th><th scope="col">Wh</th><th scope="col">מטען</th><th scope="col">בקר</th><th scope="col">מחבר טעינה</th><th scope="col">פרוטוקול צג</th></tr></thead>
       <tbody>${ids.map(id => { const x = DATA.models[id], br = battRow(x.voltage); return `<tr ${id === State.model ? 'aria-current="true"' : ''}>
         <td><button type="button" class="linkbtn" data-action="select-model" data-model="${id}"><bdi>${esc(x.short)}</bdi></button></td>
         <td class="nom">${x.voltage}V ${Conf.badge(x.dataConfidence.battery)}</td><td>${x.wh}</td><td>${br.full.toFixed(1)}V</td>
-        <td>${x.controllerAmpsNum ? x.controllerAmpsNum + 'A' : '❓'}${x.controller.count > 1 ? ' ×2' : ''}</td>
-        <td class="flagcell">${x.connectors && x.connectors.charge ? esc(x.connectors.charge.v) + ' ' + Conf.badge(x.connectors.charge.conf) : '❓'}</td>
-        <td class="flagcell">${x.displayProtocol ? esc(x.displayProtocol.v) + ' ' + Conf.badge(x.displayProtocol.conf) : '❓'}</td></tr>`; }).join('')}</tbody></table></div>
-      <div class="card stack"><h3>מטענים לפי מתח</h3><p class="lead" data-sx="s29">מטען מתאים רק כשמתח המלאה <b>ומחבר הטעינה</b> זהים. מחברים שסומנו ⚠️/❓ – לאמת לפני שימוש.</p>
+        <td>${x.controllerAmpsNum ? x.controllerAmpsNum + 'A' : 'לא ידוע'}${x.controller.count > 1 ? ' ×2' : ''}</td>
+        <td class="flagcell">${x.connectors && x.connectors.charge ? esc(x.connectors.charge.v) + ' ' + Conf.badge(x.connectors.charge.conf) : 'לא ידוע'}</td>
+        <td class="flagcell">${x.displayProtocol ? esc(x.displayProtocol.v) + ' ' + Conf.badge(x.displayProtocol.conf) : 'לא ידוע'}</td></tr>`; }).join('')}</tbody></table></div>
+      <div class="card stack"><h3>מטענים לפי מתח</h3><p class="lead" data-sx="s29">מטען מתאים רק כשמתח המלאה <b>ומחבר הטעינה</b> זהים. מחברים שסומנו ״טיפוסי״ או ״לא ידוע״ – לאמת לפני שימוש.</p>
         <dl class="specs">${Object.keys(groups).sort((a, c) => a - c).map(k => `<dt class="num">${k}V</dt><dd>${groups[k].map(esc).join(' · ')}</dd>`).join('')}</dl></div>
       <div class="card stack"><h3>רכיבים חלופיים תואמים ל-<bdi>${esc(m.short)}</bdi></h3>
         ${alt.map(([n, crit, c]) => `<div class="esc-row"><b>${n} ${Conf.badge(c)}</b><ul class="bul">${crit.map(x => `<li>${T(x)}</li>`).join('')}</ul></div>`).join('')}
@@ -1840,13 +1865,13 @@ const Tools = (() => {
       if (!br) issues.push(['bad', 'מתח לא תואם לטבלת תאים']);
       const km = kmOf(x.range); if (km) { const whkm = x.wh / km; issues.push([whkm < 8 ? 'warn' : whkm > 40 ? 'warn' : 'ok', `${f1(whkm)}Wh/ק״מ לפי הטווח המוצהר${whkm < 8 ? ' – אופטימי' : ''}`]); }
       const unk = Object.values(x.dataConfidence).filter(c => c === 'unk').length;
-      if (unk) issues.push(['warn', `${unk} שדות ❓ לא פורסמו`]);
+      if (unk) issues.push(['warn', `${unk} שדות ״לא ידוע״ – לא פורסמו`]);
       (x.specFlags || []).forEach(f => issues.push(['warn', `${f.field}: ${f.issue}`]));
       return { id, x, issues };
     });
     return `<p class="lead">בדיקה אוטומטית של כל 12 הדגמים: התאמת Wh ל-V×Ah, התאמת המתח למספר התאים, סבירות הטווח, ונתונים חסרים או סותרים.</p>
       <div class="stack">${rows.map(r => `<div class="card stack"><div class="spread"><b><bdi>${esc(r.x.short)}</bdi></b><span class="num foot">${r.x.voltage}V · ${r.x.ah}Ah · ${r.x.wh}Wh</span></div>
-        <ul class="clean">${r.issues.map(i => `<li class="verdict ${i[0]}"><span aria-hidden="true">${i[0] === 'ok' ? '✅' : i[0] === 'bad' ? '⛔' : '⚠️'}</span><span>${T(i[1])}</span></li>`).join('')}</ul></div>`).join('')}</div>
+        <ul class="clean">${r.issues.map(i => `<li class="verdict ${i[0]}">${i[0] === 'ok' ? MK.ok : i[0] === 'bad' ? MK.bad : MK.warn}<span>${T(i[1])}</span></li>`).join('')}</ul></div>`).join('')}</div>
       ${Conf.legendHTML()}`;
   }
 
@@ -1948,7 +1973,7 @@ const WizardPlus = (() => {
     return `${cap ? `<div class="note warn">${ICON.warn}<span>לפני מגע בבקר או במחברי ההספק: המתינו 2 דקות אחרי ניתוק ובדקו שיש 0V (הקבלים שומרים מתח).</span></div>` : ''}
       <div class="verify-box" id="wvBox"><b>בדיקת אימות לפני המשך</b>
         ${v.hint ? `<span class="foot">${T(v.hint)}${range ? ' · ' + esc(range) : ''}</span>` : (range ? `<span class="foot">${esc(range)}</span>` : '')}
-        ${input}<span class="vres" id="wvRes" aria-live="polite">${ok ? '✅ אומת' : ''}</span></div>`;
+        ${input}<span class="vres" id="wvRes" aria-live="polite">${ok ? MK.ok + 'אומת' : ''}</span></div>`;
   }
   function bindStep(scenario, idx, s) {
     const v = spec(s), k = key(scenario, idx);
@@ -1957,7 +1982,7 @@ const WizardPlus = (() => {
     const set = (ok, msg, fail) => {
       passed[k] = !!ok;
       if (next) next.disabled = !ok;
-      if (res) res.innerHTML = msg || '';
+      if (res) res.innerHTML = msg ? (ok ? MK.ok : fail ? MK.bad : '') + msg : '';
       if (box) box.classList.toggle('fail', !!fail);
     };
     if (next) next.disabled = !passed[k];
@@ -1966,31 +1991,31 @@ const WizardPlus = (() => {
       const inp = $('#wvIn');
       inp.addEventListener('input', () => {
         const n = parse(inp); if (n == null) { set(false, ''); return; }
-        if (v.kind === 'numFree') { set(true, `✅ נרשם: ${n}${v.unit}. השוו למתח שכתוב על הפנס לפני חיבור.`); return; }
+        if (v.kind === 'numFree') { set(true, `נרשם: ${n}${v.unit}. השוו למתח שכתוב על הפנס לפני חיבור.`); return; }
         const lo = nT(v.min), hi = nT(v.max);
-        if (n < 0 && lo >= 0) { set(false, '⛔ ערך שלילי: החודים הפוכים – או קוטביות הפוכה במחבר. לא מחברים! בדקו שוב.', true); return; }
-        if (n >= lo && n <= hi) set(true, `✅ ${n}${v.unit} בטווח (${lo}–${hi}${v.unit})`);
-        else set(false, `⛔ ${n}${v.unit} מחוץ לטווח ${lo}–${hi}${v.unit}. לא ממשיכים – חזרו על השלב או <button type="button" class="linkbtn" data-action="goto-diag">עברו לאבחון</button>.`, true);
+        if (n < 0 && lo >= 0) { set(false, 'ערך שלילי: החודים הפוכים – או קוטביות הפוכה במחבר. לא מחברים! בדקו שוב.', true); return; }
+        if (n >= lo && n <= hi) set(true, `${n}${v.unit} בטווח (${lo}–${hi}${v.unit})`);
+        else set(false, `${n}${v.unit} מחוץ לטווח ${lo}–${hi}${v.unit}. לא ממשיכים – חזרו על השלב או <button type="button" class="linkbtn" data-action="goto-diag">עבור לאבחון</button>.`, true);
       });
     } else if (v.kind === 'num2') {
       const a = $('#wvIn'), b = $('#wvIn2');
       const chk = () => {
         const x = parse(a), y = parse(b); if (x == null || y == null) { set(false, ''); return; }
         const ok1 = x >= v.ranges[0][0] && x <= v.ranges[0][1], ok2 = y >= v.ranges[1][0] && y <= v.ranges[1][1];
-        if (ok1 && ok2) set(true, '✅ אות המצערת תקין');
-        else set(false, `⛔ ${!ok1 ? (x > v.ranges[0][1] ? 'אות גבוה במנוחה – סכנת האצה! נתקו ובדקו.' : 'אות נמוך במנוחה – בדקו 5V וחיבור.') : 'אות לא מגיע לפתיחה מלאה – מצערת או חיווט.'}`, true);
+        if (ok1 && ok2) set(true, 'אות המצערת תקין');
+        else set(false, `${!ok1 ? (x > v.ranges[0][1] ? 'אות גבוה במנוחה – סכנת האצה! נתקו ובדקו.' : 'אות נמוך במנוחה – בדקו 5V וחיבור.') : 'אות לא מגיע לפתיחה מלאה – מצערת או חיווט.'}`, true);
       };
       a.addEventListener('input', chk); b.addEventListener('input', chk);
     } else if (v.kind === 'choice') {
       $$('#wvBox [data-wv]').forEach(btn => btn.addEventListener('click', () => {
         $$('#wvBox [data-wv]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
         const i = Number(btn.dataset.wv);
-        if (i === v.pass) set(true, '✅ אומת');
-        else set(false, '⛔ לא עובר אימות. אל תמשיכו – תקנו או <button type="button" class="linkbtn" data-action="goto-diag">עברו לאבחון</button>.', true);
+        if (i === v.pass) set(true, 'אומת');
+        else set(false, 'לא עובר אימות. אל תמשיכו – תקנו או <button type="button" class="linkbtn" data-action="goto-diag">עבור לאבחון</button>.', true);
       }));
     } else {
       const c = $('#wvChk');
-      c.addEventListener('change', () => set(c.checked, c.checked ? '✅ אומת' : ''));
+      c.addEventListener('change', () => set(c.checked, c.checked ? 'אומת' : ''));
     }
   }
   function reset() { Object.keys(passed).forEach(k => delete passed[k]); }
@@ -2181,7 +2206,7 @@ const DataUI = (() => {
   UI.on('dt-persist', async () => { UI.toast(await Persist.persistRequest() ? 'הדפדפן לא ימחק את הנתונים אוטומטית' : 'הדפדפן לא אישר – גבו באופן קבוע'); });
 
   /** כרטיס לתצוגות שתלויות בנתונים נעולים */
-  const lockedCard = what => `<div class="card stack"><h3>${esc(what)} נעול</h3><p class="lead">הנתונים מוצפנים במכשיר. פתחו עם PIN כדי לצפות ולשמור.</p><button type="button" class="btn primary" data-action="tl-sub" data-sub="data">פתיחה עם PIN</button></div>`;
+  const lockedCard = what => `<div class="card stack"><h3>${esc(what)} נעול</h3><p class="lead">הנתונים מוצפנים במכשיר. פתחו עם PIN כדי לצפות ולשמור.</p><button type="button" class="btn primary" data-action="tl-sub" data-sub="data">פתח עם PIN</button></div>`;
   function init() {
     initIndicator(); refreshNotices();
     let last = '';
@@ -2371,7 +2396,7 @@ const Privacy = (() => {
   function html() {
     return `<div class="card stack" id="privacyCard"><h3>הנתונים שלך</h3>
       <p class="lead">אין שרת ואין מעקב. אפשר לראות, לייצא ולמחוק הכול. <a href="privacy.html" data-legal="privacy">מדיניות הפרטיות</a> · <a href="terms.html" data-legal="terms">תנאי שימוש</a></p>
-      <div class="row"><button type="button" class="btn" data-action="pv-export">ייצוא כל הנתונים שלי</button></div>
+      <div class="row"><button type="button" class="btn" data-action="pv-export">ייצא את כל הנתונים שלי</button></div>
       <textarea class="input copybox" id="pvBox" hidden rows="5" readonly aria-label="כל הנתונים להעתקה"></textarea>
       <div class="danger-zone stack"><h4>מחק את כל הנתונים שלי</h4>
         <p class="foot">מוחק את היומן, כרטיסי הכלים, התמונות, הפרויקטים, ההעדפות, ההסכמות והמטמון של האפליקציה במכשיר הזה. אי אפשר לבטל.</p>
@@ -2555,7 +2580,7 @@ const Perf = (() => {
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; const b = $('#installBtn'); if (b) b.hidden = false; });
     window.addEventListener('appinstalled', () => { installEvt = null; UI.toast('המעבדה הותקנה'); });
   }
-  const installHTML = () => `<button type="button" class="btn sm" id="installBtn" data-action="pw-install" ${installEvt ? '' : 'hidden'}>התקנה כאפליקציה</button>`;
+  const installHTML = () => `<button type="button" class="btn sm" id="installBtn" data-action="pw-install" ${installEvt ? '' : 'hidden'}>התקן כאפליקציה</button>`;
   UI.on('pw-install', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) { /* */ } installEvt = null; const b = $('#installBtn'); if (b) b.hidden = true; });
 
   return { shouldRender, boot3D, load, setSaver, saver, state: () => state, initPWA, installHTML, hadController: false };

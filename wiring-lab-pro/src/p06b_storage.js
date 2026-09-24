@@ -126,7 +126,10 @@ const Persist = (() => {
   }
   const touch = ns => set(ns, get(ns));
   function schedule() { clearTimeout(timer); state('saving'); timer = setTimeout(flush, 250); }
-  async function flush() {
+  // כתיבות בתור אחד: אין שתי כתיבות במקביל, והמחוון מראה ״נשמר״ רק כשאין שינוי ממתין
+  let chain = Promise.resolve();
+  function flush() { const r = chain.then(flushNow); chain = r.catch(() => false); return r; }
+  async function flushNow() {
     clearTimeout(timer); timer = null;
     if (!dirty.size) { state(failed ? 'error' : 'saved'); return true; }
     const ds = [...dirty]; dirty = new Set();
@@ -142,7 +145,7 @@ const Persist = (() => {
       }
       entries.push(['meta', clone(meta)]);
       await rawSetMany(entries);
-      failed = false; lastSaved = Date.now(); state('saved'); return true;
+      failed = false; lastSaved = Date.now(); state(dirty.size ? 'saving' : 'saved'); return true;
     } catch (e) {
       ds.forEach(ns => dirty.add(ns)); failed = true; state('error'); return false;
     }
