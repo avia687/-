@@ -25,7 +25,7 @@ likes = num(first(r'"([0-9,]+) לייקים"'))
 comments = num(first(r'"הצגת ([0-9,]+) תגובות"'))
 published = first(r'"(?:publishTimeText|timestampText)":\{[^}]*?"(?:simpleText|text)":"([^"]+)"')
 titles = [t for t in dict.fromkeys(re.findall(r'"content":"([^"]{10,300})"', html))
-          if not t.startswith(("רוצה", "צריך", "זה עוזר", "היוצרים", "‪@"))]
+          if not t.startswith(("רוצה", "צריך", "זה עוזר", "היוצרים", "‪@", "שמירה", "מהירות"))]
 
 print("channel:", channel)
 print("title:", titles[:2])
