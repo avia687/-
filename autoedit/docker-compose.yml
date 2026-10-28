@@ -2,7 +2,9 @@ services:
   autoedit:
     build: .
     ports: ["8765:8765"]
-    env_file: [.env]
+    env_file:
+      - path: .env
+        required: false   # keys are optional
     volumes:
       - ./workspace:/data
       - ./config.yaml:/app/config.yaml

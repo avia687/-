@@ -28,7 +28,14 @@ cd autoedit
 ./start.sh      # מפעיל ופותח את הדפדפן בכתובת http://localhost:8765
 ```
 
-### Windows או כל מחשב עם Docker
+### Windows ב-3 צעדים
+1. מתקינים את [Docker Desktop](https://www.docker.com/products/docker-desktop), מפעילים מחדש את המחשב ופותחים את Docker Desktop.
+2. מורידים את המערכת: [קובץ ZIP](https://github.com/avia687/-/archive/refs/heads/claude/eloquent-goldberg-e6nc7a.zip). קליק ימני ← **חלץ הכל**.
+3. נכנסים לתיקייה **autoedit** ולוחצים לחיצה כפולה על **start.bat**.
+
+בפעם הראשונה ההתקנה לוקחת 10–15 דקות. אחר כך הדפדפן נפתח לבד. לכיבוי: **stop.bat**.
+
+### כל מחשב עם Docker
 ```bash
 cd autoedit
 docker compose up --build
