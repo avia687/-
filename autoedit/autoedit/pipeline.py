@@ -142,8 +142,20 @@ def build_plan(video: str | Path, niche: str, platform: str, *, language: str | 
 
     decorate(plan, content, profile, rng)
     progress(0.55, "מחשב ציון ויראליות")
-    plan["score"] = score_plan(plan, profile)
+    plan["score"] = score_plan(plan, profile, model_prob=learned_probability(niche, plan))
     return plan
+
+
+def learned_probability(niche: str, plan: dict) -> float | None:
+    """Success probability from the niche's trained model (None until the learner has trained one)."""
+    try:
+        from .learn.features import plan_to_vector
+        from .learn.model import predict
+
+        return predict(niche, plan_to_vector(plan))
+    except Exception as e:  # the editor must never depend on the learner being healthy
+        log.debug("no learned model for %s: %s", niche, e)
+        return None
 
 
 def decorate(plan: dict, content: dict, profile: dict, rng: random.Random) -> None:

@@ -50,9 +50,10 @@ def tts(text: str, lang: str, out: Path) -> np.ndarray:
     return a.astype(np.float32)
 
 
-def make_audio(lang: str, tmp: Path) -> np.ndarray:
+def make_audio(lang: str, tmp: Path, short: bool = False) -> np.ndarray:
     parts = [np.zeros(int(0.6 * SR), np.float32)]
-    for k, (txt, pause) in enumerate(LINES[lang]):
+    lines = LINES[lang][:5] if short else LINES[lang]
+    for k, (txt, pause) in enumerate(lines):
         parts.append(tts(txt, lang, tmp / f"l{k}.wav") * 0.8)
         parts.append(np.zeros(int(pause * SR), np.float32))
     a = np.concatenate(parts)
@@ -68,9 +69,9 @@ def find_face_image() -> np.ndarray:
     raise FileNotFoundError("tests/data/face.jpg missing")
 
 
-def make_video(out: Path, lang: str = "en", size=(1920, 1080), fps=30) -> Path:
+def make_video(out: Path, lang: str = "en", size=(1920, 1080), fps=30, short: bool = False) -> Path:
     tmp = Path(tempfile.mkdtemp())
-    audio = make_audio(lang, tmp)
+    audio = make_audio(lang, tmp, short)
     import soundfile as sf
 
     wav = tmp / "a.wav"
