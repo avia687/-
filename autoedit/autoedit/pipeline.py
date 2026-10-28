@@ -72,75 +72,99 @@ def build_plan(video: str | Path, niche: str, platform: str, *, language: str | 
         if scored and scored[0]["id"] in content["keep"]:
             content["hook_id"] = scored[0]["id"]
             content["title"] = selection.make_title(scored[0]["text"], lang)
-    keep_set = set(content["keep"])
 
-    reason = list(cl["removed"])
-    for i in range(len(words)):
-        if reason[i] is None and sid_of.get(i) not in keep_set:
-            reason[i] = "dropped"
-    max_sil = float(profile.get("pacing", {}).get("max_silence", 0.28))
-    if variant == "fast":
-        max_sil *= 0.6
-    segs = cleanup.build_segments(words, reason, max_silence=max_sil, duration=info.duration, audio=audio)
+    def assemble(content: dict, rng: random.Random) -> dict:
+        keep_set = set(content["keep"])
 
-    # hook first: segments that belong to the hook sentence move to the front
-    hook = content["hook_id"]
-    hook_segs = [s for s in segs if all(sid_of.get(i) == hook for i in s["words"])]
-    if hook_segs and segs.index(hook_segs[0]) != 0:
-        segs = hook_segs + [s for s in segs if s not in hook_segs]
+        reason = list(cl["removed"])
+        for i in range(len(words)):
+            if reason[i] is None and sid_of.get(i) not in keep_set:
+                reason[i] = "dropped"
+        max_sil = float(profile.get("pacing", {}).get("max_silence", 0.28))
+        if variant == "fast":
+            max_sil *= 0.6
+        segs = cleanup.build_segments(words, reason, max_silence=max_sil, duration=info.duration, audio=audio)
 
-    zoom_alt = 1.0 + (float(profile.get("zoom", {}).get("scale", 1.14)) - 1.0) * 0.7
-    clips = []
-    for k, s in enumerate(segs):
-        sids = {sid_of.get(i) for i in s["words"]}
-        role = "hook" if sids == {hook} else "body"
-        # jump cuts inside a take: alternate framing so the cut reads as intentional
-        z = 1.0 if k % 2 == 0 else zoom_alt
-        clips.append({"src": "S0", "in": s["start"], "out": s["end"], "role": role, "zoom": round(z, 3),
-                      "speed": 1.1 if variant == "fast" else 1.0, "audio": True})
-    if clips:
-        clips[-1]["role"] = "cta" if len(clips) > 2 else clips[-1]["role"]
+        # hook first: segments that belong to the hook sentence move to the front
+        hook = content["hook_id"]
+        hook_segs = [s for s in segs if all(sid_of.get(i) == hook for i in s["words"])]
+        if hook_segs and segs.index(hook_segs[0]) != 0:
+            segs = hook_segs + [s for s in segs if s not in hook_segs]
 
-    # words (source timeline) with emphasis
-    emph = {i for ids in content["emphasis"].values() for i in ids}
-    plan_words = [{"i": i, "text": w["text"], "src": "S0", "start": w["start"], "end": w["end"],
-                   "emph": i in emph, "sid": sid_of.get(i, -1), "removed": reason[i]} for i, w in enumerate(words)]
+        zoom_alt = 1.0 + (float(profile.get("zoom", {}).get("scale", 1.14)) - 1.0) * 0.7
+        clips = []
+        for k, s in enumerate(segs):
+            sids = {sid_of.get(i) for i in s["words"]}
+            role = "hook" if sids == {hook} else "body"
+            # jump cuts inside a take: alternate framing so the cut reads as intentional
+            z = 1.0 if k % 2 == 0 else zoom_alt
+            clips.append({"src": "S0", "in": s["start"], "out": s["end"], "role": role, "zoom": round(z, 3),
+                          "speed": 1.1 if variant == "fast" else 1.0, "audio": True})
+        if clips:
+            clips[-1]["role"] = "cta" if len(clips) > 2 else clips[-1]["role"]
 
-    plan = {
-        "version": 2,
-        "meta": {"niche": niche, "platform": platform, "language": lang, "aspect": aspect, "width": W, "height": H,
-                 "fps": config.FPS, "profile_version": profile.get("profile_version"), "hook_type": content["hook_type"],
-                 "editor": content.get("source"), "reasoning": content.get("reasoning", ""), "variant": variant or "main"},
-        "sources": {"S0": {"path": video, "kind": "video", "w": info.display_size[0], "h": info.display_size[1],
-                           "duration": info.duration, "has_audio": info.has_audio, "fps": info.fps}},
-        "clips": clips,
-        "words": plan_words,
-        "title": {"text": content["title"], "dur": 2.6, "sfx": "impact"} if profile.get("hook", {}).get("has_text_overlay", True) else {},
-        "cta": {"text": content["cta"], "dur": 3.0} if profile.get("structure", {}).get("cta", True) else {},
-        "captions": {**profile.get("captions", {})},
-        "camera_motion": profile.get("zoom", {}).get("camera_motion", "slow_push"),
-        "reframe": {"enabled": True},
-        "background": background or {"mode": "none"},
-        "music": {"enabled": profile.get("music", {}).get("present", True), "volume_db": profile.get("music", {}).get("volume_db", -19),
-                  "duck_db": profile.get("music", {}).get("duck_db", -11), "bpm": profile.get("music", {}).get("bpm")},
-        "sfx": {"enabled": True},
-        "audio": {"denoise": True},
-        "color": {**profile.get("color", {}), "enabled": True},
-        "progress_bar": {"enabled": profile.get("overlays", {}).get("progress_bar", True)},
-        "brand": brand or {},
-        "punch": [], "emojis": [], "broll": [], "transitions": [],
-        "stats": cl["stats"],
-    }
-    mpath = audio_mod.pick_music(niche, profile.get("music", {}).get("bpm"), music)
-    plan["music"]["path"] = str(mpath) if mpath else None
+        # words (source timeline) with emphasis
+        emph = {i for ids in content["emphasis"].values() for i in ids}
+        plan_words = [{"i": i, "text": w["text"], "src": "S0", "start": w["start"], "end": w["end"],
+                       "emph": i in emph, "sid": sid_of.get(i, -1), "removed": reason[i]} for i, w in enumerate(words)]
 
-    # inpainting
-    if remove_logo == "auto":
-        plan["sources"]["S0"]["inpaint"] = inpaint.detect_static_logos(video)
-    elif isinstance(remove_logo, list):
-        plan["sources"]["S0"]["inpaint"] = remove_logo
+        plan = {
+            "version": 2,
+            "meta": {"niche": niche, "platform": platform, "language": lang, "aspect": aspect, "width": W, "height": H,
+                     "fps": config.FPS, "profile_version": profile.get("profile_version"), "hook_type": content["hook_type"],
+                     "editor": content.get("source"), "reasoning": content.get("reasoning", ""), "variant": variant or "main"},
+            "sources": {"S0": {"path": video, "kind": "video", "w": info.display_size[0], "h": info.display_size[1],
+                               "duration": info.duration, "has_audio": info.has_audio, "fps": info.fps}},
+            "clips": clips,
+            "words": plan_words,
+            "title": {"text": content["title"], "dur": 2.6, "sfx": "impact"} if profile.get("hook", {}).get("has_text_overlay", True) else {},
+            "cta": {"text": content["cta"], "dur": 3.0} if profile.get("structure", {}).get("cta", True) else {},
+            "captions": {**profile.get("captions", {})},
+            "camera_motion": profile.get("zoom", {}).get("camera_motion", "slow_push"),
+            "reframe": {"enabled": True},
+            "background": background or {"mode": "none"},
+            "music": {"enabled": profile.get("music", {}).get("present", True), "volume_db": profile.get("music", {}).get("volume_db", -19),
+                      "duck_db": profile.get("music", {}).get("duck_db", -11), "bpm": profile.get("music", {}).get("bpm")},
+            "sfx": {"enabled": True},
+            "audio": {"denoise": True},
+            "color": {**profile.get("color", {}), "enabled": True},
+            "progress_bar": {"enabled": profile.get("overlays", {}).get("progress_bar", True)},
+            "brand": brand or {},
+            "punch": [], "emojis": [], "broll": [], "transitions": [],
+            "stats": cl["stats"],
+        }
+        mpath = audio_mod.pick_music(niche, profile.get("music", {}).get("bpm"), music)
+        plan["music"]["path"] = str(mpath) if mpath else None
 
-    decorate(plan, content, profile, rng)
+        # inpainting
+        if remove_logo == "auto":
+            plan["sources"]["S0"]["inpaint"] = inpaint.detect_static_logos(video)
+        elif isinstance(remove_logo, list):
+            plan["sources"]["S0"]["inpaint"] = remove_logo
+
+        decorate(plan, content, profile, rng)
+        return plan
+
+    plan = assemble(content, random.Random(seed))
+    # hook A/B inside the editor: when the learner has a trained model, try the alternative openings
+    # (natural first line / runner-up line) and keep the one with the highest predicted success
+    if learned_probability(niche, plan) is not None and variant is None and len(sents) > 2:
+        best, best_p = plan, learned_probability(niche, plan)
+        alts = {sents[0]["id"]}
+        ranked = sorted(sents[: max(2, len(sents) // 2)], key=lambda s: -selection.score_sentence(s, words, lang, s["id"], len(sents)))
+        alts |= {s["id"] for s in ranked[:2]}
+        tried = []
+        for hid in alts - {content["hook_id"]}:
+            if hid not in content["keep"]:
+                continue
+            alt = {**content, "hook_id": hid, "title": selection.make_title(next(s["text"] for s in sents if s["id"] == hid), lang)}
+            cand = assemble(alt, random.Random(seed))
+            p = learned_probability(niche, cand)
+            tried.append({"hook_id": hid, "p": p})
+            if p is not None and p > best_p + 0.01:
+                best, best_p = cand, p
+        plan = best
+        plan["meta"]["hook_selection"] = {"chosen_p": round(best_p, 4), "tried": tried}
     progress(0.55, "מחשב ציון ויראליות")
     plan["score"] = score_plan(plan, profile, model_prob=learned_probability(niche, plan))
     return plan

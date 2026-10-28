@@ -39,9 +39,21 @@ CTA_RE = re.compile(r"(follow|subscribe|save|comment|share|link in bio|עקבו|
 
 
 def _texts(niche: str, label: str, limit: int) -> list[dict]:
-    return db.rows("SELECT v.title, f.hook_text, f.transcript, f.vector FROM videos v JOIN features f ON f.video_id=v.id "
+    from .. import settings
+
+    langs = set(settings.get("languages", ["he", "en"]))
+    rows = db.rows("SELECT v.title, f.hook_text, f.transcript, f.vector, f.profile FROM videos v JOIN features f ON f.video_id=v.id "
                    "WHERE v.niche=? AND v.label=? ORDER BY v.success_score " + ("DESC" if label == "success" else "ASC") +
-                   " LIMIT ?", (niche, label, limit))
+                   " LIMIT ?", (niche, label, limit * 2))
+    out = []
+    for r in rows:  # drop transcripts in languages we don't publish in (mis-detected / foreign videos)
+        prof = json.loads(r.get("profile") or "{}")
+        if prof.get("language") and prof["language"] not in langs:
+            r["hook_text"], r["transcript"] = "", ""
+        if r["hook_text"] and len(r["hook_text"].split()) < 3:
+            r["hook_text"] = ""
+        out.append(r)
+    return out[:limit]
 
 
 def extract(niche: str) -> dict:

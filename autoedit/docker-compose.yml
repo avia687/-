@@ -1,0 +1,12 @@
+services:
+  autoedit:
+    build: .
+    ports: ["8765:8765"]
+    env_file: [.env]
+    volumes:
+      - ./workspace:/data
+      - ./config.yaml:/app/config.yaml
+      - ./profiles:/app/profiles
+    restart: unless-stopped
+    # GPU (NVIDIA): uncomment
+    # deploy: {resources: {reservations: {devices: [{driver: nvidia, count: all, capabilities: [gpu]}]}}}

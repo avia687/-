@@ -291,6 +291,28 @@ def setup_models() -> None:
     print("  mediapipe models ready")
 
 
+OPTIONAL_MODELS = {
+    # 2.5D parallax depth (MIT-licensed small model, ONNX)
+    "depth_anything_v2_small.onnx": "https://huggingface.co/onnx-community/depth-anything-v2-small/resolve/main/onnx/model.onnx",
+}
+
+
+def setup_optional() -> None:
+    for name, url in OPTIONAL_MODELS.items():
+        ok = _download(url, config.MODELS_DIR / name)
+        print(f"  {'✓' if ok else '✗'} {name}")
+    try:  # pre-download Whisper so the first edit doesn't wait
+        from faster_whisper import WhisperModel
+
+        WhisperModel(config.WHISPER_MODEL, device="cpu", compute_type="int8")
+        print(f"  ✓ whisper {config.WHISPER_MODEL}")
+        if config.WHISPER_MODEL_HE:
+            WhisperModel(config.WHISPER_MODEL_HE, device="cpu", compute_type="int8")
+            print(f"  ✓ whisper {config.WHISPER_MODEL_HE}")
+    except Exception as e:
+        print(f"  ! whisper pre-download skipped: {e}")
+
+
 def main() -> None:
     config.ensure_dirs()
     print("[assets] fonts");  setup_fonts()
@@ -300,6 +322,8 @@ def main() -> None:
     print("[assets] models"); setup_models()
     from .profiles_default import write_default_profiles
     write_default_profiles()
+    if "--full" in sys.argv:
+        print("[assets] optional models"); setup_optional()
     print("[assets] done")
 
 

@@ -18,3 +18,4 @@ include = ["autoedit*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
+addopts = "-p no:unraisableexception"

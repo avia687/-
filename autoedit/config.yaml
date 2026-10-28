@@ -1,0 +1,37 @@
+# AutoEdit configuration - every automation knob lives here. Restart the app after editing.
+niches: [fitness, realestate, food, business]   # niches the learning engine tracks
+languages: [he, en]
+
+scout:
+  enabled: true
+  platforms: [youtube, tiktok, instagram]
+  max_age_days: 90          # trend window
+  per_keyword: 25           # videos per keyword per source
+  keywords_per_run: 6
+  min_views: 5000
+  success_quantile: 0.75    # top 25% by relative success score = "success"
+  regular_quantile: 0.40    # bottom 40% = "regular" control group
+  youtube_daily_quota: 8000 # of the free 10,000 units/day
+  request_delay_sec: 1.5    # politeness delay between requests
+  analyze_per_run: 20
+  keep_media: false         # delete downloaded reference videos after analysis
+
+learn:
+  min_samples: 16
+  test_fraction: 0.25
+  my_posts_weight: 3.0      # my own published videos count 3x
+  min_auc_gain: 0.0         # a new profile version is activated only if test AUC beats the active one
+
+feedback:
+  checkpoints_hours: [24, 72, 168]
+
+schedule:                   # cron syntax (minute hour day month weekday)
+  timezone: Asia/Jerusalem
+  scout: "15 3 * * *"       # daily 03:15
+  feedback: "40 9 * * *"    # daily 09:40
+  learn: "30 4 * * 0"       # weekly, Sunday 04:30
+
+studio:
+  variants: 3
+  critic_target: 90
+  critic_max_rounds: 5

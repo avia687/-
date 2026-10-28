@@ -7,7 +7,7 @@ assets/models/
 assets/broll/*
 !assets/broll/.keep
 web/node_modules/
-web/dist/
+
 __pycache__/
 *.egg-info/
 .venv/

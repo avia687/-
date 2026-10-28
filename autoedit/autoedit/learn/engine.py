@@ -42,15 +42,19 @@ def build_layer(niche: str, train_res: dict, pats: dict) -> dict:
             weights.append(float(settings.get("learn.my_posts_weight", 3.0)))
     if not vecs:
         return {}
-    imp = {i["feature"]: i for i in train_res.get("importances", [])}
+    # only parameters the model found predictive *and* where winners clearly differ from regular videos
+    imp = {}
+    for i in train_res.get("importances", [])[:8]:
+        sm, rm = i.get("success_median", 0), i.get("regular_median", 0)
+        if i.get("direction") != "same" and abs(sm - rm) > 0.1 * max(abs(sm), abs(rm), 1e-6):
+            imp[i["feature"]] = i
     layer: dict = {}
     for f, path in feats.ACTIONABLE.items():
         vals = [(v[f], w) for v, w in zip(vecs, weights)
                 if f in v and (v[f] not in (None, 0) or f in ("broll_ratio", "sfx_on_cuts"))]
         if len(vals) < 3:
             continue
-        # only move the parameters the model says matter (or all of them on the first learned version)
-        if imp and f not in imp:
+        if f not in imp:
             continue
         val = _wmedian([x for x, _ in vals], [w for _, w in vals])
         lo, hi = CLAMPS.get(path, (-1e9, 1e9))
@@ -79,7 +83,64 @@ def build_layer(niche: str, train_res: dict, pats: dict) -> dict:
     }
     if pats.get("hook_templates"):
         layer.setdefault("hook", {})["examples"] = pats["hook_templates"][:6]
+    # captions: when on-screen text predicts success, make sure captions + hook title are on
+    if "caption_position" in imp or "caption_presence" in imp:
+        layer.setdefault("captions", {})["enabled"] = True
+    if "text_overlay_hook" in imp and imp["text_overlay_hook"]["direction"] == "higher":
+        layer.setdefault("hook", {})["has_text_overlay"] = True
     return layer
+
+
+def _counterfactual_filter(niche: str, layer: dict, run_id: int) -> tuple[dict, list[dict]]:
+    """Keep a proposed profile change only if the trained model predicts it *raises* the success
+    probability of real videos (partial-dependence check over the dataset). Guards against
+    spurious correlations from small samples."""
+    import pickle
+
+    r = db.one("SELECT model_path FROM model_runs WHERE id=?", (run_id,))
+    with open(r["model_path"], "rb") as f:
+        m = pickle.load(f)
+    X, _, _, _ = feats.dataset(niche)
+    if not X:
+        return layer, []
+    M, names = model._matrix(X, m["names"])
+    base = m["clf"].predict_proba(M)[:, 1].mean()
+
+    def delta(assign: dict) -> float:
+        M2 = M.copy()
+        for k, v in assign.items():
+            if k in names:
+                M2[:, names.index(k)] = v
+        return float(m["clf"].predict_proba(M2)[:, 1].mean() - base)
+
+    min_gain = 0.005  # a change must be predicted to add at least half a point of success probability
+    checks = []
+    for f, path in feats.ACTIONABLE.items():
+        if path[0] in layer and path[1] in layer[path[0]]:
+            d = delta({f: layer[path[0]][path[1]]})
+            checks.append({"change": f"{path[0]}.{path[1]}", "delta": round(d, 4)})
+            if d <= min_gain:
+                del layer[path[0]][path[1]]
+    if layer.get("hook", {}).get("type"):
+        ht = layer["hook"]["type"]
+        d = delta({f"hook_{h}": float(h == ht) for h in feats.HOOK_TYPES})
+        checks.append({"change": f"hook.type={ht}", "delta": round(d, 4)})
+        if d <= min_gain:
+            del layer["hook"]["type"]
+    if layer.get("color", {}).get("look"):
+        lk = layer["color"]["look"]
+        d = delta({f"look_{x}": float(x == lk) for x in feats.LOOKS})
+        checks.append({"change": f"color.look={lk}", "delta": round(d, 4)})
+        if d <= min_gain:
+            del layer["color"]["look"]
+    if layer.get("music", {}).get("present") is not None:
+        d = delta({"music_present": float(layer["music"]["present"])})
+        checks.append({"change": f"music.present={layer['music']['present']}", "delta": round(d, 4)})
+        if d < 0:
+            del layer["music"]["present"]
+    for k in [k for k, v in layer.items() if isinstance(v, dict) and not v and k != "learned"]:
+        del layer[k]
+    return layer, checks
 
 
 def learn(niche: str) -> dict:
@@ -89,6 +150,8 @@ def learn(niche: str) -> dict:
         return tr
     pats = patterns.extract(niche)
     layer = build_layer(niche, tr, pats)
+    layer, cf = _counterfactual_filter(niche, layer, tr["run_id"])
+    layer.setdefault("learned", {})["counterfactual"] = cf
     min_gain = float(settings.get("learn.min_auc_gain", 0.0))
     baseline = tr["baseline_auc"]
     improves = (baseline is None and tr["auc"] >= 0.6) or (baseline is not None and tr["auc"] > baseline + min_gain)
