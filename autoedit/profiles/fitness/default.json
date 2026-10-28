@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "niche": "fitness",
+  "name": "default",
+  "sources": [],
+  "pacing": {
+    "avg_shot_sec": 1.7,
+    "cuts_per_min": 35,
+    "words_per_sec": 3.2,
+    "max_silence": 0.2
+  },
+  "hook": {
+    "type": "pattern_interrupt",
+    "has_text_overlay": true,
+    "first_cut_sec": 1.5,
+    "examples": [
+      "Stop doing this exercise",
+      "תפסיקו לעשות בטן ככה"
+    ]
+  },
+  "captions": {
+    "enabled": true,
+    "font": "Montserrat Black",
+    "font_he": "Heebo Black",
+    "size": 0.068,
+    "color": "#FFFFFF",
+    "highlight_color": "#C6FF00",
+    "outline_color": "#000000",
+    "outline": 7,
+    "shadow": 3,
+    "position": 0.66,
+    "words_per_group": 2,
+    "uppercase": true,
+    "animation": "pop",
+    "highlight_mode": "color",
+    "box_color": "#7B2FF7"
+  },
+  "zoom": {
+    "punch_in_per_min": 9,
+    "scale": 1.18,
+    "style": "snap",
+    "camera_motion": "slow_push"
+  },
+  "transitions": {
+    "types": {
+      "cut": 0.6,
+      "zoom": 0.2,
+      "whip": 0.1,
+      "flash": 0.1
+    },
+    "per_min": 6
+  },
+  "music": {
+    "present": true,
+    "bpm": 124,
+    "energy": "high",
+    "volume_db": -17,
+    "duck_db": -10
+  },
+  "sfx": {
+    "per_min": 10,
+    "on_cuts": 0.45,
+    "types": [
+      "whoosh",
+      "impact",
+      "pop"
+    ]
+  },
+  "broll": {
+    "ratio": 0.12,
+    "avg_len": 1.8
+  },
+  "color": {
+    "look": "punchy",
+    "saturation": 1.15,
+    "brightness": 0.5,
+    "contrast": 0.65,
+    "warmth": 0.0
+  },
+  "structure": {
+    "hook_sec": 3,
+    "cta": true,
+    "segments": [
+      "hook",
+      "value",
+      "cta"
+    ],
+    "avg_duration": 28,
+    "cta_text_he": "שמרו לאימון הבא 💪",
+    "cta_text_en": "Save this for your next workout 💪"
+  },
+  "overlays": {
+    "emoji_per_min": 5,
+    "title_card": true,
+    "progress_bar": true
+  }
+}

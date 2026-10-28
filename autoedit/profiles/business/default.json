@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "niche": "business",
+  "name": "default",
+  "sources": [],
+  "pacing": {
+    "avg_shot_sec": 2.2,
+    "cuts_per_min": 28,
+    "words_per_sec": 3.0,
+    "max_silence": 0.25
+  },
+  "hook": {
+    "type": "bold_claim",
+    "has_text_overlay": true,
+    "first_cut_sec": 1.5,
+    "examples": [
+      "Nobody tells you this about money",
+      "הטעות שעולה לעסקים קטנים הכי ביוקר"
+    ]
+  },
+  "captions": {
+    "enabled": true,
+    "font": "Montserrat Black",
+    "font_he": "Heebo Black",
+    "size": 0.068,
+    "color": "#FFFFFF",
+    "highlight_color": "#00E5FF",
+    "outline_color": "#000000",
+    "outline": 7,
+    "shadow": 3,
+    "position": 0.64,
+    "words_per_group": 3,
+    "uppercase": true,
+    "animation": "pop",
+    "highlight_mode": "box",
+    "box_color": "#0047FF"
+  },
+  "zoom": {
+    "punch_in_per_min": 7,
+    "scale": 1.15,
+    "style": "snap",
+    "camera_motion": "slow_push"
+  },
+  "transitions": {
+    "types": {
+      "cut": 0.75,
+      "zoom": 0.15,
+      "whip": 0.05,
+      "flash": 0.05
+    },
+    "per_min": 4
+  },
+  "music": {
+    "present": true,
+    "bpm": 100,
+    "energy": "medium",
+    "volume_db": -21,
+    "duck_db": -11
+  },
+  "sfx": {
+    "per_min": 6,
+    "on_cuts": 0.3,
+    "types": [
+      "whoosh",
+      "ding",
+      "click"
+    ]
+  },
+  "broll": {
+    "ratio": 0.12,
+    "avg_len": 1.8
+  },
+  "color": {
+    "look": "cinematic",
+    "saturation": 1.0,
+    "brightness": 0.5,
+    "contrast": 0.55,
+    "warmth": 0.0
+  },
+  "structure": {
+    "hook_sec": 3,
+    "cta": true,
+    "segments": [
+      "hook",
+      "value",
+      "cta"
+    ],
+    "avg_duration": 40,
+    "cta_text_he": "עקבו לעוד תובנות עסקיות 📈",
+    "cta_text_en": "Follow for more business tips 📈"
+  },
+  "overlays": {
+    "emoji_per_min": 4,
+    "title_card": true,
+    "progress_bar": true
+  }
+}

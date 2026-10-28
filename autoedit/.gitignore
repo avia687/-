@@ -1,0 +1,16 @@
+workspace/
+assets/fonts/
+assets/luts/
+assets/sfx/
+assets/music/
+assets/models/
+assets/broll/*
+!assets/broll/.keep
+web/node_modules/
+web/dist/
+__pycache__/
+*.egg-info/
+.venv/
+.env
+config.local.yaml
+data/*.db

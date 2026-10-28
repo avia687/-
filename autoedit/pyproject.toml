@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autoedit"
+version = "0.3.0"
+description = "Automatic professional video editor driven by niche style profiles"
+requires-python = ">=3.10"
+
+[project.scripts]
+edit = "autoedit.cli:edit_main"
+autoedit = "autoedit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["autoedit*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

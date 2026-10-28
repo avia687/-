@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "niche": "realestate",
+  "name": "default",
+  "sources": [],
+  "pacing": {
+    "avg_shot_sec": 2.6,
+    "cuts_per_min": 22,
+    "words_per_sec": 2.7,
+    "max_silence": 0.3
+  },
+  "hook": {
+    "type": "number_list",
+    "has_text_overlay": true,
+    "first_cut_sec": 1.5,
+    "examples": [
+      "This $2M home has a secret room",
+      "3 טעויות שעולות לכם מאות אלפים"
+    ]
+  },
+  "captions": {
+    "enabled": true,
+    "font": "Montserrat ExtraBold",
+    "font_he": "Heebo ExtraBold",
+    "size": 0.068,
+    "color": "#FFFFFF",
+    "highlight_color": "#FFD166",
+    "outline_color": "#000000",
+    "outline": 7,
+    "shadow": 3,
+    "position": 0.64,
+    "words_per_group": 3,
+    "uppercase": false,
+    "animation": "pop",
+    "highlight_mode": "box",
+    "box_color": "#1D3557"
+  },
+  "zoom": {
+    "punch_in_per_min": 5,
+    "scale": 1.1,
+    "style": "smooth",
+    "camera_motion": "slow_push"
+  },
+  "transitions": {
+    "types": {
+      "cut": 0.6,
+      "zoom": 0.25,
+      "whip": 0.1,
+      "flash": 0.05
+    },
+    "per_min": 4
+  },
+  "music": {
+    "present": true,
+    "bpm": 92,
+    "energy": "low",
+    "volume_db": -20,
+    "duck_db": -11
+  },
+  "sfx": {
+    "per_min": 7,
+    "on_cuts": 0.3,
+    "types": [
+      "whoosh",
+      "pop",
+      "ding"
+    ]
+  },
+  "broll": {
+    "ratio": 0.3,
+    "avg_len": 2.2
+  },
+  "color": {
+    "look": "bright_clean",
+    "saturation": 1.1,
+    "brightness": 0.58,
+    "contrast": 0.55,
+    "warmth": 0.0
+  },
+  "structure": {
+    "hook_sec": 3,
+    "cta": true,
+    "segments": [
+      "hook",
+      "value",
+      "cta"
+    ],
+    "avg_duration": 38,
+    "cta_text_he": "רוצים ליווי? שלחו הודעה 🏡",
+    "cta_text_en": "DM me to see it 🏡"
+  },
+  "overlays": {
+    "emoji_per_min": 4,
+    "title_card": true,
+    "progress_bar": true
+  }
+}
