@@ -98,7 +98,11 @@ def main(media: str, out: str) -> None:
         t0 = time.time()
         print(f"== {key}: {name}", flush=True)
         try:
-            res = run.create([str(folder)], brief, job_id=f"exam_{key}", progress=lambda f, m: None)
+            done = config.WORK_DIR / "jobs" / f"exam_{key}" / "result.json"
+            if done.exists():  # resume: scenarios that already finished are not re-rendered
+                res = json.loads(done.read_text(encoding="utf-8"))
+            else:
+                res = run.create([str(folder)], brief, job_id=f"exam_{key}", progress=lambda f, m: None)
             best = res["versions"][0]
             plan = json.loads((Path(best["dir"]) / "plan.json").read_text(encoding="utf-8"))
             info = probe(best["video"])

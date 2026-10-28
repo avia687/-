@@ -54,7 +54,9 @@ class ClipReader:
                 if speed < 0.8 and clip.get("slowmo", True):
                     from .studio.enhance import slowmo_filter
 
-                    vf.append(slowmo_filter(speed, fps))  # motion-compensated in-between frames
+                    sm = slowmo_filter(speed, fps, int(src.get("h", 1080)))  # motion-compensated in-between frames
+                    if sm:
+                        vf.append(sm)
         vf += [f"fps={fps}"]
         if vf_color:
             vf.append(vf_color)
@@ -111,6 +113,38 @@ class BrollReader:
 
 
 # --------------------------------------------------------------------------- helpers
+def use_fit_layout(src: dict, clip: dict, W: int, H: int) -> bool:
+    """Low-res footage whose aspect doesn't match the output would need a huge crop-and-upscale (pixel soup).
+    Pro move: show it whole over a blurred, dimmed copy of itself."""
+    if clip.get("layout") in ("fit", "crop"):
+        return clip["layout"] == "fit"
+    if src.get("track"):
+        return False  # talking heads: tracked crop is always better
+    sw, sh = src.get("native_w", src.get("w", W)), src.get("native_h", src.get("h", H))
+    ratio = (sw / max(sh, 1)) / (W / H)
+    crop_h = sh if ratio >= 1 else sw * H / W
+    crop_w = crop_h * W / H
+    upscale = W / max(crop_w, 1)
+    return (ratio > 1.4 or ratio < 0.7) and upscale > 2.2
+
+
+def fit_layout(raw: np.ndarray, W: int, H: int, zoom: float, cx: float, cy: float) -> np.ndarray:
+    rh, rw = raw.shape[:2]
+    small = cv2.resize(raw, (max(8, rw // 8), max(8, rh // 8)), interpolation=cv2.INTER_AREA)
+    bg = cover_fit(cv2.GaussianBlur(small, (0, 0), 3), W, H)
+    bg = cv2.GaussianBlur(bg, (0, 0), 12)
+    bg = (bg.astype(np.float32) * 0.55).astype(np.uint8)
+    fw = W if rw / rh >= W / H else int(H * 0.8 * rw / rh)
+    fh = int(fw * rh / rw)
+    fg = cv2.resize(raw, (fw, fh), interpolation=cv2.INTER_CUBIC if fw > rw else cv2.INTER_AREA)
+    fg = _zoom_crop(fg, zoom, cx, cy)
+    y = max(0, int(H * 0.46 - fh / 2))
+    x = (W - fw) // 2
+    out = bg.copy()
+    out[y:y + fh, x:x + fw] = fg[: H - y, : W - x]
+    return out
+
+
 def _ease(x: float) -> float:
     x = min(1.0, max(0.0, x))
     return x * x * (3 - 2 * x)
@@ -450,13 +484,16 @@ def render(plan: dict, out_path: str | Path, workdir: str | Path, progress: Prog
                 head_room = 0.5
             else:
                 cx, cy, head_room = 0.5, 0.5, 0.5
-            x0, y0, cw, ch = reframe.crop_rect(reader.w, reader.h, W, H, cx, cy, zoom=max(1.0, zoom), head_room=head_room)
-            crop = raw[y0:y0 + ch, x0:x0 + cw]
-            interp = cv2.INTER_AREA if cw > W else cv2.INTER_CUBIC
-            frame = cv2.resize(crop, (W, H), interpolation=interp)
-            if cw < W * 0.8:  # recover perceived sharpness when upscaling
-                blur = cv2.GaussianBlur(frame, (0, 0), 1.2)
-                frame = cv2.addWeighted(frame, 1.35, blur, -0.35, 0)
+            if use_fit_layout(plan["sources"][c["src"]], c, W, H):
+                frame = fit_layout(raw, W, H, max(1.0, zoom), cx, cy)
+            else:
+                x0, y0, cw, ch = reframe.crop_rect(reader.w, reader.h, W, H, cx, cy, zoom=max(1.0, zoom), head_room=head_room)
+                crop = raw[y0:y0 + ch, x0:x0 + cw]
+                interp = cv2.INTER_AREA if cw > W else cv2.INTER_CUBIC
+                frame = cv2.resize(crop, (W, H), interpolation=interp)
+                if cw < W * 0.8:  # recover perceived sharpness when upscaling
+                    blur = cv2.GaussianBlur(frame, (0, 0), 1.2)
+                    frame = cv2.addWeighted(frame, 1.35, blur, -0.35, 0)
             tf = plan["sources"][c["src"]].get("match")
             if tf:
                 frame = color.apply_match(frame, tf)

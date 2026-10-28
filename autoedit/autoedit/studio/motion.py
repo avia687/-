@@ -90,7 +90,13 @@ class Graphics:
 
     def _cached(self, key, fn):
         if key not in self._cache:
-            self._cache[key] = fn()
+            img = fn()
+            # nothing may run off-screen: shrink any text block wider than the safe width
+            maxw = int(self.W * 0.9)
+            if img is not None and img.shape[1] > maxw:
+                s = maxw / img.shape[1]
+                img = cv2.resize(img, (maxw, max(1, int(img.shape[0] * s))), interpolation=cv2.INTER_AREA)
+            self._cache[key] = img
         return self._cache[key]
 
     def draw(self, frame: np.ndarray, t: float) -> None:
@@ -175,7 +181,7 @@ class Graphics:
 
     def _location(self, frame, g, lt, dur, k):
         size = int(self.H * (0.034 if self.H > self.W else 0.05))
-        card = self._cached(("loc", k), lambda: text_rgba("📍 " + g["text"] if not g.get("no_pin") else g["text"], self.title_font,
+        card = self._cached(("loc", k), lambda: text_rgba(g["text"], self.title_font,
                                                           size, fill=(20, 20, 20, 255), box=(255, 255, 255, 240), pad=0.45))
         pin_y = int(self.H * 0.26)
         drop = ease_out_back(lt / 0.5)

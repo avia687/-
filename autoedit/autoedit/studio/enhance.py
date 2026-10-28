@@ -138,9 +138,10 @@ def restore_faces(path: str, cache: Path, faces: int) -> str:
         return path
 
 
-def slowmo_filter(speed: float, fps: int) -> str:
-    """Decode-time filter for smooth slow motion (frames synthesized by motion compensation)."""
-    if speed >= 0.8:
+def slowmo_filter(speed: float, fps: int, src_height: int = 1080) -> str:
+    """Decode-time filter for smooth slow motion (frames synthesized by motion compensation).
+    Low-resolution footage gets no interpolation: motion compensation turns it into blocks."""
+    if speed >= 0.8 or src_height < 600:
         return ""
     return f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1"
 

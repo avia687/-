@@ -103,9 +103,20 @@ def _faces(i: dict) -> int:
     return int(round((i.get("face_ratio") or 0) * 1))
 
 
+CITIES_HE = ["תל אביב", "ירושלים", "חיפה", "רמת גן", "גבעתיים", "הרצליה", "רעננה", "כפר סבא", "הוד השרון", "נתניה",
+             "ראשון לציון", "פתח תקווה", "פתח תקוה", "באר שבע", "אשדוד", "אשקלון", "חולון", "בת ים", "רחובות", "נס ציונה",
+             "מודיעין", "אילת", "קיסריה", "זכרון יעקב", "יפו", "רמת השרון", "בני ברק", "נהריה", "עכו", "טבריה", "צפת",
+             "ראש העין", "יהוד", "קריית אונו", "אור יהודה", "גדרה", "יבנה", "חדרה", "עפולה", "כרמיאל", "הגליל", "הנגב"]
+
+
 def _location(text: str) -> str:
-    m = re.search(r"(?:ב|in )([A-Zא-ת][\wא-ת\"׳״' -]{2,24})", text or "")
-    return m.group(1).strip() if m and len(m.group(1).split()) <= 3 else ""
+    """Only real places: a known city (optionally with a neighbourhood after it) or 'in <Capitalized Place>'."""
+    t = text or ""
+    for c in sorted(CITIES_HE, key=len, reverse=True):
+        if re.search(rf"(?:^|[\s,.])(?:ב|ל|מ)?{re.escape(c)}(?:$|[\s,.])", t):
+            return c
+    m = re.search(r"\bin ((?:[A-Z][a-z]+)(?: [A-Z][a-z]+){0,2})", t)
+    return m.group(1) if m else ""
 
 
 def default_title(niche: str, lang: str, brief: str = "") -> str:
@@ -210,6 +221,7 @@ def make_sources(items: list[dict], used_ids: set[str], target_short: int) -> di
 
             img = cv2.imread(path)
             srcs[it["id"]] = {"path": path, "orig": it["orig"], "kind": "image", "w": img.shape[1], "h": img.shape[0],
+                              "native_w": it.get("w", img.shape[1]), "native_h": it.get("h", img.shape[0]),
                               "duration": 9999, "has_audio": False, "enhanced": path != it["path"]}
         else:
             path = enhance.stabilize(it["path"], cache, it.get("shake", 0))
