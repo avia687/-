@@ -54,6 +54,23 @@ function Create({ health }) {
   const fileRef = useRef();
   const dirRef = useRef();
 
+  const follow = async (job_id) => {
+    setStage("work");
+    const j = await waitJob(job_id, (j) => {
+      setProgress(j.progress || 0);
+      setMessage(j.message || "");
+    });
+    if (j.status === "failed") throw new Error(j.error || "נכשל");
+    setResult({ ...j.result, job_id });
+    setStage("done");
+  };
+
+  // refresh-safe: a running or finished job is reopened from the URL (?job=...)
+  useEffect(() => {
+    const id = new URLSearchParams(location.search).get("job");
+    if (id) follow(id).catch((e) => (setError(String(e.message || e)), setStage("idle")));
+  }, []);
+
   const addFiles = (list) => setFiles((f) => [...f, ...Array.from(list).filter((x) => /^(image|video|audio)\//.test(x.type) || /\.(heic|heif|mov|mkv|3gp)$/i.test(x.name))]);
 
   const onDrop = async (e) => {
@@ -85,20 +102,16 @@ function Create({ health }) {
       setStage("work");
       setProgress(0);
       const { job_id } = await api.post("/api/create", { batch: up.batch, brief, narration });
-      const j = await waitJob(job_id, (j) => {
-        setProgress(j.progress || 0);
-        setMessage(j.message || "");
-      });
-      if (j.status === "failed") throw new Error(j.error || "נכשל");
-      setResult({ ...j.result, job_id });
-      setStage("done");
+      history.replaceState(null, "", `?job=${job_id}`);
+      await follow(job_id);
     } catch (e) {
       setError(String(e.message || e));
       setStage("idle");
     }
   };
 
-  if (stage === "done" && result) return <Results result={result} onNew={() => (setStage("idle"), setFiles([]), setResult(null))} />;
+  if (stage === "done" && result)
+    return <Results result={result} onNew={() => (history.replaceState(null, "", "/"), setStage("idle"), setFiles([]), setResult(null))} />;
 
   const busy = stage === "upload" || stage === "work";
   const counts = files.reduce((a, f) => ((a[f.type.split("/")[0] || "other"] = (a[f.type.split("/")[0] || "other"] || 0) + 1), a), {});

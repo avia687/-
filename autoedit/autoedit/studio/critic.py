@@ -88,6 +88,9 @@ def critique(plan: dict, video: str, profile: dict) -> dict:
 
     frames = _frames(video)
     lum = np.array([f.mean() / 255 for _, f in frames]) if frames else np.array([0.5])
+    # a night shot with bright highlights (fireworks, city lights) is dark on purpose, not under-exposed
+    hi = np.array([np.percentile(f, 99.5) / 255 for _, f in frames]) if frames else np.array([1.0])
+    spread = np.array([f.std() / 255 for _, f in frames]) if frames else np.array([0.2])
     sharp = np.array([cv2.Laplacian(cv2.cvtColor(f, cv2.COLOR_BGR2GRAY), cv2.CV_64F).var() for _, f in frames]) if frames else np.array([100])
     changes = visual_changes(plan)
 
@@ -120,16 +123,17 @@ def critique(plan: dict, video: str, profile: dict) -> dict:
     add("pacing", 12, pace, f"קצב: שינוי כל {avg_shot:.1f} שנ' (יעד הנישה {target:.1f})",
         {"op": "faster" if avg_shot > target else "slower"})
     # 4. technical image quality ---------------------------------------------
-    black = float(np.mean(lum < 0.04))
+    black = float(np.mean((lum < 0.04) & (spread < 0.03) & (hi < 0.2)))
     frozen = 0.0
     if len(frames) > 3 and mode == "aroll":
         diffs = [np.abs(frames[i][1].astype(np.int16) - frames[i - 1][1]).mean() for i in range(1, len(frames))]
         frozen = float(np.mean(np.array(diffs) < 0.3))
-    expo = float(np.mean((lum > 0.12) & (lum < 0.85)))
-    rel_sharp = float(np.mean(sharp > 25))
+    expo = float(np.mean(((lum > 0.12) | (hi > 0.6)) & (lum < 0.85)))
+    rel_sharp = float(np.mean((sharp > 25) | ((hi > 0.6) & (lum < 0.15))))
     tech = 0.35 * expo + 0.35 * rel_sharp + 0.3 * (1 - min(1.0, 4 * black + 2 * frozen))
-    bad = [k for k, c in enumerate(lay) if any(abs(t - (c["t0"] + c["t1"]) / 2) < (c["t1"] - c["t0"]) / 2 and (l < 0.04 or s < 12)
-                                                for (t, _), l, s in zip(frames, lum, sharp))]
+    bad = [k for k, c in enumerate(lay) if any(abs(t - (c["t0"] + c["t1"]) / 2) < (c["t1"] - c["t0"]) / 2
+                                                and ((l < 0.04 and h < 0.2) or s < 12)
+                                                for (t, _), l, s, h in zip(frames, lum, sharp, hi))]
     add("technical", 15, tech, f"חשיפה תקינה ב-{expo:.0%} מהפריימים, חדות ב-{rel_sharp:.0%}, פריימים שחורים {black:.0%}",
         {"op": "drop_bad_shots", "clips": bad[:3]} if bad else None)
     # 5. sound ---------------------------------------------------------------

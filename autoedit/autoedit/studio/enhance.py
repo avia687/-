@@ -105,10 +105,11 @@ def upscale_image(path: str, cache: Path, target_short: int = 1440, noise: float
         if noise > 3:
             work = cv2.fastNlMeansDenoisingColored(work, None, 4 + min(6, noise / 2), 6, 7, 21)
         f = min(4.0, target_short / short)
-        up = cv2.resize(work, None, fx=f, fy=f, interpolation=cv2.INTER_LANCZOS4)
-        up = cv2.detailEnhance(up, sigma_s=8, sigma_r=0.12)
-        blur = cv2.GaussianBlur(up, (0, 0), 1.6)
-        up = cv2.addWeighted(up, 1.45, blur, -0.45, 0)
+        # two gentle Lanczos steps + a light unsharp mask: crisp without the painterly over-processed look
+        mid = cv2.resize(work, None, fx=f ** 0.5, fy=f ** 0.5, interpolation=cv2.INTER_LANCZOS4)
+        up = cv2.resize(mid, (int(work.shape[1] * f), int(work.shape[0] * f)), interpolation=cv2.INTER_LANCZOS4)
+        blur = cv2.GaussianBlur(up, (0, 0), 1.2)
+        up = cv2.addWeighted(up, 1.25, blur, -0.25, 0)
         cv2.imwrite(str(out), up)
         return str(out)
     except Exception as e:

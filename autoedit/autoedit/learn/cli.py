@@ -42,6 +42,10 @@ def register(sub) -> None:
     p.add_argument("version", help="למשל v0002, או default")
     p.set_defaults(func=_rollback)
 
+    p = sub.add_parser("auth-youtube", help="חיבור לערוץ YouTube שלך (retention) - פעם אחת")
+    p.add_argument("client_secret", help="קובץ client_secret.json מ-Google Cloud (OAuth client מסוג Desktop)")
+    p.set_defaults(func=_auth_youtube)
+
     p = sub.add_parser("daemon", help="הרץ את ה-scheduler ברקע (בלי ממשק)")
     p.set_defaults(func=_daemon)
 
@@ -92,3 +96,55 @@ def _daemon(a):
             time.sleep(3600)
     except KeyboardInterrupt:
         return 0
+
+
+def _auth_youtube(a):
+    """Installed-app OAuth (loopback) -> stores a refresh token for YouTube Analytics (read-only)."""
+    import http.server
+    import secrets
+    import urllib.parse
+    import webbrowser
+
+    import requests
+
+    from .. import config
+
+    sec = json.load(open(a.client_secret))
+    sec = sec.get("installed") or sec.get("web")
+    state = secrets.token_urlsafe(12)
+    port = 8799
+    redirect = f"http://127.0.0.1:{port}/"
+    url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode({
+        "client_id": sec["client_id"], "redirect_uri": redirect, "response_type": "code", "access_type": "offline",
+        "prompt": "consent", "state": state,
+        "scope": "https://www.googleapis.com/auth/yt-analytics.readonly https://www.googleapis.com/auth/youtube.readonly"})
+    got = {}
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            got.update({k: v[0] for k, v in q.items()})
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write("<h2 dir=rtl>מחובר! אפשר לסגור את החלון.</h2>".encode())
+
+        def log_message(self, *x):
+            pass
+
+    print("פותח דפדפן להתחברות ל-Google...\n" + url)
+    webbrowser.open(url)
+    http.server.HTTPServer(("127.0.0.1", port), H).handle_request()
+    if got.get("state") != state or "code" not in got:
+        print("ההתחברות נכשלה")
+        return 1
+    tok = requests.post("https://oauth2.googleapis.com/token", data={
+        "code": got["code"], "client_id": sec["client_id"], "client_secret": sec["client_secret"],
+        "redirect_uri": redirect, "grant_type": "authorization_code"}, timeout=30).json()
+    if "refresh_token" not in tok:
+        print("לא התקבל refresh token:", tok)
+        return 1
+    path = config.WORK_DIR / "youtube_oauth.json"
+    path.write_text(json.dumps({"client_id": sec["client_id"], "client_secret": sec["client_secret"],
+                                "refresh_token": tok["refresh_token"]}))
+    print("✓ מחובר. נתוני retention ימשכו אוטומטית.")
+    return 0
