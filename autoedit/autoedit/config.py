@@ -30,6 +30,8 @@ PLATFORMS = {
     "tiktok": {"aspect": "9:16", "max_duration": 60, "ideal": (21, 34), "lufs": -14, "safe_bottom": 0.22, "safe_top": 0.10},
     "reels": {"aspect": "9:16", "max_duration": 90, "ideal": (15, 30), "lufs": -14, "safe_bottom": 0.25, "safe_top": 0.12},
     "shorts": {"aspect": "9:16", "max_duration": 60, "ideal": (25, 45), "lufs": -14, "safe_bottom": 0.18, "safe_top": 0.10},
+    "facebook": {"aspect": "9:16", "max_duration": 90, "ideal": (15, 30), "lufs": -14, "safe_bottom": 0.22, "safe_top": 0.10},
+    "linkedin": {"aspect": "4:5", "max_duration": 600, "ideal": (30, 90), "lufs": -14, "safe_bottom": 0.12, "safe_top": 0.08},
     "youtube": {"aspect": "16:9", "max_duration": 60 * 30, "ideal": (240, 720), "lufs": -14, "safe_bottom": 0.10, "safe_top": 0.06},
 }
 

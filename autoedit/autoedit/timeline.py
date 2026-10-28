@@ -35,6 +35,10 @@ def output_words(plan: dict, lay: list[dict] | None = None) -> list[dict]:
     lay = lay or layout(plan)
     words = plan.get("words", [])
     out = []
+    for w in words:  # narration / absolute-timed words (voice-over over a montage)
+        if w.get("abs") and not w.get("hidden"):
+            out.append({"i": w["i"], "text": w["text"], "start": w["start"], "end": w["end"], "emph": bool(w.get("emph")),
+                        "sid": w.get("sid", 0), "clip": -1})
     for c in lay:
         if c.get("role") == "broll" or not c.get("audio", True):
             continue

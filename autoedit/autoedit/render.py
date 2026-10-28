@@ -41,12 +41,20 @@ class ClipReader:
         s = min(1.0, max_side / max(w, h))
         self.w, self.h = int(w * s) // 2 * 2, int(h * s) // 2 * 2
         vf = [f"scale={self.w}:{self.h}:flags=lanczos"]
+        if src.get("vf_pre"):
+            vf.insert(0, src["vf_pre"])  # e.g. HDR -> SDR tonemap must happen before scaling
+        if src.get("vf_extra"):
+            vf.append(src["vf_extra"])
         if src["kind"] == "image":
             inp = ["-loop", "1", "-framerate", str(fps), "-t", f"{dur_src / speed + 0.5:.3f}", "-i", src["path"]]
         else:
             inp = ["-ss", f"{clip['in']:.3f}", "-t", f"{dur_src + 0.2:.3f}", "-i", src["path"]]
             if speed != 1.0:
                 vf.insert(0, f"setpts=PTS/{speed:.4f}")
+                if speed < 0.8 and clip.get("slowmo", True):
+                    from .studio.enhance import slowmo_filter
+
+                    vf.append(slowmo_filter(speed, fps))  # motion-compensated in-between frames
         vf += [f"fps={fps}"]
         if vf_color:
             vf.append(vf_color)
@@ -77,8 +85,10 @@ class ClipReader:
 
 
 class BrollReader:
-    def __init__(self, path: str, W: int, H: int):
+    def __init__(self, path: str, W: int, H: int, start: float = 0.0):
         self.cap = cv2.VideoCapture(path)
+        if start:
+            self.cap.set(cv2.CAP_PROP_POS_MSEC, start * 1000)
         self.img = None
         if not self.cap.isOpened() or int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT)) <= 1:
             self.img = cv2.imread(path)
@@ -151,6 +161,12 @@ def source_color_filters(plan: dict) -> dict[str, str]:
 # --------------------------------------------------------------------------- audio
 def build_voice(plan: dict, lay: list[dict], out: Path) -> Path:
     srcs = plan["sources"]
+    narr = plan.get("narration")
+    if narr and narr.get("path") and Path(narr["path"]).exists():
+        dur = lay[-1]["t1"]
+        run(["ffmpeg", "-i", narr["path"], "-af", f"adelay=350:all=1,apad=whole_dur={dur:.3f},atrim=0:{dur:.3f}",
+             "-ar", "48000", "-ac", "1", str(out)])
+        return out
     inputs, idx = [], {}
     for c in lay:
         s = srcs[c["src"]]
@@ -286,7 +302,7 @@ def render(plan: dict, out_path: str | Path, workdir: str | Path, progress: Prog
         t = timeline.word_time(owords, b["word"]) if "word" in b else b.get("t")
         if t is None or not b.get("path") or not Path(b["path"]).exists():
             continue
-        brolls.append([t, t + b.get("dur", 1.8), b["path"], None])
+        brolls.append([t, t + b.get("dur", 1.8), b["path"], None, b.get("in", 0.0)])
 
     # sources: tracks, inpainting, background ---------------------------------
     color_vf = source_color_filters(plan)
@@ -313,6 +329,10 @@ def render(plan: dict, out_path: str | Path, workdir: str | Path, progress: Prog
     brand = plan.get("brand") or {}
     if brand.get("logo") and Path(brand["logo"]).exists():
         logo = overlays.load_rgba(brand["logo"], int(W * 0.14))
+    from .studio.motion import Graphics
+
+    graphics = Graphics(plan.get("graphics", []), W, H, brand, cap_style, spec["safe_bottom"])
+    parallax_cache: dict[int, dict] = {}
     pb = plan.get("progress_bar", {})
     pb_color = brand.get("accent_color") or pb.get("color") or cap_style.get("highlight_color", "#FFE14D")
 
@@ -370,6 +390,21 @@ def render(plan: dict, out_path: str | Path, workdir: str | Path, progress: Prog
             if c["src"] in inpainters:
                 raw = inpainters[c["src"]].apply(raw)
             local = (t - c["t0"]) / max(1e-6, c["t1"] - c["t0"])
+            mot = c.get("motion") or {}
+            if mot.get("type") == "parallax":
+                if k not in parallax_cache:
+                    from .studio.enhance import parallax_layers
+
+                    try:
+                        sub = plan["sources"][c["src"]].get("subject")
+                        parallax_cache[k] = parallax_layers(raw, sub)
+                    except Exception as e:  # depth failed -> plain Ken Burns
+                        log.warning("parallax failed: %s", e)
+                        parallax_cache[k] = None
+                if parallax_cache[k] is not None:
+                    from .studio.enhance import parallax_frame
+
+                    raw = parallax_frame(parallax_cache[k], _ease(local), mot.get("dir", 1))
             zoom = float(c.get("zoom", 1.0)) * (1 + push * local)
             for (p0, p1, sc, style) in punches:
                 if p0 <= t < p1 + 0.12:
@@ -422,12 +457,15 @@ def render(plan: dict, out_path: str | Path, workdir: str | Path, progress: Prog
             if cw < W * 0.8:  # recover perceived sharpness when upscaling
                 blur = cv2.GaussianBlur(frame, (0, 0), 1.2)
                 frame = cv2.addWeighted(frame, 1.35, blur, -0.35, 0)
+            tf = plan["sources"][c["src"]].get("match")
+            if tf:
+                frame = color.apply_match(frame, tf)
             frame = bg.apply(frame)
             # cutaway B-roll
             for b in brolls:
                 if b[0] <= t < b[1]:
                     if b[3] is None:
-                        b[3] = BrollReader(b[2], W, H)
+                        b[3] = BrollReader(b[2], W, H, b[4])
                     bf = b[3].frame((t - b[0]) / (b[1] - b[0]))
                     if bf is not None:
                         fade = min(1.0, (t - b[0]) / 0.1, (b[1] - t) / 0.1)
@@ -452,7 +490,8 @@ def render(plan: dict, out_path: str | Path, workdir: str | Path, progress: Prog
             if cta_emoji is not None and cta.get("start") is not None and t >= cta["start"]:
                 overlays.blit(frame, cta_emoji, W // 2, int(H * (1 - spec["safe_bottom"] - 0.14)),
                               overlays.pop_curve(t - cta["start"] - 0.15), 1.0)
-            if logo is not None:
+            graphics.draw(frame, t)
+            if logo is not None and not any(g["type"] == "end_card" and g["start"] <= t for g in graphics.items):
                 overlays.blit(frame, logo, W - logo.shape[1] // 2 - int(W * 0.04), int(H * spec["safe_top"]) + logo.shape[0] // 2, 1.0, 0.85)
             if pb.get("enabled", True):
                 overlays.progress_bar(frame, (t + 1 / fps) / duration, pb_color, height=max(6, H // 190))

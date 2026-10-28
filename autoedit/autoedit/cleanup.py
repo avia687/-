@@ -22,12 +22,25 @@ def norm(word: str) -> str:
     return _PUNCT.sub("", word.lower())
 
 
+GREETINGS = [
+    ["hey", "guys"], ["hi", "guys"], ["hey", "everyone"], ["hi", "everyone"], ["hello", "everyone"], ["what's", "up", "guys"],
+    ["hey", "what's", "up"], ["welcome", "back"], ["hello", "guys"],
+    ["היי", "חברים"], ["שלום", "לכולם"], ["היי", "לכולם"], ["שלום", "חברים"], ["מה", "קורה", "חברים"], ["אהלן", "חברים"], ["היי"], ["אהלן"],
+]
+
+
 def mark_words(words: list[dict], language: str) -> list[str | None]:
     """Return a removal reason per word (None = keep)."""
     lang = language if language in FILLERS else "en"
     n = len(words)
     reason: list[str | None] = [None] * n
     toks = [norm(w["text"]) for w in words]
+    # never waste the opening on a greeting ("Hey guys", "שלום לכולם")
+    for g in GREETINGS:
+        if toks[: len(g)] == g and n > len(g) + 3 and words[len(g) - 1]["end"] < 3.0:
+            for k in range(len(g)):
+                reason[k] = "greeting"
+            break
 
     for i, t in enumerate(toks):
         if not t:
@@ -128,6 +141,7 @@ def clean(transcript: dict, profile: dict, duration: float, audio: np.ndarray | 
         "removed_fillers": sum(r == "filler" for r in reason),
         "removed_stutters": sum(r == "stutter" for r in reason),
         "removed_repeats": sum(r == "repeat" for r in reason),
+        "removed_greeting": sum(r == "greeting" for r in reason),
         "jump_cuts": max(0, len(segs) - 1),
     }
     return {"segments": segs, "removed": reason, "stats": stats}
