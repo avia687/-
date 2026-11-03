@@ -278,7 +278,14 @@ export async function startServer({ port = 0, dataDir, cipher, exportDir, fontsD
     return serveFile(req, res, file);
   });
 
-  await new Promise((resolve) => server.listen(port, '127.0.0.1', resolve));
+  // Prefer a fixed port (stable Instagram redirect address); fall back to any free port.
+  await new Promise((resolve, reject) => {
+    const onErr = (err) => {
+      if (err.code === 'EADDRINUSE' && port !== 0) { server.listen(0, '127.0.0.1', resolve); } else reject(err);
+    };
+    server.once('error', onErr);
+    server.listen(port, '127.0.0.1', () => { server.off('error', onErr); resolve(); });
+  });
   boundPort = server.address().port;
   log('info', 'server.listen', { port: boundPort });
   return { server, port: boundPort, engine, url: `http://127.0.0.1:${boundPort}/`, close: () => new Promise((r) => server.close(r)) };

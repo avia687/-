@@ -1,0 +1,66 @@
+name: AutoEdit — Windows installer
+
+on:
+  push:
+    branches: [claude/beautiful-heisenberg-uajgmt, main]
+    paths: ['autoedit/**', '.github/workflows/autoedit-windows.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: autoedit
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: autoedit/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Engine end-to-end on Windows (10 videos → Reel → export)
+        run: |
+          node scripts/make-test-media.mjs test-media
+          node tests/smoke-engine.mjs test-media viral
+
+      - name: Build UI
+        run: npm run build:ui
+
+      - name: Build installer
+        run: npx electron-builder --win nsis --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Version
+        id: v
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AutoEdit-Setup
+          path: autoedit/release/*.exe
+
+      - name: Publish download link
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: autoedit-v${{ steps.v.outputs.version }}-build.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: AutoEdit ${{ steps.v.outputs.version }} (Windows) — build ${{ github.run_number }}
+          body: |
+            הורידו את הקובץ AutoEdit-Setup והפעילו אותו בלחיצה כפולה.
+            Download AutoEdit-Setup and double-click it to install.
+          files: autoedit/release/*.exe
+          make_latest: true

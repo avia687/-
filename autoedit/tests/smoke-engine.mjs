@@ -43,4 +43,6 @@ const ex = engine.exportVideo(p.id, { versionId: v.id, preset: 'reel' });
 const exDone = await wait(ex.id);
 console.log('EXPORT', exDone.status, exDone.error || '', `${((Date.now() - t0) / 1000).toFixed(1)}s`, JSON.stringify(exDone.result?.qc), exDone.result?.savedTo);
 console.log('DATA', dataDir, path.join(dataDir, 'projects', p.id, v.preview));
-process.exit(0);
+const ok = done.status === 'done' && exDone.status === 'done' && fs.existsSync(exDone.result.savedTo) && v.edl.duration > 8;
+console.log(ok ? 'SMOKE PASS' : 'SMOKE FAIL');
+process.exit(ok ? 0 : 1);
