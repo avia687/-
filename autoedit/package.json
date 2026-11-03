@@ -1,0 +1,33 @@
+{
+  "name": "autoedit",
+  "productName": "AutoEdit",
+  "version": "0.1.0",
+  "description": "AutoEdit AI Video Studio — upload footage, get a professionally edited video.",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build:ui": "vite build",
+    "start": "node server/start.js",
+    "test": "vitest run",
+    "e2e": "node tests/e2e.mjs",
+    "electron": "electron .",
+    "dist:win": "vite build && electron-builder --win nsis --publish never"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.4.0",
+    "ffmpeg-static": "5.2.0",
+    "ffprobe-static": "3.1.0",
+    "heic-convert": "^2.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "vite": "5.4.11",
+    "vitest": "2.1.8"
+  }
+}
