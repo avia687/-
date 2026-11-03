@@ -207,3 +207,21 @@ def vision_review(frames, plan) -> dict | None:
         f"mode {meta.get('mode')}, concept {json.dumps(meta.get('concept', {}), ensure_ascii=False)}.\n"
         "Score 0-100 like a pro who would only publish 90+. Give up to 4 notes in Hebrew and the fixes to apply.",
         REVIEW_SCHEMA, images=[p], effort="medium")
+
+
+def score_breakdown(plan: dict) -> dict:
+    """Final Video Score split into what a creator cares about (from the stored Critic checks)."""
+    checks = {c["key"]: c["score"] for c in (plan.get("critic") or {}).get("checks", [])}
+    if not checks:
+        return {}
+
+    def pct(*keys):
+        vals = [checks[k] for k in keys if k in checks]
+        return int(round(100 * sum(vals) / len(vals))) if vals else None
+
+    brand = plan.get("brand") or {}
+    has_brand = any(brand.get(k) for k in ("logo", "accent_color", "primary_color", "caption_font"))
+    out = {"hook": pct("hook"), "story": pct("payoff", "hook"), "pacing": pct("pacing", "retention"),
+           "visuals": pct("technical", "restraint"), "audio": pct("sound"), "captions": pct("captions"),
+           "brand": 100 if has_brand else None}
+    return {k: v for k, v in out.items() if v is not None}

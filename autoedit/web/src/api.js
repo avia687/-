@@ -20,6 +20,7 @@ export const api = {
   get: (u) => req("GET", u),
   post: (u, b) => req("POST", u, b ?? {}),
   put: (u, b) => req("PUT", u, b),
+  del: (u) => req("DELETE", u),
 };
 
 /** Upload with real progress (XHR) so big phone videos show a moving bar. */

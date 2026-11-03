@@ -3,10 +3,18 @@ import { api, uploadFiles, waitJob, watchJob } from "./api.js";
 
 const PLATFORMS = { tiktok: "TikTok", reels: "Reels", shorts: "Shorts", facebook: "Facebook", youtube: "YouTube", linkedin: "LinkedIn" };
 const NICHES = { fitness: "כושר", realestate: "נדל״ן", food: "אוכל", business: "עסקים" };
-const VARIANT_NAMES = { main: "גרסה ראשית", hook_b: "Hook חלופי", short: "קצרה וקצבית" };
+const VARIANT_NAMES = { main: "גרסה ראשית", hook_b: "Hook חלופי", short: "קצרה וקצבית", viral: "ויראלי", cinematic: "קולנועי", premium: "פרימיום" };
+const STYLES = [
+  ["viral", "ויראלי", "מהיר, hook חזק, הרבה תנועה"],
+  ["cinematic", "קולנועי", "אלגנטי, שוטים ארוכים, מינימום אפקטים"],
+  ["premium", "פרימיום", "נקי ויוקרתי, תנועה מבוקרת"],
+];
+const DURATIONS = [[15, "15 שנ׳"], [30, "30 שנ׳"], [60, "60 שנ׳"], [null, "אוטומטי"]];
+const BREAKDOWN = { hook: "Hook", story: "סיפור", pacing: "קצב", visuals: "ויזואליה", audio: "סאונד", captions: "כתוביות", brand: "מותג" };
 
 export default function App() {
-  const [tab, setTab] = useState("create");
+  const initial = new URLSearchParams(location.search).get("job") ? "create" : "projects";
+  const [tab, setTab] = useState(initial);
   const [health, setHealth] = useState(null);
   useEffect(() => {
     api.get("/api/health").then(setHealth).catch(() => {});
@@ -19,7 +27,8 @@ export default function App() {
         </div>
         <nav>
           {[
-            ["create", "יצירה"],
+            ["projects", "הפרויקטים שלי"],
+            ["create", "סרטון חדש"],
             ["learn", "למידה"],
             ["brand", "המותג שלי"],
             ["settings", "הגדרות"],
@@ -31,7 +40,8 @@ export default function App() {
         </nav>
       </header>
       <main>
-        {tab === "create" && <Create health={health} />}
+        {tab === "projects" && <Projects onNew={() => setTab("create")} onOpen={(id) => (history.replaceState(null, "", `?job=${id}`), setTab("create"))} />}
+        {tab === "create" && <Create key={location.search} health={health} />}
         {tab === "learn" && <Learn health={health} />}
         {tab === "brand" && <Brand />}
         {tab === "settings" && <Settings health={health} />}
@@ -50,6 +60,9 @@ function Create({ health }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [narration, setNarration] = useState("auto");
+  const [style, setStyle] = useState("viral");
+  const [duration, setDuration] = useState(30);
+  const [platform, setPlatform] = useState("reels");
   const [drag, setDrag] = useState(false);
   const fileRef = useRef();
   const dirRef = useRef();
@@ -60,7 +73,7 @@ function Create({ health }) {
       setProgress(j.progress || 0);
       setMessage(j.message || "");
     });
-    if (j.status === "failed") throw new Error(j.error || "נכשל");
+    if (j.status === "failed") throw new Error(j.error || "משהו השתבש. נסו שוב.");
     setResult({ ...j.result, job_id });
     setStage("done");
   };
@@ -101,7 +114,7 @@ function Create({ health }) {
       });
       setStage("work");
       setProgress(0);
-      const { job_id } = await api.post("/api/create", { batch: up.batch, brief, narration });
+      const { job_id } = await api.post("/api/create", { batch: up.batch, brief, narration, style, target_seconds: duration, platform });
       history.replaceState(null, "", `?job=${job_id}`);
       await follow(job_id);
     } catch (e) {
@@ -117,7 +130,7 @@ function Create({ health }) {
   const counts = files.reduce((a, f) => ((a[f.type.split("/")[0] || "other"] = (a[f.type.split("/")[0] || "other"] || 0) + 1), a), {});
   return (
     <section className="create">
-      <h1>מהחומר הגולמי לסרטון מוכן. בשלושה צעדים.</h1>
+      <h1>מעלים חומר. AutoEdit עורך.</h1>
       <div
         className={`drop ${drag ? "drag" : ""} ${files.length ? "has" : ""}`}
         onDragOver={(e) => (e.preventDefault(), setDrag(true))}
@@ -147,7 +160,33 @@ function Create({ health }) {
           בחירת תיקייה שלמה
         </button>
       </div>
-      <input className="brief" placeholder='משפט אחד (לא חובה): למשל "סרטון למכירת דירה, אנרגטי"' value={brief} onChange={(e) => setBrief(e.target.value)} disabled={busy} />
+      <input className="brief" placeholder='מה המטרה? (לא חובה) למשל "סרטון למכירת דירה, אנרגטי"' value={brief} onChange={(e) => setBrief(e.target.value)} disabled={busy} />
+      <div className="choices">
+        <div className="choice-row">
+          <span className="choice-label">סגנון</span>
+          {STYLES.map(([k, l, d]) => (
+            <button key={k} className={`chip ${style === k ? "on" : ""}`} title={d} onClick={() => setStyle(k)} disabled={busy}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <div className="choice-row">
+          <span className="choice-label">אורך</span>
+          {DURATIONS.map(([v, l]) => (
+            <button key={l} className={`chip ${duration === v ? "on" : ""}`} onClick={() => setDuration(v)} disabled={busy}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <div className="choice-row">
+          <span className="choice-label">איפה יפורסם</span>
+          {["reels", "tiktok", "shorts", "facebook", "youtube"].map((p) => (
+            <button key={p} className={`chip ${platform === p ? "on" : ""}`} onClick={() => setPlatform(p)} disabled={busy}>
+              {PLATFORMS[p]}
+            </button>
+          ))}
+        </div>
+      </div>
       <details className="adv">
         <summary>אפשרויות נוספות</summary>
         <label>
@@ -187,19 +226,19 @@ function Results({ result, onNew }) {
   const [sel, setSel] = useState(0);
   const versions = result.versions || [];
   const v = versions[sel];
-  const k = v ? Number(v.dir.split("/v").pop()) : 1;
+  const k = v ? v.k || Number(v.dir.split("/v").pop()) : 1;
   const [videoUrl, setVideoUrl] = useState(null);
   useEffect(() => setVideoUrl(null), [sel]);
   return (
     <section className="results">
       <div className="row between">
-        <h2>3 גרסאות מוכנות. בחרו אחת.</h2>
+        <h2>3 גרסאות לבחירה</h2>
         <button className="ghost" onClick={onNew}>
           + סרטון חדש
         </button>
       </div>
       <div className="concept muted">
-        נישה: {NICHES[result.concept?.niche] || result.concept?.niche} · מצב רוח: {result.concept?.mood} · {result.items} פריטי חומר · {Math.round(result.elapsed_sec)} שניות
+        נישה: {NICHES[result.concept?.niche] || result.concept?.niche} · אווירה: {{ energetic: "אנרגטית", calm: "רגועה", luxury: "יוקרתית", emotional: "מרגשת", fun: "כיפית" }[result.concept?.mood] || result.concept?.mood} · {result.items} פריטי חומר · {Math.round(result.elapsed_sec)} שניות
       </div>
       <div className="versions">
         {versions.map((x, i) => (
@@ -210,11 +249,11 @@ function Results({ result, onNew }) {
               <Score value={x.score} />
             </div>
             {i === 0 && <div className="badge">מומלצת</div>}
-            <ul className="notes">{(x.notes || []).slice(0, 2).map((n, j) => <li key={j}>{n}</li>)}</ul>
+            {x.duration ? <div className="muted small">{x.duration} שניות</div> : null}
           </div>
         ))}
       </div>
-      {v && <Workbench key={`${result.job_id}-${k}`} jobId={result.job_id} k={k} onVideo={setVideoUrl} result={result} />}
+      {v && <Workbench key={`${result.job_id}-${k}`} jobId={result.job_id} k={k} onVideo={setVideoUrl} result={result} version={v} />}
     </section>
   );
 }
@@ -224,8 +263,56 @@ function Score({ value }) {
   return <span className={`score ${c}`}>{value}</span>;
 }
 
-function Workbench({ jobId, k, onVideo, result }) {
+function ScorePanel({ info, onImprove, onUndo, onRedo, busy }) {
+  if (!info) return null;
+  const b = info.breakdown || {};
+  return (
+    <div className="panel scorepanel">
+      <div className="row between">
+        <h3>
+          ציון הסרטון <Score value={info.score} />
+        </h3>
+        <div className="row">
+          <button className="mini" onClick={onUndo} disabled={busy || !info.history?.can_undo} title="בטל שינוי אחרון">
+            ↶ בטל
+          </button>
+          <button className="mini" onClick={onRedo} disabled={busy || !info.history?.can_redo} title="בצע שוב">
+            ↷ שוב
+          </button>
+        </div>
+      </div>
+      <div className="breakdown">
+        {Object.entries(b).map(([k, v]) => (
+          <div key={k} className="bd">
+            <span>{BREAKDOWN[k] || k}</span>
+            <span className="b">
+              <span style={{ width: `${v}%` }} className={v >= 90 ? "up" : v >= 75 ? "mid" : "down"} />
+            </span>
+            <b>{v}</b>
+          </div>
+        ))}
+      </div>
+      {info.explain?.length > 0 && (
+        <>
+          <h4>מה עשיתי</h4>
+          <ul className="explain">{info.explain.map((x, i) => <li key={i}>{x}</li>)}</ul>
+        </>
+      )}
+      <button className="ghost" onClick={onImprove} disabled={busy}>
+        ✨ שפר אוטומטית
+      </button>
+    </div>
+  );
+}
+
+function Workbench({ jobId, k, onVideo, result, version }) {
   const [busy, setBusy] = useState(false);
+  const [info, setInfo] = useState({ score: version?.score, breakdown: version?.breakdown, explain: version?.explain });
+  const refreshInfo = () => api.get(`/api/versions/${jobId}/${k}/history`).then(setInfo).catch(() => {});
+  useEffect(() => {
+    refreshInfo();
+  }, [jobId, k]);
+  const videoOf = (r) => r.video_url || (r.video ? `/files/${r.video.split("/workspace/").pop()}` : null);
   const [prog, setProg] = useState(0);
   const [chat, setChat] = useState([]);
   const [msg, setMsg] = useState("");
@@ -238,7 +325,7 @@ function Workbench({ jobId, k, onVideo, result }) {
       if (job_id) {
         const j = await waitJob(job_id, (j) => setProg(j.progress || 0));
         if (j.status === "done") onDone?.(j.result);
-        else setChat((c) => [...c, { who: "ai", text: "שגיאה: " + j.error }]);
+        else setChat((c) => [...c, { who: "ai", text: j.error || "משהו השתבש. נסו שוב." }]);
       }
     } finally {
       setBusy(false);
@@ -251,15 +338,29 @@ function Workbench({ jobId, k, onVideo, result }) {
     setMsg("");
     run(api.post(`/api/versions/${jobId}/${k}/chat`, { message: m }), (r) => {
       onVideo(r.video_url || `/files/${r.video.split("/workspace/").pop()}`);
-      if (r.critic) setChat((c) => [...c, { who: "ai", text: `עודכן. ציון המבקר: ${r.critic.score}` }]);
+      if (r.critic) setChat((c) => [...c, { who: "ai", text: `עודכן. ציון: ${r.critic.score}` }]);
+      refreshInfo();
     });
   };
+  const undo = (dir) =>
+    run(api.post(`/api/versions/${jobId}/${k}/${dir}`), (r) => {
+      onVideo(videoOf(r));
+      refreshInfo();
+    });
+  const improve = () =>
+    run(api.post(`/api/versions/${jobId}/${k}/improve`), (r) => {
+      onVideo(videoOf(r));
+      setChat((c) => [...c, { who: "ai", text: `שיפרתי: ${r.score_before} ← ${r.score}` }]);
+      refreshInfo();
+    });
   return (
     <div className="workbench">
+      <div className="col">
+      <ScorePanel info={info} onImprove={improve} onUndo={() => undo("undo")} onRedo={() => undo("redo")} busy={busy} />
       <div className="panel chat">
-        <h3>עריכה בצ׳אט</h3>
+        <h3>בקשו מה-AI לשנות</h3>
         <div className="msgs">
-          {chat.length === 0 && <div className="muted">כתבו בשפה חופשית: "תקצר את ההתחלה", "מוזיקה יותר שקטה", "תוסיף כתובית בשנייה 12: מבצע!"</div>}
+          {chat.length === 0 && <div className="muted">למשל: "תקצר את ההתחלה", "מוזיקה יותר שקטה", "יותר מהיר", "תוסיף כתובית בשנייה 12: מבצע!"</div>}
           {chat.map((c, i) => (
             <div key={i} className={`msg ${c.who}`}>
               {c.text}
@@ -274,9 +375,10 @@ function Workbench({ jobId, k, onVideo, result }) {
           </button>
         </div>
         <button className="link" onClick={() => setManual((m) => !m)}>
-          {manual ? "הסתר שליטה ידנית" : "שליטה ידנית (timeline)"}
+          {manual ? "הסתר מצב מתקדם" : "מצב מתקדם (Pro)"}
         </button>
         {manual && <Timeline jobId={jobId} k={k} onRendered={onVideo} run={run} busy={busy} />}
+      </div>
       </div>
       <Export jobId={jobId} k={k} result={result} run={run} busy={busy} />
     </div>
@@ -403,7 +505,7 @@ function Export({ jobId, k, result, run, busy }) {
           <option value="h265">H.265 (קובץ קטן יותר)</option>
         </select>
         <button className="cta small" onClick={exp} disabled={busy}>
-          ייצא
+          אשר וייצא באיכות מלאה
         </button>
       </div>
       {files.length > 0 && (
@@ -802,54 +904,196 @@ function FileField({ label, accept, onFile, current, image }) {
   );
 }
 
-/* ------------------------------------------------------------------ settings */
-function Settings({ health }) {
-  const keys = health?.keys || {};
-  const caps = health?.capabilities || {};
-  const rows = [
-    ["ANTHROPIC_API_KEY", "Claude: הבמאי, המבקר, הצ׳אט והכותרות", "console.anthropic.com → API Keys"],
-    ["YOUTUBE_API_KEY", "חיפוש סרטונים מצליחים ב-YouTube ו-Shorts", "console.cloud.google.com → YouTube Data API v3 → Credentials"],
-    ["PEXELS_API_KEY", "B-roll חינמי", "pexels.com/api"],
-    ["PIXABAY_API_KEY", "B-roll חינמי (גיבוי)", "pixabay.com/api/docs"],
-    ["ELEVENLABS_API_KEY", "קריינות טבעית ושכפול הקול שלך", "elevenlabs.io → Profile → API Keys"],
-    ["METRICOOL_API_TOKEN", "תזמון פרסום (אופציונלי)", "Metricool → Account settings → API"],
-  ];
+/* ------------------------------------------------------------------ projects */
+function Projects({ onNew, onOpen }) {
+  const [list, setList] = useState(null);
+  const load = () => api.get("/api/projects").then(setList).catch(() => setList([]));
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 4000);
+    return () => clearInterval(t);
+  }, []);
+  if (!list) return <div className="muted">טוען…</div>;
+  const resume = list.find((p) => p.status === "interrupted");
+  const remove = async (p) => {
+    if (p._confirm) {
+      await api.del(`/api/projects/${p.id}`);
+      load();
+    } else setList(list.map((x) => (x.id === p.id ? { ...x, _confirm: true } : x)));
+  };
+  const retry = async (p) => {
+    await api.post(`/api/projects/${p.id}/retry`);
+    onOpen(p.id);
+  };
   return (
-    <section className="settings panel">
-      <h2>הגדרות ומפתחות</h2>
-      <p className="muted">
-        המפתחות נשמרים בקובץ <code>.env</code> בתיקיית המערכת. בלי מפתחות הכול עדיין עובד, עם חלופות מקומיות. הסבר מלא צעד אחר צעד נמצא ב-README.
-      </p>
-      <table>
-        <tbody>
-          {rows.map(([k, what, where]) => (
-            <tr key={k}>
-              <td>{keys[k] ? "✅" : "⚪"}</td>
-              <td>
-                <code>{k}</code>
-                <div className="muted small">{what}</div>
-              </td>
-              <td className="small">{where}</td>
-            </tr>
+    <section className="projects">
+      <div className="row between">
+        <h2>הפרויקטים שלי</h2>
+        <button className="cta small" onClick={onNew}>
+          + סרטון חדש
+        </button>
+      </div>
+      {resume && (
+        <div className="panel resume">
+          <b>העבודה על "{resume.name}" הופסקה.</b> להמשיך מאיפה שהפסקת?
+          <button className="ghost" onClick={() => retry(resume)}>
+            המשך
+          </button>
+        </div>
+      )}
+      {list.length === 0 ? (
+        <div className="empty panel">
+          <div className="drop-icon">▶</div>
+          <h3>עוד אין פרויקטים</h3>
+          <p className="muted">מעלים תמונות או סרטונים, ו-AutoEdit עורך אותם לסרטון מוכן לפרסום.</p>
+          <button className="cta small" onClick={onNew}>
+            צרו את הסרטון הראשון
+          </button>
+        </div>
+      ) : (
+        <div className="pgrid">
+          {list.map((p) => (
+            <div key={p.id} className="pcard">
+              <div className="pthumb" onClick={() => (p.status === "ready" || p.status === "exported" || p.status === "working" || p.status === "queued") && onOpen(p.id)}>
+                {p.thumbnail_url ? <img src={p.thumbnail_url} alt="" /> : <div className="ph">▶</div>}
+                {(p.status === "working" || p.status === "queued") && (
+                  <div className="pprog">
+                    <div className="bar">
+                      <div style={{ width: `${Math.round((p.progress || 0) * 100)}%` }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="pmeta">
+                <b className="ellip">{p.name}</b>
+                <span className={`status s-${p.status}`}>{p.status_he}</span>
+                <span className="muted small">
+                  {p.duration ? `${p.duration} שנ׳ · ` : ""}
+                  {PLATFORMS[p.platform] || ""} · {p.updated?.replace("T", " ").slice(5, 16)}
+                </span>
+                {p.status === "failed" && <span className="small bad">{p.error}</span>}
+              </div>
+              <div className="row">
+                {(p.status === "failed" || p.status === "interrupted") && (
+                  <button className="mini" onClick={() => retry(p)}>
+                    נסה שוב
+                  </button>
+                )}
+                <button className="mini danger" onClick={() => remove(p)}>
+                  {p._confirm ? "למחוק לצמיתות?" : "מחיקה"}
+                </button>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
-      <h3>חומרה ומודלים</h3>
-      <div className="chips">
-        {Object.entries(caps).map(([k, v]) => (
-          <span key={k} className={`chip ${v ? "on" : ""}`}>
-            {v ? "✓" : "–"} {k}
-          </span>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ settings */
+function Services() {
+  const [rows, setRows] = useState(null);
+  const [vals, setVals] = useState({});
+  const [tests, setTests] = useState({});
+  const load = () => api.get("/api/settings/services").then(setRows);
+  useEffect(() => {
+    load();
+  }, []);
+  if (!rows) return null;
+  const save = async (key) => {
+    await api.put("/api/settings/services", { [key]: vals[key] || "" });
+    setVals({ ...vals, [key]: "" });
+    await load();
+    setTests({ ...tests, [key]: { message: "בודק…" } });
+    setTests({ ...tests, [key]: await api.post(`/api/settings/services/${key}/test`) });
+  };
+  return (
+    <div className="panel">
+      <h2>שירותי AI</h2>
+      <p className="muted">
+        הכול עובד גם בלי מפתחות, עם חלופות מקומיות. מפתח מוסיף יכולות. המפתחות נשמרים מוצפנים רק במחשב הזה, ולא מוצגים שוב.
+      </p>
+      <div className="services">
+        {rows.map((r) => (
+          <div key={r.key} className="svc">
+            <div>
+              <b>{r.name}</b> {r.configured ? <span className="good small">✓ מחובר</span> : <span className="muted small">לא מוגדר</span>}
+              <div className="muted small">{r.what}</div>
+              <div className="muted small">איפה משיגים: {r.where}</div>
+            </div>
+            <div className="row">
+              <input type="password" autoComplete="off" placeholder={r.configured ? "הדביקו מפתח חדש להחלפה" : "הדביקו כאן את המפתח"}
+                value={vals[r.key] || ""} onChange={(e) => setVals({ ...vals, [r.key]: e.target.value })} />
+              <button onClick={() => save(r.key)} disabled={!vals[r.key]}>
+                שמור ובדוק
+              </button>
+              {r.configured && (
+                <button className="mini danger" onClick={() => api.put("/api/settings/services", { [r.key]: "" }).then(load)}>
+                  הסר
+                </button>
+              )}
+            </div>
+            {tests[r.key] && <div className={`small ${tests[r.key].ok ? "good" : tests[r.key].ok === false ? "bad" : "muted"}`}>{tests[r.key].message}</div>}
+          </div>
         ))}
       </div>
-      <h3>אוטומציה</h3>
-      <ul>
-        {(health?.scheduler || []).map((j) => (
-          <li key={j.id}>
-            {{ scout: "חיפוש סרטונים", feedback: "משיכת ביצועים", learn: "אימון מחדש" }[j.id] || j.id}: הריצה הבאה {j.next_run?.slice(0, 16)}
-          </li>
-        ))}
-      </ul>
+    </div>
+  );
+}
+
+function Privacy() {
+  const [p, setP] = useState(null);
+  useEffect(() => {
+    api.get("/api/privacy").then(setP).catch(() => {});
+  }, []);
+  if (!p) return null;
+  return (
+    <div className="panel">
+      <h2>פרטיות</h2>
+      <h4>מה נשמר</h4>
+      <ul>{p.stored.map((x) => <li key={x}>{x}</li>)}</ul>
+      <h4>איפה זה נשמר</h4>
+      <p>
+        רק במחשב שלך: <code>{p.storage_path}</code> ({p.disk_free_gb}GB פנויים)
+      </p>
+      <h4>מה נשלח ל-AI</h4>
+      <p>{p.sent_to_ai}</p>
+      <h4>איך מוחקים</h4>
+      <p>{p.delete_how}</p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ settings */
+function Settings({ health }) {
+  const caps = health?.capabilities || {};
+  const CAP_HE = { gpu: "כרטיס מסך (GPU)", realesrgan: "הגדלת איכות Real-ESRGAN", rife: "הילוך איטי RIFE", gfpgan: "שחזור פנים",
+    depth_onnx: "עומק לתנועת תלת-ממד", deepfilternet: "ניקוי קול מתקדם", demucs: "הפרדת קול ממוזיקה", nvenc: "קידוד מהיר ב-GPU" };
+  return (
+    <section className="settings">
+      <Services />
+      <Privacy />
+      <div className="panel">
+        <h2>מצב המערכת</h2>
+        <h4>מנועים מתקדמים במחשב הזה</h4>
+        <p className="muted small">מה שלא זמין מוחלף אוטומטית בחלופה מקומית, והעריכה ממשיכה.</p>
+        <div className="chips">
+          {Object.entries(caps).map(([k, v]) => (
+            <span key={k} className={`chip ${v ? "on" : ""}`}>
+              {v ? "✓" : "–"} {CAP_HE[k] || k}
+            </span>
+          ))}
+        </div>
+        <h4>אוטומציה ברקע</h4>
+        <ul>
+          {(health?.scheduler || []).map((j) => (
+            <li key={j.id}>
+              {{ scout: "חיפוש סרטונים מצליחים", feedback: "משיכת ביצועים", learn: "למידה מחדש" }[j.id] || j.id}: הריצה הבאה {j.next_run?.slice(0, 16).replace("T", " ")}
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

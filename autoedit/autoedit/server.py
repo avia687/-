@@ -31,9 +31,12 @@ WEB_DIST = config.ROOT / "web" / "dist"
 async def lifespan(app: FastAPI):
     config.ensure_dirs()
     settings.load_dotenv()
+    from . import projects, secrets_store
     from .learn.scheduler import setup_logging, start
 
+    secrets_store.apply_env()
     setup_logging()
+    projects.recover_interrupted()
     tasks.start_consumer()
     try:
         start()
@@ -46,6 +49,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AutoEdit", lifespan=lifespan)
+
+
+@app.exception_handler(Exception)
+async def friendly(request, exc):  # never show a developer error to the user
+    log.exception("unhandled error on %s", request.url.path)
+    return JSONResponse({"detail": "משהו השתבש. נסו שוב בעוד רגע."}, status_code=500)
 config.ensure_dirs()
 app.mount("/files", StaticFiles(directory=str(config.WORK_DIR)), name="files")
 
@@ -92,17 +101,28 @@ class CreateReq(BaseModel):
     batch: str
     brief: str = ""
     narration: str = "auto"
+    style: str | None = None           # viral | cinematic | premium
+    target_seconds: float | None = None
+    platform: str | None = None
+    name: str | None = None
 
 
 @app.post("/api/create")
 def create(req: CreateReq):
+    from . import projects
+
     d = config.WORK_DIR / "uploads" / req.batch
     if not d.exists():
-        raise HTTPException(404, "batch not found")
+        raise HTTPException(404, "הקבצים לא נמצאו - נסו להעלות שוב")
     job_id = uuid.uuid4().hex[:10]
-    tasks.new_job(job_id, "create", req.model_dump())
-    tasks.task_create(job_id, [str(d)], req.brief, req.narration)
-    return {"job_id": job_id}
+    name = req.name or (req.brief[:40] if req.brief else f"פרויקט {db.now()[:10]}")
+    projects.create(job_id, name, platform=req.platform, goal=req.brief, style=req.style,
+                    target_seconds=req.target_seconds, brief=req.brief, job_id=job_id)
+    payload = {**req.model_dump(), "inputs": [str(d)]}
+    tasks.new_job(job_id, "create", payload)
+    tasks.task_create(job_id, [str(d)], req.brief, req.narration,
+                      {"style": req.style, "target_seconds": req.target_seconds, "platform": req.platform})
+    return {"job_id": job_id, "project_id": job_id}
 
 
 class EditReq(BaseModel):
@@ -195,9 +215,11 @@ def get_plan(job_id: str, k: int):
 
 @app.put("/api/versions/{job_id}/{k}/plan")
 def put_plan(job_id: str, k: int, body: dict):
+    from . import projects
+
     d = _version_dir(job_id, k)
     plan = body.get("plan") or body
-    (d / "plan.json").write_text(json.dumps(plan, ensure_ascii=False, indent=1), encoding="utf-8")
+    projects.record(job_id, k, plan, "עריכה ידנית")
     return _rerender(job_id, k, d, preview=True)
 
 
@@ -224,12 +246,14 @@ def chat(job_id: str, k: int, req: ChatReq):
     done = chat_mod.apply(plan, ops)
     if not done:
         return {"reply": reply, "ops": ops, "job_id": None}
-    (d / "plan.json").write_text(json.dumps(plan, ensure_ascii=False, indent=1), encoding="utf-8")
+    from . import projects
+
+    projects.record(job_id, k, plan, req.message[:80])
     log_path = d / "chat.json"
     hist = json.loads(log_path.read_text(encoding="utf-8")) if log_path.exists() else []
     hist.append({"message": req.message, "ops": ops, "reply": reply, "ts": db.now()})
     log_path.write_text(json.dumps(hist, ensure_ascii=False, indent=1), encoding="utf-8")
-    return {"reply": reply, "ops": ops, **_rerender(job_id, k, d, preview=False)}
+    return {"reply": reply, "ops": ops, **_rerender(job_id, k, d, preview=True)}
 
 
 class ExportReq(BaseModel):
@@ -245,7 +269,7 @@ def export(job_id: str, k: int, req: ExportReq):
         raise HTTPException(400, f"unknown platforms {bad}")
     eid = uuid.uuid4().hex[:10]
     tasks.new_job(eid, "export", req.model_dump(), parent=job_id)
-    tasks.task_export(eid, str(d / "plan.json"), req.platforms, req.codec)
+    tasks.task_export(eid, str(d / "plan.json"), req.platforms, req.codec, job_id)
     return {"job_id": eid}
 
 
@@ -263,6 +287,159 @@ def publish(job_id: str, k: int, req: PublishReq):
     pid = add_post(req.url, plan["meta"]["niche"], plan, job_id=job_id, variant=plan["meta"].get("variant"),
                    published_at=req.published_at, plan_path=str(d / "plan.json"))
     return {"post_id": pid}
+
+
+# ------------------------------------------------------------------ projects & versions
+def _project_view(p: dict) -> dict:
+    from . import projects
+
+    j = tasks.get(p["id"]) or {}
+    return {**p, "thumbnail_url": file_url(p.get("thumbnail")), "status_he": projects.STATUS_HE.get(p["status"], p["status"]),
+            "progress": j.get("progress"), "message": j.get("message"), "error": j.get("error")}
+
+
+@app.get("/api/projects")
+def list_projects():
+    from . import projects
+
+    return [_project_view(p) for p in projects.list_all()]
+
+
+@app.get("/api/projects/{pid}")
+def get_project(pid: str):
+    from . import projects
+
+    p = projects.get(pid)
+    if not p:
+        raise HTTPException(404, "הפרויקט לא נמצא")
+    j = tasks.get(pid)
+    return {"project": _project_view(p), "job": _decorate(j) if j else None}
+
+
+@app.delete("/api/projects/{pid}")
+def delete_project(pid: str):
+    import shutil as sh
+
+    from . import projects
+
+    j = tasks.get(pid)
+    batch = ((j or {}).get("input") or {}).get("batch")
+    projects.delete(pid)
+    if batch:
+        sh.rmtree(config.WORK_DIR / "uploads" / batch, ignore_errors=True)
+    return {"ok": True}
+
+
+@app.post("/api/projects/{pid}/retry")
+def retry_project(pid: str):
+    from . import projects
+
+    j = tasks.get(pid)
+    if not j or not j.get("input"):
+        raise HTTPException(404, "אין מה לנסות שוב")
+    inp = j["input"]
+    projects.update(pid, status="queued")
+    tasks.update(pid, status="queued", progress=0.0, message="בתור", error=None)
+    tasks.task_create(pid, inp.get("inputs") or [str(config.WORK_DIR / "uploads" / inp["batch"])], inp.get("brief", ""),
+                      inp.get("narration", "auto"), {k: inp.get(k) for k in ("style", "target_seconds", "platform")})
+    return {"job_id": pid}
+
+
+def _version_payload(pid: str, k: int, plan: dict | None = None) -> dict:
+    from . import projects
+    from .studio.critic import score_breakdown
+
+    if plan is None:
+        plan = json.loads((_version_dir(pid, k) / "plan.json").read_text(encoding="utf-8"))
+    return {"history": projects.history(pid, k), "score": (plan.get("critic") or {}).get("score"),
+            "breakdown": score_breakdown(plan), "explain": plan.get("explain", [])}
+
+
+@app.get("/api/versions/{pid}/{k}/history")
+def version_history(pid: str, k: int):
+    return _version_payload(pid, k)
+
+
+@app.post("/api/versions/{pid}/{k}/undo")
+def version_undo(pid: str, k: int):
+    from . import projects
+
+    plan = projects.undo(pid, k)
+    if plan is None:
+        return {"changed": False, **_version_payload(pid, k)}
+    return {"changed": True, **_rerender(pid, k, _version_dir(pid, k), preview=True), **_version_payload(pid, k, plan)}
+
+
+@app.post("/api/versions/{pid}/{k}/redo")
+def version_redo(pid: str, k: int):
+    from . import projects
+
+    plan = projects.redo(pid, k)
+    if plan is None:
+        return {"changed": False, **_version_payload(pid, k)}
+    return {"changed": True, **_rerender(pid, k, _version_dir(pid, k), preview=True), **_version_payload(pid, k, plan)}
+
+
+@app.post("/api/versions/{pid}/{k}/restore/{n}")
+def version_restore(pid: str, k: int, n: int):
+    from . import projects
+
+    plan = projects.restore(pid, k, n)
+    return {**_rerender(pid, k, _version_dir(pid, k), preview=True), **_version_payload(pid, k, plan)}
+
+
+@app.post("/api/versions/{pid}/{k}/improve")
+def version_improve(pid: str, k: int):
+    jid = uuid.uuid4().hex[:10]
+    tasks.new_job(jid, "improve", {"project": pid, "version": k}, parent=pid)
+    tasks.task_improve(jid, pid, k)
+    return {"job_id": jid}
+
+
+@app.post("/api/versions/{pid}/{k}/duplicate")
+def version_duplicate(pid: str, k: int):
+    from . import projects
+
+    return {"k": projects.duplicate(pid, k)}
+
+
+# ------------------------------------------------------------------ settings: AI services & privacy
+@app.get("/api/settings/services")
+def services():
+    from . import secrets_store
+
+    return secrets_store.status()
+
+
+@app.put("/api/settings/services")
+def save_services(body: dict):
+    from . import secrets_store
+
+    return secrets_store.save(body)
+
+
+@app.post("/api/settings/services/{key}/test")
+def test_service(key: str):
+    from . import secrets_store
+
+    return secrets_store.test(key)
+
+
+@app.get("/api/privacy")
+def privacy():
+    import shutil as sh
+
+    from . import llm
+
+    used = sh.disk_usage(str(config.WORK_DIR))
+    return {
+        "storage_path": str(config.WORK_DIR.resolve()),
+        "stored": ["הקבצים שהעליתם", "התמלולים והניתוחים", "גרסאות העריכה", "הגדרות המותג", "מפתחות API (מוצפנים)"],
+        "sent_to_ai": ("כשמוגדר מפתח Claude: טקסט התמלול, תיאור קצר של החומר ומספר פריימים מוקטנים מהטיוטה. "
+                       "הסרטונים המקוריים לא נשלחים.") if llm.available() else "אין מפתח Claude - שום דבר לא נשלח לענן.",
+        "disk_free_gb": round(used.free / 1e9, 1),
+        "delete_how": "בעמוד 'הפרויקטים שלי' לחצו על מחיקה ליד הפרויקט - הקבצים נמחקים מהמחשב.",
+    }
 
 
 # ------------------------------------------------------------------ learning dashboard

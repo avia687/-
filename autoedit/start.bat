@@ -15,14 +15,23 @@ if errorlevel 1 (
 )
 
 docker info >nul 2>&1
-if errorlevel 1 (
-  echo  Starting Docker Desktop, please wait...
-  start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-  :waitdocker
-  timeout /t 5 >nul
-  docker info >nul 2>&1
-  if errorlevel 1 goto waitdocker
-)
+if not errorlevel 1 goto dockerok
+echo  Starting Docker Desktop, please wait 1-3 minutes...
+set "DD="
+if exist "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" set "DD=%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+if exist "%LOCALAPPDATA%\Programs\Docker\Docker\Docker Desktop.exe" set "DD=%LOCALAPPDATA%\Programs\Docker\Docker\Docker Desktop.exe"
+if defined DD start "" "%DD%"
+if not defined DD echo  Please open Docker Desktop from the Start menu.
+set /a TRIES=0
+:waitdocker
+timeout /t 5 >nul
+set /a TRIES+=1
+docker info >nul 2>&1
+if not errorlevel 1 goto dockerok
+if %TRIES%==36 echo  Docker is taking long. Open Docker Desktop and wait for "Engine running".
+if %TRIES%==36 echo  If it stays on "Engine starting": Start - type PowerShell - right click - Run as administrator - type: wsl --update
+goto waitdocker
+:dockerok
 
 if not exist ".env" copy ".env.example" ".env" >nul
 

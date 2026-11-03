@@ -59,23 +59,70 @@ def progress_cb(job_id: str):
     return cb
 
 
-def _run(job_id: str, fn):
+def friendly_error(e: Exception) -> str:
+    """What the user sees. Technical details go to the log only."""
+    msg = str(e)
+    if any("\u0590" <= ch <= "\u05ff" for ch in msg):  # our own Hebrew messages are already user-facing
+        return msg
+    if isinstance(e, (MemoryError,)):
+        return "למחשב נגמר הזיכרון בזמן העבודה. נסו פחות קבצים או סגרו תוכנות אחרות."
+    if isinstance(e, (FileNotFoundError, PermissionError)):
+        return "אחד הקבצים לא נמצא או לא נגיש. נסו להעלות אותו שוב."
+    if "No space left" in msg:
+        return "אין מספיק מקום פנוי בדיסק. פנו מקום ונסו שוב."
+    return "משהו השתבש בעיבוד. אפשר ללחוץ 'נסה שוב' - אם זה חוזר, שלחו לנו את קובץ היומן."
+
+
+def _run(job_id: str, fn, project: str | None = None, done_status: str = "ready"):
     update(job_id, status="running", message="מתחיל")
+    if project:
+        _project(project, status="working")
     try:
         res = fn(progress_cb(job_id))
         update(job_id, status="done", progress=1.0, message="מוכן", result=res)
+        if project:
+            _project(project, status=done_status)
         return res
     except Exception as e:  # report, never crash the worker
         log.error("job %s failed:\n%s", job_id, traceback.format_exc())
-        update(job_id, status="failed", message="נכשל", error=f"{type(e).__name__}: {e}"[:1500])
+        update(job_id, status="failed", message="צריך את תשומת לבך", error=friendly_error(e))
+        if project:
+            _project(project, status="failed")
         return None
+
+
+def _project(pid: str, **fields):
+    try:
+        from . import projects
+
+        projects.update(pid, **fields)
+    except Exception:
+        log.exception("project update failed")
 
 
 @huey.task()
 def task_create(job_id: str, inputs: list[str], brief: str, narration: str = "auto", overrides: dict | None = None):
     from .studio import run
 
-    return _run(job_id, lambda cb: run.create(inputs, brief, job_id=job_id, progress=cb, narration=narration))
+    o = overrides or {}
+
+    def go(cb):
+        res = run.create(inputs, brief, job_id=job_id, progress=cb, narration=narration, style=o.get("style"),
+                         target_seconds=o.get("target_seconds"), platform=o.get("platform"))
+        from . import projects
+
+        best = res["versions"][0]
+        projects.update(job_id, thumbnail=(res.get("thumbnails") or [None])[0], selected=best["k"],
+                        duration=best.get("duration"))
+        return res
+    return _run(job_id, go, project=job_id)
+
+
+@huey.task()
+def task_improve(job_id: str, project_id: str, k: int):
+    from .studio import run
+
+    return _run(job_id, lambda cb: run.improve(project_id, k, progress=cb), project=project_id)
 
 
 @huey.task()
@@ -110,7 +157,7 @@ def task_render(job_id: str, plan_path: str, out: str, preview: bool = False):
 
 
 @huey.task()
-def task_export(job_id: str, plan_path: str, platforms: list[str], codec: str = "h264"):
+def task_export(job_id: str, plan_path: str, platforms: list[str], codec: str = "h264", project: str | None = None):
     from pathlib import Path
 
     from .studio import export
@@ -118,8 +165,9 @@ def task_export(job_id: str, plan_path: str, platforms: list[str], codec: str = 
     def go(cb):
         plan = json.loads(Path(plan_path).read_text(encoding="utf-8"))
         files = export.export_all(plan, Path(plan_path).parent / "export", platforms, codec, progress=cb)
-        return {"files": files}
-    return _run(job_id, go)
+        thumbs = export.thumbnails(plan, files[0]["path"], Path(plan_path).parent / "thumbs") if files else []
+        return {"files": files, "thumbnails": thumbs}
+    return _run(job_id, go, project=project, done_status="exported")
 
 
 @huey.task()

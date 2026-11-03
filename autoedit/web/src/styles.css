@@ -129,3 +129,34 @@ tr.active td { color: var(--accent2); }
   .barrow { grid-template-columns: 110px 1fr 54px; }
   .cta { width: 100%; }
 }
+
+.choices { display: grid; gap: 10px; margin: 6px 0 16px; text-align: right; }
+.choice-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.choice-label { min-width: 90px; color: var(--muted); font-size: 14px; }
+.chip { background: transparent; }
+button.chip.on { border-color: var(--accent); background: #7c3aed33; color: var(--text); }
+.col { display: grid; gap: 16px; align-content: start; }
+.scorepanel h3 { display: flex; gap: 10px; align-items: center; }
+.breakdown { display: grid; gap: 6px; margin: 6px 0 10px; }
+.bd { display: grid; grid-template-columns: 80px 1fr 34px; gap: 8px; align-items: center; font-size: 14px; }
+.bd .b { background: var(--panel2); height: 10px; border-radius: 99px; overflow: hidden; display: block; }
+.bd .b span { display: block; height: 100%; border-radius: 99px; }
+.bd .up { background: var(--good); } .bd .mid { background: var(--ok); } .bd .down { background: var(--bad); }
+.explain { margin: 0 0 12px; padding-right: 18px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.pcard { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: grid; gap: 8px; }
+.pthumb { position: relative; aspect-ratio: 9 / 16; background: #000; border-radius: 12px; overflow: hidden; cursor: pointer; display: grid; place-items: center; }
+.pthumb img { width: 100%; height: 100%; object-fit: cover; }
+.pthumb .ph { font-size: 36px; color: var(--muted); }
+.pprog { position: absolute; inset: auto 10px 10px 10px; }
+.pmeta { display: grid; gap: 3px; }
+.status { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--panel2); justify-self: start; }
+.s-ready, .s-exported { background: #14532d; color: #86efac; }
+.s-failed, .s-interrupted { background: #78350f; color: #fcd34d; }
+.s-working, .s-queued { background: #312e81; color: #c7d2fe; }
+.resume { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.empty { text-align: center; display: grid; gap: 10px; place-items: center; padding: 40px 18px; }
+.services { display: grid; gap: 14px; }
+.svc { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.settings { display: grid; gap: 16px; }
+.ghost { background: transparent; }

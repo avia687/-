@@ -125,7 +125,9 @@ def use_fit_layout(src: dict, clip: dict, W: int, H: int) -> bool:
     crop_h = sh if ratio >= 1 else sw * H / W
     crop_w = crop_h * W / H
     upscale = W / max(crop_w, 1)
-    return (ratio > 1.4 or ratio < 0.7) and upscale > 2.2
+    # photos are pre-upscaled and move (Ken Burns), so a full-frame crop holds up much further than video
+    limit = 4.5 if src.get("kind") == "image" else 2.2
+    return (ratio > 1.4 or ratio < 0.7) and upscale > limit
 
 
 def fit_layout(raw: np.ndarray, W: int, H: int, zoom: float, cx: float, cy: float) -> np.ndarray:
