@@ -204,6 +204,18 @@ describe('AI Director', () => {
     expect(g.width).toBe(540);
     expect(outputSize(edl, 'k4', false)).toEqual({ width: 2160, height: 3840 });
   });
+  it('uses the transcript to cut filler words and stutters', () => {
+    const words = [];
+    let t = 0.2;
+    for (let i = 0; i < 40; i++) { const filler = i % 5 === 2; words.push({ w: filler ? 'אממ' : `מילה${i}`, start: t, end: t + 0.3, filler, repeat: false }); t += 0.4 + (filler ? 0 : 0); }
+    const proj = { ...project, transcripts: { a1: { words } } };
+    for (const style of ['viral', 'cinematic']) {
+    const edl = direct(proj, { targetDuration: 60, style });
+    const fillers = words.filter((w) => w.filler);
+    const inside = fillers.filter((f) => edl.shots.some((s) => s.mediaId === 'a1' && f.start < s.out && f.end > s.in));
+    expect(inside.length).toBe(0);
+    }
+  });
   it('throws a friendly error when there is nothing to edit', () => {
     expect(() => direct({ ...project, media: [] }, {})).toThrow();
   });

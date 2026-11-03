@@ -67,7 +67,34 @@ function windowScore(a, start, end, hasAudio) {
   return s.length ? mean(s.map((x) => momentScore(x, hasAudio))) : 0;
 }
 
+/** Word-accurate regions from a transcript: drops fillers ("אממ", "uh") and stutters, keeps natural pauses. */
+function wordRegions(m, st) {
+  const D = m.analysis.meta.duration;
+  const all = m.transcript?.words || [];
+  if (all.filter((w) => !w.filler && !w.repeat).length < 3) return null;
+  const regions = [];
+  let cur = null;
+  for (const w of all) {
+    // A filler or stutter always ends the current phrase so it is cut out, whatever the style's pause tolerance.
+    if (w.filler || w.repeat) { if (cur) { regions.push(cur); cur = null; } continue; }
+    if (cur && w.start - cur[1] <= st.silenceCut) cur[1] = w.end;
+    else { if (cur) regions.push(cur); cur = [w.start, w.end]; }
+  }
+  if (cur) regions.push(cur);
+  const a = m.analysis;
+  const cutWords = all.filter((w) => w.filler || w.repeat);
+  // Padding keeps breaths natural but must never reach into a removed word.
+  const padIn = (s) => Math.max(s - st.padBefore, ...cutWords.filter((w) => w.end <= s).map((w) => w.end + 0.02), 0);
+  const padOut = (e) => Math.min(e + st.padAfter, ...cutWords.filter((w) => w.start >= e).map((w) => w.start - 0.02), D);
+  return regions
+    .map(([s, e]) => [padIn(s), padOut(e)])
+    .filter(([s, e]) => e - s >= 0.5)
+    .map(([s, e]) => ({ mediaId: m.id, in: r2(s), out: r2(e), score: windowScore(a, s, e, true) }));
+}
+
 function speechRegions(m, st) {
+  const fromWords = wordRegions(m, st);
+  if (fromWords) return fromWords;
   const a = m.analysis;
   const D = a.meta.duration;
   const long = a.silences.filter(([s, e]) => e - s >= st.silenceCut);
@@ -163,7 +190,7 @@ export function direct(project, opts = {}) {
   const target = clamp(Number(opts.targetDuration || project.targetDuration || 30), 5, 600);
   const why = [];
 
-  const ready = project.media.filter((m) => m.analysis && !m.error);
+  const ready = project.media.filter((m) => m.analysis && !m.error).map((m) => (project.transcripts?.[m.id] ? { ...m, transcript: project.transcripts[m.id] } : m));
   // Duplicates: keep only the best take of each group.
   const dupGroups = findDuplicates(ready);
   const dropped = new Set();
