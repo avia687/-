@@ -7,6 +7,7 @@ import { createEngine } from '../engine/index.js';
 const mediaDir = process.argv[2];
 const style = process.argv[3] || 'viral';
 const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ae-'));
+setTimeout(() => { console.log('SMOKE TIMEOUT'); for (const l of fs.readFileSync(path.join(dataDir, 'logs', 'autoedit.log'), 'utf8').split('\n').slice(-30)) console.log(l.slice(0, 1500)); process.exit(2); }, 20 * 60 * 1000).unref();
 const engine = await createEngine({ dataDir, exportDir: path.join(dataDir, 'Videos') });
 const p = await engine.createProject({ name: 'Smoke test', platform: 'instagram', style, targetDuration: 30 });
 const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
@@ -20,7 +21,8 @@ const wait = (id) => new Promise((res) => {
   const on = (j) => {
     if (j.id !== id) return;
     const s = `${j.status} ${j.stage} ${Math.round(j.progress * 100)}%`;
-    if (s !== last && (j.progress * 100) % 1 < 0.6) { last = s; }
+    const key = `${j.status} ${j.stage}`;
+    if (key !== last) { last = key; console.log(`  [${new Date().toISOString().slice(11, 19)}] ${j.type} ${s}`); }
     if (['done', 'failed', 'cancelled'].includes(j.status)) { engine.jobs.off('update', on); res(j); }
   };
   engine.jobs.on('update', on);

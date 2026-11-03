@@ -5,7 +5,7 @@ import path from 'node:path';
 import { FFMPEG } from '../engine/ffmpeg.js';
 
 const out = process.argv[2] || 'test-media';
-const ff = (args) => execFileSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-y', ...args]);
+const ff = (args) => { console.log('make', args.at(-1)); execFileSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-nostdin', '-y', ...args], { stdio: ['ignore', 'inherit', 'inherit'], timeout: 180000 }); };
 for (const d of ['talking', 'broll', 'before', 'after', 'music']) fs.mkdirSync(path.join(out, d), { recursive: true });
 
 // Speech-like audio: voiced syllables with natural pauses + one long dead gap.

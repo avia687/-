@@ -22,6 +22,7 @@ function pickBinary(envVar, resolver, fallback) {
 }
 
 export const FFMPEG = pickBinary('AUTOEDIT_FFMPEG', () => require('ffmpeg-static'), 'ffmpeg');
+const STALL_MS = Number(process.env.AUTOEDIT_STALL_MS || 180000);
 export const FFPROBE = pickBinary('AUTOEDIT_FFPROBE', () => require('ffprobe-static').path, 'ffprobe');
 
 /**
@@ -37,9 +38,16 @@ export function runFfmpeg(args, { duration, onProgress, signal, collectStderr = 
     let stderr = '';
     let stdoutBuf = '';
     const onAbort = () => { try { child.kill('SIGKILL'); } catch { /* ignore */ } };
+    // Stall watchdog: ffmpeg reports progress every ~0.5s; silence for this long means it is stuck.
+    let lastOutput = Date.now();
+    let stalled = false;
+    const watchdog = setInterval(() => {
+      if (Date.now() - lastOutput > STALL_MS) { stalled = true; clearInterval(watchdog); onAbort(); }
+    }, 5000);
     signal?.addEventListener('abort', onAbort, { once: true });
 
     child.stdout.on('data', (d) => {
+      lastOutput = Date.now();
       stdoutBuf += d.toString();
       let idx;
       while ((idx = stdoutBuf.indexOf('\n')) >= 0) {
@@ -52,14 +60,20 @@ export function runFfmpeg(args, { duration, onProgress, signal, collectStderr = 
       }
     });
     child.stderr.on('data', (d) => {
+      lastOutput = Date.now();
       if (!collectStderr) return;
       stderr += d.toString();
       if (stderr.length > 8_000_000) stderr = stderr.slice(-4_000_000);
     });
-    child.on('error', (err) => { signal?.removeEventListener('abort', onAbort); reject(err); });
+    child.on('error', (err) => { clearInterval(watchdog); signal?.removeEventListener('abort', onAbort); reject(err); });
     child.on('close', (code) => {
+      clearInterval(watchdog);
       signal?.removeEventListener('abort', onAbort);
       if (signal?.aborted) return reject(new CancelledError());
+      if (stalled) {
+        log('error', 'ffmpeg.stalled', { args: full.join(' ').slice(0, 2000), tail: stderr.slice(-2000) });
+        return reject(Object.assign(new Error('ffmpeg stalled'), { retryable: true }));
+      }
       if (code === 0) { onProgress?.(1); return resolve({ stderr }); }
       const tail = stderr.split('\n').slice(-25).join('\n');
       log('error', 'ffmpeg.failed', { code, args: full.join(' ').slice(0, 4000), tail });
