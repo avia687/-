@@ -163,14 +163,10 @@ export function buildRenderGraph(edl, resolveMedia, { preview = false, preset = 
   if (music) {
     const mm = resolveMedia(music.mediaId, false);
     const mi = addInput(['-stream_loop', '-1', '-ss', f3(music.start || 0), '-i', mm.path]);
-    chains.push(`[${mi}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=duration=${f3(total)},volume=${f3(music.volume ?? 0.8)},afade=t=in:d=0.3,afade=t=out:st=${f3(Math.max(0, total - 1.5))}:d=1.5[mus]`);
-    if (music.duck && dialog) {
-      chains.push(`[voice]asplit=2[vmain][vsc]`);
-      chains.push(`[mus][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=15:release=350:makeup=1[musd]`);
-      chains.push(`[vmain][musd]amix=inputs=2:normalize=0:duration=first[mix]`);
-    } else {
-      chains.push(`[voice][mus]amix=inputs=2:normalize=0:duration=first[mix]`);
-    }
+    // Ducking = a smooth volume curve built from where speech is heard (no feedback graph → no deadlocks).
+    const duck = music.duck && dialog && music.duckIntervals?.length ? `,volume='${duckExpr(music.duckIntervals, music.duckDepth ?? 0.72)}':eval=frame` : '';
+    chains.push(`[${mi}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=duration=${f3(total)},asetpts=PTS-STARTPTS,volume=${f3(music.volume ?? 0.8)}${duck},afade=t=in:d=0.3,afade=t=out:st=${f3(Math.max(0, total - 1.5))}:d=1.5[mus]`);
+    chains.push(`[voice][mus]amix=inputs=2:normalize=0:duration=first[mix]`);
     mixA = 'mix';
   }
   const sfxShots = shots.map((s, i) => ({ s, i })).filter(({ s }) => s.sfx && sfxFiles[s.sfx.type]);
@@ -228,4 +224,14 @@ export async function renderEdl(edl, resolveMedia, outFile, { preview = false, p
     await fsp.rm(tmpOut, { force: true });
   }
   return { file: outFile, duration: g.total, width: g.width, height: g.height };
+}
+
+/**
+ * ffmpeg expression for music ducking: 1 outside speech, (1-depth) under speech, with 0.25s ramps.
+ * Sum of trapezoids, clipped to 1 — commas escaped for the filter parser.
+ */
+export function duckExpr(intervals, depth = 0.72, ramp = 0.25) {
+  const parts = intervals.slice(0, 400).map(([a, b]) => `clip((t-${f3(a - ramp)})/${ramp}\\,0\\,1)*clip((${f3(b + ramp)}-t)/${ramp}\\,0\\,1)`);
+  if (!parts.length) return '1';
+  return `1-${depth}*min(1\\,${parts.join('+')})`;
 }

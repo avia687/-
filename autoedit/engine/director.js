@@ -264,6 +264,9 @@ export function direct(project, opts = {}) {
   else if (structure !== 'speech') why.push(T('לא הוספתי מוזיקה כי לא הועלה שיר. העלו שיר שיש לכם זכויות עליו ואסנכרן אליו את החיתוכים.', "No music was added because none was uploaded. Add a song you have rights to and I'll sync the cuts to it."));
   if (structure === 'speech') why.push(T('איזנתי את הקול: ניקוי רעשים, בהירות ועוצמה אחידה.', 'Balanced the voice: noise cleanup, clarity and even loudness.'));
 
+  // Music ducking curve: where the voice is actually heard on the final timeline (measured, not guessed).
+  if (audio.music && audio.music.duck) audio.music.duckIntervals = speechTimeline(shots, ready);
+
   const edl = {
     version: 1,
     createdAt: new Date().toISOString(),
@@ -588,4 +591,24 @@ export function chooseStyle(project) {
     if (probe.structure === 'beforeAfter') return 'premium';
     return probe.audio.music ? 'viral' : 'cinematic';
   } catch { return 'viral'; }
+}
+
+/** Timeline intervals where speech is audible (from the analysis of each shot's audio source). */
+export function speechTimeline(shots, media) {
+  const byId = Object.fromEntries(media.map((m) => [m.id, m]));
+  const out = [];
+  for (const s of shots) {
+    if (!s.audio || (s.speed || 1) !== 1) continue;
+    const a = byId[s.audio.mediaId]?.analysis;
+    if (!a?.samples?.length) continue;
+    for (const x of a.samples) {
+      if (x.silent || x.t + SAMPLE <= s.audio.in || x.t >= s.audio.in + s.duration) continue;
+      const t0 = s.start + Math.max(0, x.t - s.audio.in);
+      const t1 = s.start + Math.min(s.duration, x.t + SAMPLE - s.audio.in);
+      const last = out[out.length - 1];
+      if (last && t0 - last[1] < 0.6) last[1] = Math.max(last[1], t1); // hold through short pauses
+      else out.push([t0, t1]);
+    }
+  }
+  return out.map(([a, b]) => [r2(a), r2(b)]);
 }

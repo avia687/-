@@ -46,13 +46,19 @@ export function runFfmpeg(args, { duration, onProgress, signal, collectStderr = 
     }, 5000);
     signal?.addEventListener('abort', onAbort, { once: true });
 
+    let lastOutTime = -1;
     child.stdout.on('data', (d) => {
-      lastOutput = Date.now();
       stdoutBuf += d.toString();
       let idx;
       while ((idx = stdoutBuf.indexOf('\n')) >= 0) {
         const line = stdoutBuf.slice(0, idx).trim();
         stdoutBuf = stdoutBuf.slice(idx + 1);
+        if (line.startsWith('out_time_us=')) {
+          const v = Number(line.slice(12));
+          // Only real advancement counts as "alive" — a deadlocked graph keeps printing the same time.
+          if (Number.isFinite(v) && v > lastOutTime) { lastOutTime = v; lastOutput = Date.now(); }
+        }
+        if (line.startsWith('progress=end')) lastOutput = Date.now();
         if (line.startsWith('out_time_us=') && duration && onProgress) {
           const us = Number(line.slice(12));
           if (Number.isFinite(us) && us >= 0) onProgress(Math.min(1, us / 1e6 / duration));

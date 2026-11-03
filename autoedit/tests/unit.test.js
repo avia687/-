@@ -10,7 +10,9 @@ import { direct, STYLES } from '../engine/director.js';
 import { ProjectStore, atomicWriteJson, readJsonSafe } from '../engine/store.js';
 import { fileKeyCipher } from '../engine/settings.js';
 import { roleHint, kindOf, sequenceHint } from '../engine/ingest.js';
-import { buildRenderGraph, outputSize } from '../engine/render.js';
+import { buildRenderGraph, outputSize, duckExpr } from '../engine/render.js';
+import { speechTimeline } from '../engine/director.js';
+import { runFfmpeg } from '../engine/ffmpeg.js';
 import { annotate } from '../engine/transcribe.js';
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'aeu-'));
@@ -218,5 +220,19 @@ describe('AI Director', () => {
   });
   it('throws a friendly error when there is nothing to edit', () => {
     expect(() => direct({ ...project, media: [] }, {})).toThrow();
+  });
+});
+
+describe('audio ducking + watchdog', () => {
+  it('builds a ducking curve from where speech is heard', () => {
+    const media = [{ id: 'v', analysis: { samples: [0, 0.5, 1, 1.5, 2, 2.5].map((t, i) => ({ t, silent: i === 3 || i === 4 })) } }];
+    const iv = speechTimeline([{ mediaId: 'v', audio: { mediaId: 'v', in: 0 }, start: 10, duration: 3, speed: 1 }], media);
+    expect(iv[0][0]).toBe(10);
+    expect(iv.length).toBe(2);
+    expect(duckExpr(iv)).toMatch(/^1-0.72\*min\(1/);
+  });
+  it('watchdog does not interfere with a normal ffmpeg run', async () => {
+    // A real ffmpeg run that finishes quickly must still succeed with the watchdog armed.
+    await expect(runFfmpeg(['-f', 'lavfi', '-i', 'sine=d=0.2', '-f', 'null', '-'])).resolves.toBeTruthy();
   });
 });
