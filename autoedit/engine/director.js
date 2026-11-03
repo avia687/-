@@ -551,3 +551,14 @@ export function scoreEdit(edl, byId, st) {
   const overall = Math.round(hook * 0.3 + pacing * 0.2 + variation * 0.15 + deadTime * 0.15 + payoff * 0.2);
   return { hook, pacing, variation, deadTime, payoff, overall };
 }
+
+/** "AI decides for me": pick the style that fits the material (structure + music + goal). */
+export function chooseStyle(project) {
+  try {
+    const probe = direct(project, { style: 'viral', targetDuration: project.targetDuration });
+    if (project.goal === 'ad' || project.goal === 'product') return 'premium';
+    if (probe.structure === 'speech') return 'viral';
+    if (probe.structure === 'beforeAfter') return 'premium';
+    return probe.audio.music ? 'viral' : 'cinematic';
+  } catch { return 'viral'; }
+}

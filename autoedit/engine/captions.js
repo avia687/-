@@ -105,7 +105,12 @@ export function buildCaptions(p, edl, { style, preview = false, brand } = {}) {
     const ch = chunks[c];
     const start = ch[0].start;
     const end = Math.min(ch[ch.length - 1].end + 0.25, chunks[c + 1]?.[0].start ?? Infinity);
-    const text = (w) => (st.upper && !HEB.test(w) ? w.toUpperCase() : w);
+    // Creator-style: drop trailing periods/commas; RLM keeps "!"/"?" on the correct side in Hebrew.
+    const text = (w) => {
+      let t = w.replace(/[.,;:]+$/u, '');
+      if (st.upper && !HEB.test(t)) t = t.toUpperCase();
+      return rtl ? `${t}\u200F` : t;
+    };
     const imp = ch.map((w) => isImportant(w.w));
     emphasized += imp.filter(Boolean).length;
     const render = (activeIdx) => ch.map((w, i) => {

@@ -3,7 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import { analyzeMedia } from './analysis.js';
-import { direct, STYLES } from './director.js';
+import { direct, STYLES, chooseStyle } from './director.js';
 import { renderEdl, EXPORT_PRESETS, outputSize } from './render.js';
 import { inspectRender, fixEdl, finalScore } from './qc.js';
 import { newId } from './store.js';
@@ -96,6 +96,11 @@ export class Pipeline {
         p = this.store.get(projectId);
       }
       ctx.progress(0.62, 'directing');
+      if (!STYLES[p.style]) {
+        const style = chooseStyle(p);
+        await this.store.update(projectId, (d) => { d.style = style; });
+        p = this.store.get(projectId);
+      }
       const directives = { ...(params.directives || {}) };
       const brandCfg = this.settings.get().brand;
       const version = await this.buildVersion(p, { style: p.style, platform: p.platform, targetDuration: p.targetDuration, directives, brand: brandCfg }, ctx, 0.64, 0.98, T('הגרסה הראשונה', 'First version'));
@@ -152,8 +157,12 @@ export class Pipeline {
       if (!fixed) break;
       edl = fixed;
     }
+    const thumb = `renders/${id}_thumb.jpg`;
+    try {
+      await runFfmpeg(['-ss', String(Math.min(1.2, edl.duration / 3)), '-i', out, '-frames:v', '1', '-vf', 'scale=360:-2', '-q:v', '4', this.store.resolve(p.id, thumb)], { signal: ctx.signal });
+    } catch { /* thumbnail is cosmetic */ }
     return {
-      id, n, createdAt: new Date().toISOString(), label, request,
+      id, n, createdAt: new Date().toISOString(), label, request, thumb,
       style: edl.style, platform: edl.platform, targetDuration: edl.targetDuration, directives: edl.directives,
       edl, preview: rel, qc: summarizeQc(report), score: finalScore(edl, report, p.media), explanations: edl.explanations,
     };
